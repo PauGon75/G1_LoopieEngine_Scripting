@@ -27,8 +27,8 @@ namespace Loopie {
 
 	class FileDialog {
     public:
-        static DialogResult SelectFile(const std::vector<FileFilter>& filters, const std::filesystem::path& defaultPath = "");
-        static DialogResult SelectFiles(const std::vector<FileFilter>& filters, const std::filesystem::path& defaultPath = "");
+        static DialogResult SelectFile(const std::vector<FileFilter>& filters = {}, const std::filesystem::path& defaultPath = "");
+        static DialogResult SelectFiles(const std::vector<FileFilter>& filters = {}, const std::filesystem::path& defaultPath = "");
 
         static DialogResult SelectFolder(const std::filesystem::path& defaultPath = "");
         static DialogResult SelectFolders(const std::filesystem::path& defaultPath = "");

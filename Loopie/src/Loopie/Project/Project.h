@@ -9,17 +9,19 @@ namespace Loopie {
 		Project() = default;
 		~Project() = default;
 
-		bool Create(std::filesystem::path projectPath, const std::string& name);
-		bool Open(std::filesystem::path pathPath);
+		bool Create(const std::filesystem::path& projectPath, const std::string& name);
+		bool Open(const std::filesystem::path& pathPath);
 
-		const std::string GetProjectName() { return ProjectPath.filename().string(); }
-		bool IsEmpty() { return ProjectPath.empty() || !std::filesystem::exists(ProjectPath); }
+		const std::string GetProjectName() { return m_projectPath.filename().string(); }
+		bool IsEmpty() { return m_projectPath.empty() || !std::filesystem::exists(m_projectPath); }
 		
-		const std::filesystem::path& GetProjectPath() { return ProjectPath; }
-		const std::filesystem::path& GetAssetsPath() { return AssetsPath; }
+		const std::filesystem::path& GetProjectPath() { return m_projectPath; }
+		const std::filesystem::path& GetAssetsPath() { return m_assetsPath; }
+		const std::filesystem::path& GetConfigPath() { return m_congifPath; }
 
 	private:
-		std::filesystem::path ProjectPath;
-		std::filesystem::path AssetsPath;
+		std::filesystem::path m_projectPath;
+		std::filesystem::path m_assetsPath;
+		std::filesystem::path m_congifPath;
 	};
 }

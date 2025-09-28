@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.10)
 
 project ("Loopie" VERSION 0.1.0 LANGUAGES C CXX)
 
@@ -9,7 +9,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${SOURCES})
 
 find_package(spdlog REQUIRED)
 find_package(glad REQUIRED)
-find_package(opengl REQUIRED)
+find_package(OpenGL REQUIRED)
 find_package(glm REQUIRED)
 find_package(SDL3 REQUIRED)
 find_package(nfd REQUIRED)

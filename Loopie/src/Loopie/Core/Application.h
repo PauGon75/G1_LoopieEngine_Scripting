@@ -2,10 +2,11 @@
 
 #include "Loopie/Core/Module.h"
 #include "Loopie/Core/Window.h"
+#include "Loopie/Core/InputEventManager.h"
+#include "Loopie/Project/Project.h"
 #include "Loopie/ImGui/ImGuiManager.h"
 
 #include <vector>
-#include "Loopie/Project/Project.h"
 
 namespace Loopie {
 	class Application {
@@ -21,6 +22,7 @@ namespace Loopie {
 
 		static Application& GetInstance();
 		Window* GetWindow() const;
+		InputEventManager& GetInputEvent();
 
 	private:
 		void ProcessEvents();
@@ -34,6 +36,8 @@ namespace Loopie {
 		Window* m_window = nullptr;
 
 		ImGuiManager m_imguiManager;
+
+		InputEventManager m_inputEvent;
 
 		bool m_running = true;
 	};

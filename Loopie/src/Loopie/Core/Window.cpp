@@ -11,7 +11,7 @@ namespace Loopie {
 	{
 		// PSTODO: Ask if we will get the SDL error message like this
 		// PSTODO: Verify if ASSERT works like this
-		ASSERT(!SDL_Init(SDL_INIT_VIDEO), "SDL_VIDEO could not initialize! SDL_Error: {0}", SDL_GetError());
+		ASSERT(!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS), "SDL_VIDEO could not initialize! SDL_Error: {0}", SDL_GetError());
 
 		m_window = SDL_CreateWindow("test_window_name", WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT,
 			SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE /*0*/); // Flags

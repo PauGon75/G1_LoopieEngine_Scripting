@@ -81,6 +81,11 @@ namespace Loopie {
 		return m_window;
 	}
 
+	InputEventManager& Application::GetInputEvent()
+	{
+		return m_inputEvent;
+	}
+
 	void Application::Run()
 	{
 		while (m_running)
@@ -90,6 +95,7 @@ namespace Loopie {
 			
 			m_imguiManager.StartFrame();
 
+			m_inputEvent.Update();
 			ProcessEvents();
 
 			for (Module* module : m_modules) {
@@ -107,59 +113,50 @@ namespace Loopie {
 
 	void Application::ProcessEvents()
 	{
-		// TEMP TESTING POLLING! -> Requiered by ImGui
-		SDL_Event e;
-		while (SDL_PollEvent(&e))
+		if (m_inputEvent.HasEvent(SDL_EVENT_QUIT))
 		{
-			m_imguiManager.GetEvents(e);
-			if (e.type == SDL_EVENT_QUIT)
+			Close();
+			return;
+		}
+
+		if (m_inputEvent.HasEvent(SDL_EVENT_KEY_DOWN)) {
+			if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F1) == KeyState::DOWN)
+			{
+				m_window->GetSize().second, m_window->GetPosition().first, m_window->GetPosition().second, m_window->IsFullscreen();
+			}
+			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F2) == KeyState::DOWN)
+			{
+				m_window->SetWindowFullscreen(!m_window->IsFullscreen());
+			}
+			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F3) == KeyState::DOWN)
+			{
+				m_window->SetResizable(true);
+			}
+			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F4) == KeyState::DOWN)
+			{
+				m_window->SetResizable(false);
+			}
+			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F5) == KeyState::DOWN)
+			{
+				m_window->SetTitle("Loopie!");
+			}
+			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F6) == KeyState::DOWN)
+			{
+				m_window->SetPosition(10, 10);
+			}
+			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F7) == KeyState::DOWN)
+			{
+				m_window->SetWindowSize(1280, 720);
+			}
+			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F8) == KeyState::DOWN)
+			{
+				m_window->SetWindowSize(1280, 720, true);
+			}
+			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_ESCAPE) == KeyState::DOWN)
 			{
 				Close();
-				break; // Exit the loop
-			}
-			else if (e.type == SDL_EVENT_KEY_DOWN)
-			{
-				// USED FOR WINDOW TESTING RIGHT NOW! (Aware that switch case would be better but testing laziness.)
-				SDL_Keycode key = e.key.key;
-				if (key == SDLK_F1)
-				{
-					m_window->GetSize().second, m_window->GetPosition().first, m_window->GetPosition().second, m_window->IsFullscreen();
-				}
-				else if (key == SDLK_F2)
-				{
-					m_window->SetWindowFullscreen(!m_window->IsFullscreen());
-				}
-				else if (key == SDLK_F3)
-				{
-					m_window->SetResizable(true);
-				}
-				else if (key == SDLK_F4)
-				{
-					m_window->SetResizable(false);
-				}
-				else if (key == SDLK_F5)
-				{
-					m_window->SetTitle("Loopie!");
-				}
-				else if (key == SDLK_F6)
-				{
-					m_window->SetPosition(10, 10);
-				}
-				else if (key == SDLK_F7)
-				{
-					m_window->SetWindowSize(1280, 720);
-				}
-				else if (key == SDLK_F8)
-				{
-					m_window->SetWindowSize(1280, 720, true);
-				}
-				else if (key == SDLK_ESCAPE)
-				{
-					Close();
-				}
 			}
 		}
-		// TEMP TESTING POLLING OVER!
 	}
 
 	void Application::Close()
