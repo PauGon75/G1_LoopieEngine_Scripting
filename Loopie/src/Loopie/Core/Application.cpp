@@ -109,8 +109,6 @@ namespace Loopie {
 					module->OnInterfaceRender();
 				}
 			}
-
-			ImGui::ShowDemoWindow();
 			m_imguiManager.EndFrame();
 
 			m_window->Update();		

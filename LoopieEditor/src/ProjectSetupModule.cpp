@@ -1,4 +1,4 @@
-#include "CreateProjectModule.h"
+#include "ProjectSetupModule.h"
 
 #include "EditorModule.h"
 
@@ -10,7 +10,7 @@
 
 namespace Loopie
 {
-	void CreateProjectModule::OnUpdate()
+	void ProjectSetupModule::OnUpdate()
 	{
 		Application& app = Application::GetInstance();
 		if (!app.m_activeProject.IsEmpty())
@@ -19,15 +19,15 @@ namespace Loopie
 			app.RemoveModule(this);
 		}
 	}
-	void CreateProjectModule::OnLoad()
+	void ProjectSetupModule::OnLoad()
 	{
 		m_interface = new ProjectSetupInterface();
 	}
-	void CreateProjectModule::OnUnload()
+	void ProjectSetupModule::OnUnload()
 	{
 		delete m_interface;
 	}
-	void CreateProjectModule::OnInterfaceRender()
+	void ProjectSetupModule::OnInterfaceRender()
 	{
 		ImGui::DockSpaceOverViewport();
 		m_interface->Render();

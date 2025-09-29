@@ -4,10 +4,10 @@
 #include "Interfaces/ProjectSetupInterface.h"
 
 namespace Loopie {
-	class CreateProjectModule : public Module{
+	class ProjectSetupModule : public Module{
 	public:
-		CreateProjectModule() = default;
-		~CreateProjectModule() = default;
+		ProjectSetupModule() = default;
+		~ProjectSetupModule() = default;
 
 		void OnUpdate() override;
 		void OnLoad()override;
