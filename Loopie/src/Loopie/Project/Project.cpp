@@ -5,7 +5,7 @@
 namespace Loopie {
 	bool Project::Create(const std::filesystem::path& projectPath, const std::string& name) {
 
-		if (DirectoryManager::Contains(projectPath / name)) {
+		if (projectPath.empty() || DirectoryManager::Contains(projectPath / name)) {
 			return false;
 		}
 
@@ -18,7 +18,7 @@ namespace Loopie {
 	}
 
 	bool Project::Open(const std::filesystem::path& projectPath) {
-		if (!DirectoryManager::Contains(projectPath) || !DirectoryManager::Contains(projectPath / "project.config")) {
+		if (projectPath.empty()|| !DirectoryManager::Contains(projectPath) || !DirectoryManager::Contains(projectPath / "project.config")) {
 			return false;
 		}
 

@@ -8,5 +8,9 @@ namespace Loopie {
 		EditorMenuInterface();
 		~EditorMenuInterface() = default;
 		void Render() override;
+
+	private:
+		void RenderOpenProjectPopUp();
+		void RenderCreateProjectPopUp();
 	};
 }
