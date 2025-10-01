@@ -21,61 +21,56 @@ namespace Loopie
 
 
 #pragma region Recent Projects
-		//ImGui::SetNextWindowSize(ImVec2(windowSizeX/3,windowSizeY*5/6),ImGuiCond_Once);
-		//ImGui::SetNextWindowPos({ 0, 0 }, ImGuiCond_Once);
-		ImGui::Begin("Recent Projects", nullptr);
+		ImGui::Begin("Recent Projects", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 		
 		ImGui::End();
 #pragma endregion
 
-#pragma region Load Project
-		ImGui::Begin("Load Project", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-		ImGui::LabelText("Path", m_projectPath.string().c_str());
+#pragma region Load
+		ImGui::Begin("Load Project", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+		ImGui::InputText("Path", m_loadProjectPath.data(), m_loadProjectPath.capacity(), ImGuiInputTextFlags_ReadOnly);
 		ImGui::SameLine();
 		if (ImGui::Button("##", { 20,20 }))
 		{
 			DialogResult result = FileDialog::SelectFolder();
 			if (result.Status == DialogResultType::SUCCESS)
 			{
-				m_projectPath = result.Paths[0];
+				m_loadProjectPath = result.Paths[0].string();
 			}
 		}
-		ImGui::LabelText("##", m_projectPath.string().c_str());
-		if (ImGui::Button("Load Project", { 150,20 }))
+
+		if (ImGui::Button("Open Project", { 150,20 }))
 		{
-			if (Application::GetInstance().m_activeProject.Open(m_projectPath)) {
-				Log::Info("Project Selected");
-			}
-			else {
-				Log::Info("Project Couldn't be Selected");
+			if (Application::GetInstance().m_activeProject.Open(m_loadProjectPath)) {
+				ImGui::CloseCurrentPopup();
 			}
 		}
 		ImGui::End();
 #pragma endregion
 #pragma region Create Project
-		ImGui::Begin("Create Project", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+		ImGui::Begin("Create Project", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse  | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 		ImGui::InputText("Project Name", m_projectName, IM_ARRAYSIZE(m_projectName));
 
-		ImGui::LabelText("Path", m_projectPath.string().c_str());
+		ImGui::InputText("Path", m_createProjectPath.data(), m_createProjectPath.capacity(), ImGuiInputTextFlags_ReadOnly);
 		ImGui::SameLine();
 		if (ImGui::Button("##", { 20,20 }))
 		{
 			DialogResult result = FileDialog::SelectFolder();
 			if (result.Status == DialogResultType::SUCCESS)
 			{
-				m_projectPath = result.Paths[0];
+				m_createProjectPath = result.Paths[0].string();
 			}
 		}
+
 		if (ImGui::Button("Create Project", { 150,20 }))
 		{
-			if (Application::GetInstance().m_activeProject.Create(m_projectPath, m_projectName)) {
-				Log::Info("Project Created");
-			}
-			else {
-				Log::Info("Project Couldn't be Created");
+			if (Application::GetInstance().m_activeProject.Create(m_createProjectPath, m_projectName)) {
+				ImGui::CloseCurrentPopup();
 			}
 		}
+		//Log::Info("{0}x{1}",Application::GetInstance().GetWindow()->GetSize().first, Application::GetInstance().GetWindow()->GetSize().second);
 		ImGui::End();
 #pragma endregion
 	}
 }
+

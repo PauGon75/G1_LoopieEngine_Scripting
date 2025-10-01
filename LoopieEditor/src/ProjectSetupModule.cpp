@@ -22,6 +22,8 @@ namespace Loopie
 	void ProjectSetupModule::OnLoad()
 	{
 		m_interface = new ProjectSetupInterface();
+		Application::GetInstance().GetWindow()->SetTitle("Loopie Engine | Project Setup");
+		Application::GetInstance().GetWindow()->SetResizable(false);
 	}
 	void ProjectSetupModule::OnUnload()
 	{
@@ -29,7 +31,8 @@ namespace Loopie
 	}
 	void ProjectSetupModule::OnInterfaceRender()
 	{
-		ImGui::DockSpaceOverViewport();
+		ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
+		ImGui::DockSpaceOverViewport(dockspace_id, ImGui::GetMainViewport(), ImGuiDockNodeFlags_NoResize);
 		m_interface->Render();
 	}
 }
