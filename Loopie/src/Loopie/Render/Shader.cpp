@@ -42,7 +42,6 @@ namespace Loopie {
 			Loopie::Log::Critical("Shader linking failed. Deleting shader.");
 			glDeleteProgram(m_ID);
 			m_ID = 0;
-			m_isValidShader = false;
 		}
 
 		glDeleteShader(vertexShader);
