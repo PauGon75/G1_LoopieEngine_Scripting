@@ -2,6 +2,7 @@
 
 #include "Loopie/Core/Assert.h"
 #include "Loopie/Core/Log.h"
+#include "Loopie/Render/Shader.h" // TEMP INCLUDE FOR SHADER TESTING
 
 #include <SDL3/SDL_init.h> // TEMP INCLUDE FOR POLLING EVENTS
 #include <SDL3/SDL.h>// TEMP INCLUDE FOR POLLING EVENTS
@@ -152,9 +153,70 @@ namespace Loopie {
 			{
 				m_window->SetWindowSize(1280, 720);
 			}
+			// TEST - F8 FOR CORRECT SHADER TESTING
 			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F8) == KeyState::DOWN)
 			{
-				m_window->SetWindowSize(1280, 720, true);
+				/*m_window->SetWindowSize(1280, 720, true);*/
+
+				const char* vertexShaderSource = "\n"
+					"#version 460 core\n"
+					"layout (location = 0) in vec3 inPos;\n"
+					"layout (location = 1) in vec3 inColor;\n"
+					"out vec3 vertexColor;\n"
+					"uniform mat4 modelViewProj;\n"
+					"void main()\n"
+					"{\n"
+					"gl_Position = modelViewProj * vec4(inPos, 1.0);\n"
+					"vertexColor = inColor;\n"
+					"}\0";
+
+				const char* fragmentShaderSource = "\n"
+					"#version 460 core\n"
+					"in vec3 vertexColor;\n"
+					"out vec4 FragColor;\n"
+					"void main()\n"
+					"{\n"
+					"   FragColor = vec4(vertexColor, 1.0f);\n"
+					"}\0";
+
+				Shader* shader = new Shader(vertexShaderSource, fragmentShaderSource);
+				if (!shader->GetIsValidShader())
+				{
+					delete shader;
+					shader = nullptr;
+				}
+				if (shader)
+				{
+					shader->PrintParsedVariables();
+				}
+			}
+			// TEST - F9 FOR FAILING SHADER TESTING
+			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_F9) == KeyState::DOWN)
+			{
+				/*m_window->SetWindowSize(1280, 720, true);*/
+
+				const char* vertexShaderSource = "\n"
+					"#2\n";
+
+				const char* fragmentShaderSource = "\n"
+					"#version 460 core\n"
+					"in vec3 vertexColor;\n"
+					"out vec4 FragColor;\n"
+					"void main()\n"
+					"{\n"
+					"   FragColor = vec4(vertexColor, 1.0f);\n"
+					"}\0";
+
+				Shader* shader = new Shader(vertexShaderSource, fragmentShaderSource);
+				if (!shader->GetIsValidShader())
+				{
+					delete shader;
+					shader = nullptr;
+				}
+				if (shader)
+				{
+					shader->PrintParsedVariables();
+				}
 			}
 			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_ESCAPE) == KeyState::DOWN)
 			{
