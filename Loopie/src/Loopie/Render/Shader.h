@@ -1,9 +1,19 @@
-#include <glad/glad.h>
 #include <Loopie/Core/Math.h>
 
 #include <string>
 #include <vector>
 #include <unordered_map>
+
+typedef unsigned int GLuint;
+typedef int GLint;
+typedef unsigned int GLenum;
+
+// Things left to work on for this module: 
+// - The shader file may have more than the vertex and fragment information. Geometry might
+//   be added. In which case, that information should be able to be parsed and compiled as well.
+// - Check how the 'file.shader' will be structured. Right now the order has to be 
+//   [vertex] and then [fragment]. We will need to change that in the future.
+// - Verify if we actually need to cache the attributes, version and uniforms.
 
 namespace Loopie {
 	class Shader
@@ -61,7 +71,7 @@ namespace Loopie {
 		bool CheckIfShaderIsBoundAndWarn();
 
 	private:
-		GLuint m_ID;
+		GLuint m_id;
 		std::unordered_map<std::string, GLint> m_uniformLocationCache;
 		mutable std::vector<std::string> m_activeUniformsCache;
 		mutable std::vector<std::string> m_activeAttributesCache;

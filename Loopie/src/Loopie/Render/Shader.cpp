@@ -4,10 +4,12 @@
 #include <regex>
 #include <fstream>
 #include <sstream>
+#include <glad/glad.h>
 
 namespace Loopie {
 	// If shader compilation/linking fails, GetIsValidShader() will return false.
 	// The object is still valid but the shader program may not be usable.
+	// SourcePath should have first [vertex] and then [fragment]
 	Shader::Shader(const char* sourcePath)
 	{
 		m_filePath = sourcePath;
@@ -40,16 +42,16 @@ namespace Loopie {
 			return;
 		}
 
-		m_ID = glCreateProgram();
-		glAttachShader(m_ID, vertexShader);
-		glAttachShader(m_ID, fragmentShader);
-		glLinkProgram(m_ID);
+		m_id = glCreateProgram();
+		glAttachShader(m_id, vertexShader);
+		glAttachShader(m_id, fragmentShader);
+		glLinkProgram(m_id);
 
-		if (!CheckCompileErrors(m_ID, "PROGRAM"))
+		if (!CheckCompileErrors(m_id, "PROGRAM"))
 		{
 			Loopie::Log::Critical("Shader linking failed. Deleting shader.");
-			glDeleteProgram(m_ID);
-			m_ID = 0;
+			glDeleteProgram(m_id);
+			m_id = 0;
 		}
 
 		glDeleteShader(vertexShader);
@@ -58,12 +60,12 @@ namespace Loopie {
 
 	Shader::~Shader()
 	{
-		glDeleteProgram(m_ID);
+		glDeleteProgram(m_id);
 	}
 
 	void Shader::Bind() const
 	{
-		glUseProgram(m_ID);
+		glUseProgram(m_id);
 	}
 
 	void Shader::Unbind() const
@@ -120,8 +122,8 @@ namespace Loopie {
 		}
 
 		// Delete old program and swap them
-		glDeleteProgram(m_ID);
-		m_ID = newProgram;
+		glDeleteProgram(m_id);
+		m_id = newProgram;
 
 		// Clear cache since uniform locations may have changed
 		m_uniformLocationCache.clear();
@@ -231,7 +233,7 @@ namespace Loopie {
 
 	GLuint Shader::GetProgramID() const
 	{
-		return m_ID;
+		return m_id;
 	}
 
 	GLint Shader::GetUniformLocation(const std::string& name)
@@ -241,7 +243,7 @@ namespace Loopie {
 			return m_uniformLocationCache[name];
 		}
 
-		GLint location = glGetUniformLocation(m_ID, name.c_str());
+		GLint location = glGetUniformLocation(m_id, name.c_str());
 		m_uniformLocationCache[name] = location;
 		return location;
 	}
@@ -270,7 +272,7 @@ namespace Loopie {
 	{
 		GLint currentProgram;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-		return currentProgram == static_cast<GLint>(m_ID);
+		return currentProgram == static_cast<GLint>(m_id);
 	}
 
 	const std::vector<std::string>& Shader::GetActiveUniforms() const
@@ -281,7 +283,7 @@ namespace Loopie {
 		m_activeUniformsCache.clear();
 
 		GLint count;
-		glGetProgramiv(m_ID, GL_ACTIVE_UNIFORMS, &count);
+		glGetProgramiv(m_id, GL_ACTIVE_UNIFORMS, &count);
 
 		for (GLint i = 0; i < count; i++)
 		{
@@ -290,7 +292,7 @@ namespace Loopie {
 			GLint size;
 			GLenum type;
 
-			glGetActiveUniform(m_ID, i, sizeof(name), &length, &size, &type, name);
+			glGetActiveUniform(m_id, i, sizeof(name), &length, &size, &type, name);
 			m_activeUniformsCache.push_back(std::string(name));
 		}
 
@@ -306,7 +308,7 @@ namespace Loopie {
 		m_activeAttributesCache.clear();
 
 		GLint count;
-		glGetProgramiv(m_ID, GL_ACTIVE_ATTRIBUTES, &count);
+		glGetProgramiv(m_id, GL_ACTIVE_ATTRIBUTES, &count);
 
 		for (GLint i = 0; i < count; i++)
 		{
@@ -315,7 +317,7 @@ namespace Loopie {
 			GLint size;
 			GLenum type;
 
-			glGetActiveAttrib(m_ID, i, sizeof(name), &length, &size, &type, name);
+			glGetActiveAttrib(m_id, i, sizeof(name), &length, &size, &type, name);
 			m_activeAttributesCache.push_back(std::string(name));
 		}
 
