@@ -1,5 +1,8 @@
 #pragma once
+
 #include <vector>
+
+#include "Loopie/Render/BufferLayout.h"
 namespace Loopie
 {
 	class VertexBuffer
@@ -11,7 +14,11 @@ namespace Loopie
 		void Bind() const;
 		void Unbind() const;
 
+		const BufferLayout& GetLayout()const { return m_layout; }
+		void SetLayout(const BufferLayout& layout) { m_layout = layout; }
+
 	private:
 		unsigned int m_vboID;
+		BufferLayout m_layout;
 	};
 }
