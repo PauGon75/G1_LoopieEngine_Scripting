@@ -6,6 +6,9 @@
 namespace Loopie {
     const std::filesystem::path DirectoryManager::CreateFolder(const std::filesystem::path& path, const std::string& folderName)
     {
+        if(path.empty())
+            return std::filesystem::path();
+
         std::filesystem::path directorypath = path / folderName;
         if (Contains(directorypath)) {
             return directorypath;
@@ -19,6 +22,10 @@ namespace Loopie {
 
     const std::filesystem::path DirectoryManager::CreateFile(const std::filesystem::path& path, const std::string& fileName, const std::string& fileExtension)
     {
+
+        if (path.empty())
+            return std::filesystem::path();
+
         std::filesystem::path filePath = path / (fileName + fileExtension);
         if (Contains(filePath)) {
             return filePath;

@@ -1,4 +1,5 @@
 #pragma once
+#include "Loopie/Core/Math.h"
 
 #include <SDL3/SDL_events.h>
 #include <bitset>
@@ -26,9 +27,9 @@ namespace Loopie {
 		KeyState GetGamepadButtonStatus(SDL_GamepadButton controlCode) const;
 		KeyState GetMouseButtonStatus(int mouseIndex) const;
 
-		const std::pair<float, float>& GetMousePosition() const;
-		std::pair<float, float> GetLeftAxis() const;
-		std::pair<float, float> GetRightAxis() const;
+		const vec2& GetMousePosition() const;
+		vec2 GetLeftAxis() const;
+		vec2 GetRightAxis() const;
 
 		float GetLeftTrigger() const;
 		float GetRightTrigger() const;
@@ -65,7 +66,7 @@ namespace Loopie {
 		std::array<float, SDL_GAMEPAD_AXIS_COUNT> m_axes;
 		std::array<KeyState, 5> m_mouse;
 
-		std::pair<float, float> m_mousePosition;
+		vec2 m_mousePosition;
 
 		float m_axisDeadZone = 0.15f;
 

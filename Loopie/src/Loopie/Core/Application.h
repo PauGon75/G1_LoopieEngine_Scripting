@@ -40,6 +40,7 @@ namespace Loopie {
 		InputEventManager m_inputEvent;
 
 		bool m_running = true;
+		bool m_renderInterface = true;
 	};
 
 	//// Define Main

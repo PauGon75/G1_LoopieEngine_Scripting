@@ -2,9 +2,9 @@
 
 #include "Loopie/Core/Assert.h"
 #include "Loopie/Core/Log.h"
+#include "Loopie/Render/Renderer.h"
 
 #include <SDL3/SDL_init.h>
-#include <glad/glad.h>
 
 namespace Loopie {
 	Window::Window()
@@ -21,10 +21,10 @@ namespace Loopie {
 		ASSERT(m_glContext == NULL, "OpenGL context is NULL!");
 
 		// Load OpenGL functions via GLAD
-		ASSERT(!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress), "Failed to Initialize GLAD!");
+		Renderer::Init(SDL_GL_GetProcAddress); /// Replace
 		
 		// Set clear color, optional
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	}
 
 	Window::~Window()
@@ -52,7 +52,7 @@ namespace Loopie {
 		return returnStatus;
 	}
 
-	std::pair<int, int> Window::GetSize() const /// Change To vector when posible (glm)
+	ivec2 Window::GetSize() const /// Change To vector when posible (glm)
 	{
 		int x;
 		int y;
@@ -62,7 +62,7 @@ namespace Loopie {
 		return { x, y };
 	}
 
-	std::pair<int, int> Window::GetPosition() const /// Change To vector when posible (glm)
+	ivec2 Window::GetPosition() const /// Change To vector when posible (glm)
 	{
 		int x;
 		int y;
@@ -89,8 +89,8 @@ namespace Loopie {
 	{
 		if (savePreviousWindowsSize)
 		{
-			m_windowPrevWidth = GetSize().first;
-			m_windowPrevHeight = GetSize().second;
+			m_windowPrevWidth = GetSize().x;
+			m_windowPrevHeight = GetSize().y;
 		}
 		ASSERT(!SDL_SetWindowSize(m_window, width, height), "Window couldn't change to new size!");
 	}
@@ -135,12 +135,5 @@ namespace Loopie {
 	{
 		SDL_SetWindowPosition(m_window, x, y); // returns bool
 	}
-
-	void Window::ClearWindow()
-	{
-		glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
-
 }
 

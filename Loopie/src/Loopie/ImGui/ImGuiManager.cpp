@@ -49,9 +49,9 @@ namespace Loopie {
 	void ImGuiManager::EndFrame()
 	{
 		Window* window = Application::GetInstance().GetWindow();
-		std::pair<int, int> size = window->GetSize();
+		ivec2 size = window->GetSize();
 		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2((float)size.first, (float)size.second);
+		io.DisplaySize = ImVec2((float)size.x, (float)size.y);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

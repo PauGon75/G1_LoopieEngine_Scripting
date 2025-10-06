@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL_video.h>
-#include <utility> // Added for std::pair -> Remove when implemented glm vectors
+#include "Loopie/Core/Math.h"
 
 #define WINDOW_DEFAULT_WIDTH 800
 #define WINDOW_DEFAULT_HEIGHT 600
@@ -14,8 +14,8 @@ namespace Loopie {
 
 		bool Update();
 
-		std::pair<int, int> GetSize() const;
-		std::pair<int, int> GetPosition() const;
+		ivec2 GetSize() const;
+		ivec2 GetPosition() const;
 		bool HasFocus() const;
 		bool IsFullscreen() const;
 
@@ -26,9 +26,6 @@ namespace Loopie {
 		void SetTitle(const char* title);/// Maybe Do a getter also?
 		void SetPosition(int x, int y);
 		// missing borderless, vsync, multi-monitor?
-
-
-		void ClearWindow(); /// Remove Later when Rendering Class implemented
 
 		SDL_Window* GetSDLWindow() const { return m_window; }
 		SDL_GLContext GetSDL_GL_Context() const { return m_glContext; }

@@ -124,17 +124,17 @@ namespace Loopie {
 		return m_mouse[mouseIndex];
 	}
 
-	const std::pair<float, float>& InputEventManager::GetMousePosition() const
+	const vec2& InputEventManager::GetMousePosition() const
 	{
 		return m_mousePosition;
 	}
 
-	std::pair<float, float> InputEventManager::GetLeftAxis() const
+	vec2 InputEventManager::GetLeftAxis() const
 	{
 		return { m_axes[SDL_GAMEPAD_AXIS_LEFTX], m_axes[SDL_GAMEPAD_AXIS_LEFTY] };
 	}
 
-	std::pair<float, float> InputEventManager::GetRightAxis() const
+	vec2 InputEventManager::GetRightAxis() const
 	{
 		return { m_axes[SDL_GAMEPAD_AXIS_RIGHTX], m_axes[SDL_GAMEPAD_AXIS_RIGHTY] };
 	}

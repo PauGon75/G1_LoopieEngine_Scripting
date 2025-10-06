@@ -1,12 +1,14 @@
 #include "EditorModule.h"
 
+#include "Loopie/Core/Application.h"
+
 #include <imgui.h>
 
 namespace Loopie
 {
 	void EditorModule::OnLoad()
 	{
-
+		Application::GetInstance().GetWindow()->SetResizable(true);
 	}
 	void EditorModule::OnUnload()
 	{
@@ -22,7 +24,5 @@ namespace Loopie
 		m_console.Render();
 		m_hierarchy.Render();
 		m_scene.Render();
-
-		
 	}
 }
