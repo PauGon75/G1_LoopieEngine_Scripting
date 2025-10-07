@@ -8,6 +8,9 @@ namespace Loopie {
 	{
 		BufferLayout& layout = m_vbo.GetLayout();
 		layout.AddLayoutElement(GLVariableType::FLOAT, 3);
+		layout.AddLayoutElement(GLVariableType::FLOAT, 2);
+		layout.AddLayoutElement(GLVariableType::FLOAT, 3);
+		layout.AddLayoutElement(GLVariableType::FLOAT, 3);
 		layout.AddLayoutElement(GLVariableType::FLOAT, 3);
 
 		m_vao.AddBuffer(m_vbo, m_ebo);

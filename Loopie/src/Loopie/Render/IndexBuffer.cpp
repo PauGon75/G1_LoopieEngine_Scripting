@@ -9,6 +9,7 @@ namespace Loopie
         glGenBuffers(1, &m_rendererID);
         Bind();
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW);
+        Unbind();
         m_count = count;
     }
 

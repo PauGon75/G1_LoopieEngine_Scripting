@@ -12,6 +12,9 @@ namespace Loopie {
 
 	struct Vertex {
 		vec3 Position;
+		vec2 TexCoord;
+		vec3 Normal;
+		vec3 Tangent;
 		vec3 Color;
 	};
 

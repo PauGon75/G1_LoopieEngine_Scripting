@@ -54,7 +54,7 @@ namespace Loopie {
 
 		bool m_vsyncState = false;
 
-		int m_targetFramerate = 0;
+		int m_targetFramerate = 60;
 		unsigned long long m_lastFrameTime = 0;
 		float m_deltaTimeMs = 0.0f;
 	};

@@ -9,6 +9,7 @@ namespace Loopie
 		glGenBuffers(1, &m_rendererID);
 		Bind();
 		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+		Unbind();
 	}
 
 	VertexBuffer::~VertexBuffer()

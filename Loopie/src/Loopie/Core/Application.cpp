@@ -90,53 +90,17 @@ namespace Loopie {
 	{
 		////TESTING VARIABLES
 
-		std::vector<Vertex> cubeVertices
-		{
-			//Position                  Color
-			{{-0.5f, -0.5f, -0.5f},		{1.0f, 0.0f, 0.0f,}},
-			{{0.5f, -0.5f, -0.5f},		{0.0f, 1.0f, 0.0f,}},
-			{{0.5f, 0.5f, -0.5f},		{0.0f, 0.0f, 1.0f,}},
-			{{-0.5f, 0.5f, -0.5f},		{1.0f, 0.0f, 0.0f,}},
-			{{-0.5f, -0.5f, 0.5f},		{0.0f, 1.0f, 1.0f,}},
-			{{0.5f, -0.5f, 0.5f},		{1.0f, 1.0f, 0.0f,}},
-			{{0.5f, 0.5f, 0.5f},		{1.0f, 0.0f, 1.0f,}},
-			{{-0.5f, 0.5f, 0.5f},		{1.0f, 1.0f, 1.0f,}}
-		};
+		std::vector<Mesh*> meshes = MeshImporter::LoadModel("assets/models/loopie.obj");
 
-		std::vector<unsigned int> cubeIndices
-		{
-			// Top face
-			3, 2, 6,
-			6, 7, 3,
-			// Bottom face
-			0, 1, 5,
-			5, 4, 0,
-			// Left face
-			0, 4, 7,
-			7, 3, 0,
-			// Right face
-			1, 5, 6,
-			6, 2, 1,
-			// Back face
-			0, 1, 2,
-			2, 3, 0,
-			// Front face
-			4, 5, 6,
-			6, 7, 4,
-		};
-
-		Mesh mesh = Mesh(cubeVertices, cubeIndices);
-
-		glm::vec3 position(0.0f, 0.0f, -5.0f);
+		glm::vec3 position(0.0f, 0.0f, -2.0f);
 		glm::vec3 forward(0.0f, 0.0f, 1.0f);
 		glm::vec3 up(0.0f, 1.0f, 0.0f);
-		glm::mat4 viewMatrix = glm::lookAt(position             // Camera Position
-			, position + forward   // Target Position
-			, up);                 // Up Vector
+		glm::mat4 viewMatrix = glm::lookAt(position, position + forward, up);
+
 		// Projection Matrix
 		const float FOV = 45.0f;
 		const float NEAR_PLANE = 0.1f;
-		const float FAR_PLANE = 100.0f;
+		const float FAR_PLANE = 200.0f;
 
 		float rotation = 0.0f;
 		const float SPEED = 100.0f;
@@ -184,9 +148,12 @@ namespace Loopie {
 
 			rotation += SPEED * m_window->GetDeltaTime();
 
-			mesh.GetShader().Bind();
-			mesh.GetShader().SetUniformMat4("modelViewProj", modelViewProj);
-			mesh.Render();
+			for (size_t i = 0; i < meshes.size(); i++)
+			{
+				meshes[i]->GetShader().Bind();
+				meshes[i]->GetShader().SetUniformMat4("modelViewProj", modelViewProj);
+				meshes[i]->Render();
+			}
 			
 			/////
 
@@ -195,6 +162,14 @@ namespace Loopie {
 
 			m_window->Update();		
 		}
+
+		///// TEST AREA
+		for (size_t i = 0; i < meshes.size(); i++)
+		{
+			delete meshes[i];
+		}
+		meshes.clear();
+		/////
 	}
 
 	void Application::ProcessEvents(InputEventManager& eventController)
