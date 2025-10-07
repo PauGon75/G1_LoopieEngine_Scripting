@@ -291,7 +291,7 @@ namespace Loopie {
 				Close();
 			}
 			else if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_I) == KeyState::DOWN){
-				m_renderInterface = !m_renderInterface;
+				SetInterfaceState(!m_renderInterface);
 			}
 		}
 	}

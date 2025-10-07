@@ -12,11 +12,15 @@ namespace Loopie {
 		void Render() override;
 
 	private:
+		void RenderAboutMenu();
+
 		void RenderOpenProjectPopUp();
 		void RenderCreateProjectPopUp();
 
 	private:
 		char m_projectName[128] = "";
 		std::string m_projectPath = "";
+
+		bool m_showAboutMenu = false;
 	};
 }

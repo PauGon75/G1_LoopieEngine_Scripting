@@ -24,6 +24,9 @@ namespace Loopie {
 		Window* GetWindow() const;
 		InputEventManager& GetInputEvent();
 
+		void SetInterfaceState(bool enabled) { m_renderInterface = enabled; }
+		bool IsInterfaceVisible() const{ return m_renderInterface; }
+
 	private:
 		void ProcessEvents();
 

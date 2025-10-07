@@ -25,7 +25,7 @@ add_custom_target(copy_resources ALL
         ${PROJECT_SOURCE_DIR}/imgui.ini
         ${OUTPUT_PATH}/imgui.ini
 
-        COMMENT ${OUTPUT_PATH})
+        COMMENT "Resources Copied Successfully")
 
 add_dependencies(${PROJECT_NAME} copy_resources)
 
