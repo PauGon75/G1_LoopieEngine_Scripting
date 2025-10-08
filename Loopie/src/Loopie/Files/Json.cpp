@@ -7,7 +7,7 @@ namespace Loopie {
     JsonData Json::ReadFromString(const std::string& data)
     {
         JsonData jsonData;
-        jsonData.m_data = json::parse(data);
+        jsonData.m_data = json::parse(data, nullptr, false);
         jsonData.m_empty = jsonData.m_data.is_discarded();
         return jsonData;
     }
@@ -16,12 +16,24 @@ namespace Loopie {
     {
         JsonData jsonData;
         std::ifstream ifs(filePath);
-        jsonData.m_data = json::parse(ifs);
+        jsonData.m_data = json::parse(ifs, nullptr, false);
         jsonData.m_empty = jsonData.m_data.is_discarded();
         return jsonData;
     }
 
-    bool Json::WriteToFile(const std::filesystem::path& filePath, const JsonData& jsonData, int indent)
+    bool Json::WriteToFileFromString(const std::filesystem::path& filePath, const std::string& jsonString, int indent)
+    {
+        std::ofstream ofs(filePath);
+        if (!ofs.is_open()) return false;
+        
+        json j = json::parse(jsonString, nullptr, false);
+        if (j.is_discarded()) return false;
+        ofs << j.dump(indent);
+   
+        return true;
+    }
+
+    bool Json::WriteToFileFromData(const std::filesystem::path& filePath, const JsonData& jsonData, int indent)
     {
         std::ofstream ofs(filePath);
         if (!ofs.is_open()) return false;
@@ -173,7 +185,7 @@ namespace Loopie {
 
     bool JsonData::ToFile(const std::filesystem::path& filePath, int indent)
     {
-        return Json::WriteToFile(filePath, *this, indent);
+        return Json::WriteToFileFromData(filePath, *this, indent);
     }
 
 #pragma endregion

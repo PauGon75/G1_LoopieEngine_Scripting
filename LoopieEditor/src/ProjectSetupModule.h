@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Loopie/Core/Module.h"
-#include "Interfaces/ProjectSetupInterface.h"
+#include "Interfaces/ProjectSetup/ProjectSetupInterface.h"
 
 namespace Loopie {
 	class ProjectSetupModule : public Module{
@@ -13,6 +13,8 @@ namespace Loopie {
 		void OnLoad()override;
 		void OnUnload()override;
 		void OnInterfaceRender()override;
+	private:
+
 	private:
 		ProjectSetupInterface* m_interface = nullptr;
 	};
