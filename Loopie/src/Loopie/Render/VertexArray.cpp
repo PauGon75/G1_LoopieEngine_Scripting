@@ -50,12 +50,10 @@ namespace Loopie
         m_vbo = &vbo;
 
         const BufferLayout& layout = m_vbo->GetLayout();
-        unsigned int index = 0;
         for (const auto& element : layout.GetElements())
         {
-            glEnableVertexAttribArray(index);
-            glVertexAttribPointer(index, element.Count, ConvertGLVariableTypeToGlType(element.Type), GL_FALSE, layout.GetStride(), (const void*)(uintptr_t)element.Offset);
-            index++;
+            glEnableVertexAttribArray(element.Index);
+            glVertexAttribPointer(element.Index, element.Count, ConvertGLVariableTypeToGlType(element.Type), GL_FALSE, layout.GetStride(), (const void*)(uintptr_t)element.Offset);
         }
         
         Unbind();

@@ -39,56 +39,57 @@ namespace Loopie {
 
 		auto mesh = static_cast<const aiMesh*>(meshPtr);
 
-		std::vector<Vertex> vertices;
+		std::vector<float> vertices;
 		std::vector<unsigned int> indices;
+		VertexComponents components;
 
-		vertices.reserve(mesh->mNumVertices);
+		components.Normal = mesh->HasNormals();
+		components.TexCoord = mesh->mTextureCoords[0];
+		components.Tangent = mesh->HasTangentsAndBitangents();
+		components.Color = mesh->HasVertexColors(0);
+
+		int totalComponents = components.Position ? 3 : 0;
+		totalComponents += components.Normal ? 3 : 0;
+		totalComponents += components.TexCoord ? 2 : 0;
+		totalComponents += components.Tangent ? 3 : 0;
+		totalComponents += components.Color ? 3 : 0;
+
+		vertices.reserve(totalComponents * mesh->mNumVertices);
+
 		for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-			Vertex vertex{};
-			vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+			///Position
+			vertices.push_back(mesh->mVertices[i].x);
+			vertices.push_back(mesh->mVertices[i].y);
+			vertices.push_back(mesh->mVertices[i].z);
 
-			if (mesh->HasNormals()) {
-				vertex.Normal = {
-					mesh->mNormals[i].x,
-					mesh->mNormals[i].y,
-					mesh->mNormals[i].z
-				};
-			}
-			else {
-				vertex.Normal = { 0.0f, 0.0f, 0.0f };
+			///TexCoords
+			if (components.TexCoord) {
+				vertices.push_back(mesh->mTextureCoords[0][i].x);
+				vertices.push_back(mesh->mTextureCoords[0][i].y);
 			}
 
-			if (mesh->mTextureCoords[0]) {
-				vertex.TexCoord = {
-					mesh->mTextureCoords[0][i].x,
-					mesh->mTextureCoords[0][i].y
-				};
-			}
-			else {
-				vertex.TexCoord = { 0.0f, 0.0f };
+			///Normals
+			if (components.Normal) {
+				vertices.push_back(mesh->mNormals[i].x);
+				vertices.push_back(mesh->mNormals[i].y);
+				vertices.push_back(mesh->mNormals[i].z);
 			}
 
-			if (mesh->HasTangentsAndBitangents()) {
-
-				vertex.Tangent = { 
-					mesh->mTangents[i].x,
-					mesh->mTangents[i].y,
-					mesh->mTangents[i].z 
-				};
-			}
-			else {
-				vertex.Tangent = { 0.0f, 0.0f, 0.0f };
+			///Tangent
+			if (components.Tangent) {
+				vertices.push_back(mesh->mTangents[i].x);
+				vertices.push_back(mesh->mTangents[i].y);
+				vertices.push_back(mesh->mTangents[i].z);
 			}
 
-			if (mesh->HasVertexColors(0)) {
+			///Color
+			if (components.Color) {
 				const aiColor4D& c = mesh->mColors[0][i];
-				vertex.Color = { c.r, c.g, c.b };
-			}
-			else {
-				vertex.Color = { 1.0f, 1.0f, 1.0f };
+				vertices.push_back(c.r);
+				vertices.push_back(c.g);
+				vertices.push_back(c.b);
 			}
 
-			vertices.push_back(vertex);
 		}
 
 		for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
@@ -97,6 +98,6 @@ namespace Loopie {
 				indices.push_back(face.mIndices[j]);
 		}
 
-		return new Mesh(vertices, indices);
+		return new Mesh(vertices, indices, components);
 	}
 }
