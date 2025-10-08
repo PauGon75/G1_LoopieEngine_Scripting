@@ -5,6 +5,7 @@
 #include "Loopie/Render/IndexBuffer.h"
 #include "Loopie/Render/VertexBuffer.h"
 #include "Loopie/Render/VertexArray.h"
+#include "Loopie/Components/Texture.h"
 
 #include <vector>
 
@@ -35,5 +36,6 @@ namespace Loopie {
 		IndexBuffer m_ebo;
 
 		Shader m_shader = Shader("assets/shaders/CorrectShader.shader");
+		Texture m_texture = Texture("assets/texture.jpg");
 	};
 }

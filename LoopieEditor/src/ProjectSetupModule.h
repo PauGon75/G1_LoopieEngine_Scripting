@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Loopie/Core/Module.h"
-#include "Interfaces/ProjectSetupInterface.h"
+#include "Interfaces/ProjectSetup/ProjectSetupInterface.h"
 
 namespace Loopie {
 	class ProjectSetupModule : public Module{

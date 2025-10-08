@@ -14,6 +14,9 @@ namespace Loopie {
 		layout.AddLayoutElement(GLVariableType::FLOAT, 3);
 
 		m_vao.AddBuffer(m_vbo, m_ebo);
+
+		m_texture.Bind();
+		//m_shader.SetUniformInt();
 	}
 
 	void Mesh::Render() {

@@ -1,5 +1,5 @@
 #pragma once
-#include "Interface.h"
+#include "../LoopieEditor/src/Interfaces/Interface.h"
 
 #include <string>
 
