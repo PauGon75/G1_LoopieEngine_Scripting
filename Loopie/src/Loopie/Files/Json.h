@@ -30,9 +30,14 @@ namespace Loopie {
         bool IsObject() const { return IsValid() && m_node->is_object(); }
         bool IsArray() const { return IsValid() && m_node->is_array(); }
         bool IsEmpty() const { return Size() == 0; }
+
+        unsigned int Size(const std::string& keyPath);
         unsigned int Size() const { return IsValid() ? (unsigned int)m_node->size() : 0; }
 
-        void Reset();
+        bool IsArrayEmpty(const std::string& keyPath) const;
+        bool IsArrayEmpty() const { return  Size() == 0 ? true : false; }
+
+        
 
         JsonNode Child(const std::string& keyPath) const;
         bool Contains(const std::string& keyPath) const;
@@ -86,6 +91,13 @@ namespace Loopie {
             return false;
         }
 
+        std::vector<std::string> GetObjectKeys(const std::string& keyPath) const;
+        std::vector<std::string> GetObjectKeys() const;
+
+        bool HasKey(const std::string& keyPath, const std::string& key) const;
+        bool HasKey(const std::string& key) const;
+
+
         JsonNode CreateObjectField(const std::string& keyPath);
         JsonNode CreateArrayField(const std::string& keyPath);
 
@@ -102,6 +114,36 @@ namespace Loopie {
 
             (*parent.m_node)[key] = value;
             return JsonNode(&(*parent.m_node)[key]);
+        }
+
+        template <typename T>
+        JsonResult<T> GetArrayElement(const std::string& keyPath, unsigned int index) {
+            if (keyPath.empty())
+                return GetArrayElement(index);
+
+            JsonNode node = Child(keyPath);
+            if (node.IsArray()) return node.GetArrayElement(index);
+            
+            JsonResult<T> result;
+            result.Found = false;
+            return result;
+        }
+
+        template <typename T>
+        JsonResult<T> GetArrayElement(unsigned int index) {
+            JsonResult<T> result;
+            if (IsArray()) {
+                unsigned int size = Size();
+                if (size == 0 || size <= index) {
+                    result.Found = false;
+                    return result;
+                }
+                result.Found = true;
+                result.Result = (*m_node)[index].get<T>();
+                return result;
+            }
+            result.Found = false;
+            return result;
         }
 
         template <typename T>
@@ -166,6 +208,9 @@ namespace Loopie {
         std::string ToString(int indent = 4) const;
 
     private:
+            void Reset();
+
+    private:
         json* m_node = nullptr;
         json* m_parentNode = nullptr;
     };
@@ -178,6 +223,10 @@ namespace Loopie {
 
         bool IsEmpty() const { return m_empty; }
 
+        unsigned int Size() {
+            return Root().Size();
+        }
+
         template <typename T>
         JsonResult<T> GetValue(const std::string& keyPath, T defaultValue = {}) {
             return Root().GetValue(keyPath, defaultValue);
@@ -188,39 +237,52 @@ namespace Loopie {
             return Root().SetValue(keyPath, value);
         }
 
-        template <typename T>
-        bool CreateField(const std::string& key, T value) {
-            return Root().CreateField(key, value).IsValid();
+        std::vector<std::string> GetObjectKeys(const std::string& keyPath) {
+            return Root().GetObjectKeys(keyPath);
         }
 
-        JsonNode CreateObjectField(const std::string& key) {
-            return Root().CreateObjectField(key);
-        }
-
-        JsonNode CreateArrayField(const std::string& key) {
-            return Root().CreateArrayField(key);
+        bool HasKey(const std::string& keyPath, const std::string& key) {
+            return Root().HasKey(keyPath, key);
         }
 
         template <typename T>
-        bool AddArrayElement(const std::string& key, T value) {
-            return Root().AddArrayElement(key, value);
+        bool CreateField(const std::string& keyPath, T value) {
+            return Root().CreateField(keyPath, value).IsValid();
+        }
+
+        JsonNode CreateObjectField(const std::string& keyPath) {
+            return Root().CreateObjectField(keyPath);
+        }
+
+        JsonNode CreateArrayField(const std::string& keyPath) {
+            return Root().CreateArrayField(keyPath);
         }
 
         template <typename T>
-        bool ModifyArrayElement(const std::string& key, unsigned int index, T value) {
-            return Root().ModifyArrayElement(key, index, value);
+        JsonResult<T> GetArrayElement(const std::string& keyPath, unsigned int index) {
+            return Root().GetArrayElement<T>(keyPath, index);
         }
 
-        bool RemoveArrayElement(const std::string& key, unsigned int index) {
-            return Root().RemoveArrayElement(key, index);
+        template <typename T>
+        bool AddArrayElement(const std::string& keyPath, T value) {
+            return Root().AddArrayElement(keyPath, value);
         }
 
-        bool ClearArray(const std::string& key) {
-            return Root().ClearArray(key);
+        template <typename T>
+        bool ModifyArrayElement(const std::string& keyPath, unsigned int index, T value) {
+            return Root().ModifyArrayElement(keyPath, index, value);
         }
 
-        bool Remove(const std::string& key) {
-            return Root().Remove(key);
+        bool RemoveArrayElement(const std::string& keyPath, unsigned int index) {
+            return Root().RemoveArrayElement(keyPath, index);
+        }
+
+        bool ClearArray(const std::string& keyPath) {
+            return Root().ClearArray(keyPath);
+        }
+
+        bool Remove(const std::string& keyPath) {
+            return Root().Remove(keyPath);
         }
 
         std::string ToString(int indent = 4) const {
@@ -241,6 +303,7 @@ namespace Loopie {
     public:
         static JsonData ReadFromString(const std::string& data);
         static JsonData ReadFromFile(const std::filesystem::path& filePath);
-        static bool WriteToFile(const std::filesystem::path& filePath, const JsonData& jsonData, int indent = 4);
+        static bool WriteToFileFromData(const std::filesystem::path& filePath, const JsonData& jsonString, int indent = 4);
+        static bool WriteToFileFromString(const std::filesystem::path& filePath, const std::string& jsonData, int indent = 4);
     };
 }

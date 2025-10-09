@@ -1,5 +1,6 @@
 #pragma once
-#include "../LoopieEditor/src/Interfaces/Interface.h"
+#include  "src/Interfaces/Interface.h"
+#include "Loopie/Files/Json.h"
 
 #include <string>
 
@@ -7,9 +8,24 @@ namespace Loopie {
 	class ProjectSetupInterface : public Interface {
 	public:
 		ProjectSetupInterface();
-		~ProjectSetupInterface() = default;
+		~ProjectSetupInterface();
 		void Render()override;
+
 	private:
+
+		void GetRecentProjects();
+		bool ExistsRecentProject(const std::string& id);
+		void DeleteRecentProject(const std::string& id);
+
+		bool TryOpenProject(const std::string& path);
+
+		void RenderRecentProjectsMenu();
+		void RenderCreateProjectMenu();
+		void RenderLoadProjectMenu();
+
+	private:
+		std::vector<std::string > m_recentProjects;
+
 		std::string m_createProjectPath;
 		std::string m_loadProjectPath;
 		char m_projectName[128] = "";

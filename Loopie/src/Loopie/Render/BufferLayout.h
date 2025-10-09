@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <glad/glad.h>
 
 namespace Loopie {
@@ -27,12 +28,13 @@ namespace Loopie {
 
 	struct BufferElement {
 
+		unsigned int Index;
 		GLVariableType Type;
 		unsigned int Count;
 		unsigned int Offset;
 
-		BufferElement(unsigned int Offset, const GLVariableType& Type, unsigned int Count)
-			: Offset(Offset), Type(Type), Count(Count)
+		BufferElement(unsigned int Index, unsigned int Offset, const GLVariableType& Type, unsigned int Count)
+			: Index(Index), Offset(Offset), Type(Type), Count(Count)
 		{
 
 		}
@@ -41,8 +43,8 @@ namespace Loopie {
 	class BufferLayout {
 	public:
 
-		void AddLayoutElement(GLVariableType type, unsigned int count) {
-			m_layout.emplace_back(BufferElement{ m_stride, type, count });
+		void AddLayoutElement(unsigned int index,GLVariableType type, unsigned int count, const std::string& name) {
+			m_layout.emplace_back(BufferElement{ index, m_stride, type, count });
 			m_stride+=GetGLVariableSize(type)*count;
 		}
 

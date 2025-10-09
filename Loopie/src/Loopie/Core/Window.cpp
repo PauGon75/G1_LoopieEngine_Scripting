@@ -22,6 +22,8 @@ namespace Loopie {
 		m_glContext = SDL_GL_CreateContext(m_window);
 		ASSERT(m_glContext == NULL, "OpenGL context is NULL!");
 
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
 		// Load OpenGL functions via GLAD
 		Renderer::Init(SDL_GL_GetProcAddress); /// Replace
 		

@@ -11,25 +11,26 @@
 
 namespace Loopie {
 
-	struct Vertex {
-		vec3 Position;
-		vec2 TexCoord;
-		vec3 Normal;
-		vec3 Tangent;
-		vec3 Color;
+	struct VertexComponents {
+		bool Position = true;
+		bool TexCoord = false;
+		bool Tangent = false;
+		bool Color = false;
+		bool Normal = false;
 	};
 
 	class Mesh {
 	public :
-		Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
+		Mesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices, const VertexComponents& components);
 		~Mesh() = default;
 
 		void Render();
 
 		Shader& GetShader() { return m_shader; }
 	private:
-		std::vector<Vertex> m_vertices;
+		std::vector<float> m_vertices;
 		std::vector<unsigned int> m_indices;
+		VertexComponents m_components;
 
 		VertexArray m_vao;
 		VertexBuffer m_vbo;

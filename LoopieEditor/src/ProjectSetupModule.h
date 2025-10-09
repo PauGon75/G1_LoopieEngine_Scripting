@@ -14,6 +14,8 @@ namespace Loopie {
 		void OnUnload()override;
 		void OnInterfaceRender()override;
 	private:
+
+	private:
 		ProjectSetupInterface* m_interface = nullptr;
 	};
 }
