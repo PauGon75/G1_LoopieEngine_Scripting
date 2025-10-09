@@ -30,7 +30,7 @@ namespace Loopie {
 		void SetWindowSize(int width, int height, bool savePreviousWindowsSize = false);
 		void SetWindowFullscreen(bool enable, const SDL_DisplayMode* mode = nullptr);
 		void SetResizable(bool enable);/// Maybe Do a getter also?
-		void SetVsync(bool enable);
+		void SetVsync(bool enable, bool forceCall = false);
 		void SetFramerateLimit(int fps);
 		void SetTitle(const char* title);/// Maybe Do a getter also?
 		void SetPosition(int x, int y);

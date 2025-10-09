@@ -30,7 +30,7 @@ namespace Loopie {
 		// Set clear color, optional
 		Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 
-		SetVsync(false);
+		SetVsync(false, true);
 	}
 
 	Window::~Window()
@@ -148,9 +148,9 @@ namespace Loopie {
 		SDL_SetWindowResizable(m_window, enable); // returns bool
 	}
 
-	void Window::SetVsync(bool enable)
+	void Window::SetVsync(bool enable, bool forceCall)
 	{
-		if (enable == m_vsyncState)
+		if (!forceCall && enable == m_vsyncState)
 			return;
 		ASSERT(!SDL_GL_SetSwapInterval(enable), "Error setting vsync! SDL Error: {0}", SDL_GetError());
 		m_vsyncState = enable;
