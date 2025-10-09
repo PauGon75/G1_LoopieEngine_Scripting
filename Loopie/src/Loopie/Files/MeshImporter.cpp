@@ -23,7 +23,7 @@ namespace Loopie {
 		return meshes;
 	}
 
-	bool MeshImporter::CheckIfIsModel(const char* path) const
+	bool MeshImporter::CheckIfIsModel(const char* path)
 	{
 		Assimp::Importer importer;
 		std::string extension = std::filesystem::path(path).extension().string();
@@ -36,10 +36,7 @@ namespace Loopie {
 		if (!extension.empty() && extension[0] == '.')
 			extension = extension.substr(1);
 
-		bool isModel = importer.IsExtensionSupported(extension);
-		if (isModel) LoadModel(path);
-
-		return isModel;
+		return importer.IsExtensionSupported(extension);
 	}
 
 	void MeshImporter::ProcessNode(void* nodePtr, const void* scenePtr, std::vector<Mesh*>& meshes) {

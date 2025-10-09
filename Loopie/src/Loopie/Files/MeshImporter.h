@@ -8,7 +8,7 @@ namespace Loopie {
 	class MeshImporter {
 	public:
 		static std::vector<Mesh*> LoadModel(const std::string& filepath);
-		bool CheckIfIsModel(const char* path) const;
+		static bool CheckIfIsModel(const char* path);
 
 	private:
 		static void ProcessNode(void* node, const void* scene, std::vector<Mesh*>& meshes);
