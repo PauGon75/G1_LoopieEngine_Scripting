@@ -22,8 +22,10 @@ namespace Loopie {
 
 		m_vao.AddBuffer(m_vbo, m_ebo);
 
+		m_shader.Bind();
 		m_texture.Bind();
-		//m_shader.SetUniformInt();
+		m_shader.SetUniformInt("u_Texture", 0);
+		m_shader.Unbind();
 	}
 
 	void Mesh::Render() {

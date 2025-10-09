@@ -37,6 +37,6 @@ namespace Loopie {
 		IndexBuffer m_ebo;
 
 		Shader m_shader = Shader("assets/shaders/CorrectShader.shader");
-		Texture m_texture = Texture("assets/texture.jpg");
+		Texture m_texture = Texture("assets/texture.png");
 	};
 }

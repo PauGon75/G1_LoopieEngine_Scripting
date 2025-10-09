@@ -6,18 +6,26 @@ layout (location = 2) in vec3 inNormal;
 layout (location = 3) in vec3 inTangent;
 layout (location = 4) in vec3 inColor;
 out vec3 vertexColor;
+
+out vec2  v_TexCoord;
 uniform mat4 modelViewProj;
 void main()
 {
 	gl_Position = modelViewProj * vec4(inPos, 1.0);
 	vertexColor = inNormal;
+	v_TexCoord = inTexCoord;
 }
 
 [fragment]
 #version 460 core
-in vec3 vertexColor;
+in vec2 v_TexCoord;
+
 out vec4 FragColor;
+
+uniform sampler2D u_Texture;
+
 void main()
 {
-	FragColor = vec4(vertexColor, 1.0f) + vec4(0.5f,0.5f,0.5f,0.0f);
+	vec4 texColor = texture(u_Texture, v_TexCoord);
+	FragColor = texColor;
 }

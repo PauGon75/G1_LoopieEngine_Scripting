@@ -90,9 +90,9 @@ namespace Loopie {
 	{
 		////TESTING VARIABLES
 
-		std::vector<Mesh*> meshes = MeshImporter::LoadModel("assets/models/loopie.obj");
+		std::vector<Mesh*> meshes = MeshImporter::LoadModel("assets/models/Player_Arms.fbx");
 
-		glm::vec3 position(0.0f, 0.0f, -2.0f);
+		glm::vec3 position(0.0f, 0.0f, -100.0f);
 		glm::vec3 forward(0.0f, 0.0f, 1.0f);
 		glm::vec3 up(0.0f, 1.0f, 0.0f);
 		glm::mat4 viewMatrix = glm::lookAt(position, position + forward, up);
