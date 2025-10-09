@@ -5,14 +5,14 @@ layout (location = 1) in vec2 inTexCoord;
 layout (location = 2) in vec3 inNormal;
 layout (location = 3) in vec3 inTangent;
 layout (location = 4) in vec3 inColor;
-out vec3 vertexColor;
 
 out vec2  v_TexCoord;
+
 uniform mat4 modelViewProj;
+
 void main()
 {
 	gl_Position = modelViewProj * vec4(inPos, 1.0);
-	vertexColor = inNormal;
 	v_TexCoord = inTexCoord;
 }
 

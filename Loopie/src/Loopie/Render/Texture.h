@@ -11,11 +11,11 @@ namespace Loopie
 		void Bind(unsigned int unit = 0)const;
 		void Unbind()const;
 
-		unsigned int GetID()const { return m_Texture_ID; }
+		unsigned int GetID()const { return m_texture_ID; }
 	private:
-		unsigned int m_Texture_ID;
-		int m_Width;
-		int m_Height;
-		int m_Channels;
+		unsigned int m_texture_ID;
+		int m_width;
+		int m_height;
+		int m_channels;
 	};
 }

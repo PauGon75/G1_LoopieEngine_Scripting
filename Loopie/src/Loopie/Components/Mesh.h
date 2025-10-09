@@ -5,7 +5,7 @@
 #include "Loopie/Render/IndexBuffer.h"
 #include "Loopie/Render/VertexBuffer.h"
 #include "Loopie/Render/VertexArray.h"
-#include "Loopie/Components/Texture.h"
+#include "Loopie/Render/Texture.h"
 
 #include <vector>
 
