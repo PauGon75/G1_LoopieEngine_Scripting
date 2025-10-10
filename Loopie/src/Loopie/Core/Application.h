@@ -44,6 +44,8 @@ namespace Loopie {
 
 		bool m_running = true;
 		bool m_renderInterface = true;
+
+		
 	};
 
 	//// Define Main

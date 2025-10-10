@@ -8,6 +8,8 @@
 
 
 #include "Loopie/Core/Math.h" // TEMP INCLUDE FOR SHADER TESTING
+#include "Loopie/Components/Camera.h" //TEMP TEST FOR CAMERA TESTING
+#include "Loopie/Components/Transform.h" //TEMP TEST FOR CAMERA TESTING
 
 namespace Loopie {
 	Application* Application::s_Instance = nullptr;
@@ -89,25 +91,13 @@ namespace Loopie {
 	void Application::Run()
 	{
 		////TESTING VARIABLES
-
+		Camera camera;
+		camera.SetPosition(vec3(0, 0, -50.f));
+		Transform meshT;
 		std::vector<Mesh*> meshes;
-
-		glm::vec3 position(0.0f, 0.0f, -50.0f);
-		glm::vec3 forward(0.0f, 0.0f, 1.0f);
-		glm::vec3 up(0.0f, 1.0f, 0.0f);
-		glm::mat4 viewMatrix = glm::lookAt(position, position + forward, up);
-
-		// Projection Matrix
-		const float FOV = 45.0f;
-		const float NEAR_PLANE = 0.1f;
-		const float FAR_PLANE = 200.0f;
 
 		float rotation = 0.0f;
 		const float SPEED = 100.0f;
-
-
-		ivec2 windowSize = m_window->GetSize();
-		glm::mat4 projectionMatrix = glm::perspective(glm::radians(FOV), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), NEAR_PLANE, FAR_PLANE);
 
 		////
 
@@ -152,22 +142,26 @@ namespace Loopie {
 					meshes = MeshImporter::LoadModel(fileName);
 				}
 			}
+			if (m_inputEvent.HasEvent(SDL_EVENT_WINDOW_RESIZED)) {
+				ivec2 windowSize = m_window->GetSize();
+				camera.SetViewport(0, 0, windowSize.x, windowSize.y);
+			}
 
 			if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_W) == KeyState::REPEAT)
-				position.z += 10 * m_window->GetDeltaTime();
+				camera.SetPosition(vec3(0, 0, camera.GetPosition().z + 10 * m_window->GetDeltaTime()));
 
 			if (m_inputEvent.GetKeyStatus(SDL_SCANCODE_S) == KeyState::REPEAT)
-				position.z -= 10 * m_window->GetDeltaTime();
+				camera.SetPosition(vec3(0, 0, camera.GetPosition().z - 10 * m_window->GetDeltaTime()));
 
-			windowSize = m_window->GetSize();
-
-			viewMatrix = glm::lookAt(position, position + forward, up);
-			projectionMatrix = glm::perspective(glm::radians(FOV), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), NEAR_PLANE, FAR_PLANE);
-			glm::mat4 modelMatrix(1.0f);
-			modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 modelViewProj = projectionMatrix * viewMatrix * modelMatrix;
 
 			rotation += SPEED * m_window->GetDeltaTime();
+			vec3 rot = meshT.GetEulerAnglesDeg();
+			rot.y += rotation;
+
+			meshT.SetEulerAnglesDeg(rot);
+
+			glm::mat4 modelViewProj = camera.GetViewProjectionMatrix() * meshT.GetTransformMatrix();
+
 
 			for (size_t i = 0; i < meshes.size(); i++)
 			{
