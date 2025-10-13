@@ -5,24 +5,31 @@
 
 #include <string>
 #include <unordered_map>
+	
 
 namespace Loopie {
 	class Scene
 	{
 	public:
-		Scene() = default;
+		Scene(const std::string& filePath);
 		~Scene();
 
-		Entity* CreateEntity(const std::string& name = "Entity");
+		void SaveScene();
+
+		std::shared_ptr<Entity> CreateEntity(const std::string& name = "Entity");
 		void RemoveEntity(UUID uuid);
 
-		Entity* GetEntity(UUID uuid) const;
-		Entity* GetEntity(const std::string& name) const;
+		std::shared_ptr<Entity> GetEntity(UUID uuid) const;
+		std::shared_ptr<Entity> GetEntity(const std::string& name) const;
 		// Returns the unordered_map of the UUID and Entity ptrs
 		// Usage: for (const auto& [uuid, entity] : scene.GetAllEntities()) {entity->Update();}
-		const std::unordered_map<UUID, Entity*>& GetAllEntities() const;
+		const std::unordered_map<UUID, std::shared_ptr<Entity>>& GetAllEntities() const;
 
 	private:
-		std::unordered_map<UUID, Entity*> m_entities;
-	};
+		void LoadScene();
+
+	private:
+		std::unordered_map<UUID, std::shared_ptr<Entity>> m_entities;
+		std::string m_filePath;
+	};	
 }

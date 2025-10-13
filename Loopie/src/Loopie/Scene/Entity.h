@@ -9,13 +9,14 @@
 
 namespace Loopie
 {
-	class Entity
+	class Entity : std::enable_shared_from_this<Entity>
 	{
 	public:
 		Entity(const std::string& name);
 		~Entity();
+		
 
-		void AddComponent(Component* component); 
+		void AddComponent(std::shared_ptr<Component> component);
 		template<typename T>
 		std::shared_ptr<T> GetComponent() const
 		{
@@ -52,26 +53,26 @@ namespace Loopie
 		}
 
 		// If a child is set up, then it means this is its parent and will update it accordingly
-		void AddChild(Entity* child);
-		void RemoveChild(Entity* child);
+		void AddChild(std::shared_ptr<Entity> child);
+		void RemoveChild(std::shared_ptr<Entity> child);
 		void RemoveChild(UUID childUuid);
 
 		UUID GetUuid() const;
 		std::string GetName() const;
 		bool GetIsActive() const;
-		Entity* GetChild(UUID uuid) const;
-		const std::vector<Entity*>& GetChildren() const;
-		Entity* GetParent() const { return m_parentEntity; }
+		std::shared_ptr<Entity> GetChild(UUID uuid) const;
+		std::vector<std::shared_ptr<Entity>> GetChildren() const;
+		std::weak_ptr<Entity> GetParent() const;
 
 		void SetName(const std::string& name);
 		void SetIsActive(bool active);
 		// If a parent is set up, then it means this is its child and will update it accordingly
-		void SetParent(Entity* parent);
+		void SetParent(std::shared_ptr<Entity> parent);
 
 	private:
-		Entity* m_parentEntity = nullptr;
-		std::vector<Entity*> m_childrenEntities;
-		std::vector<Component*> m_components;
+		std::weak_ptr<Entity> m_parentEntity;
+		std::vector<std::shared_ptr<Entity>> m_childrenEntities;
+		std::vector<std::shared_ptr<Component>> m_components;
 
 		UUID m_uuid;
 		std::string m_name;

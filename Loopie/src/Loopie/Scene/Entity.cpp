@@ -8,17 +8,11 @@ namespace Loopie {
 
 	Entity::~Entity()
 	{
-		for (Component* component : m_components)
-		{
-			delete component;
-		}
 		m_components.clear();
-
 		m_childrenEntities.clear();
-		m_parentEntity = nullptr;
 	}
 
-	void Entity::AddComponent(Component* component)
+	void Entity::AddComponent(std::shared_ptr<Component> component)
 	{
 		if (component)
 		{
@@ -26,27 +20,27 @@ namespace Loopie {
 		}
 	}
 
-	void Entity::AddChild(Entity* child)
+	void Entity::AddChild(std::shared_ptr<Entity> child)
 	{
-		if (child && child != this)
+		if (child && child.get() != this)
 		{
-			if (child->m_parentEntity)
+			std::shared_ptr<Entity> childParent = child->m_parentEntity.lock();
+			if (childParent)
 			{
-				child->m_parentEntity->RemoveChild(child);
+				childParent->RemoveChild(child);
 			}
 
 			m_childrenEntities.push_back(child);
-			child->m_parentEntity = this;
+			child->m_parentEntity = weak_from_this();
 		}
 	}
 
-	void Entity::RemoveChild(Entity* child)
+	void Entity::RemoveChild(std::shared_ptr<Entity> child)
 	{
 		for (auto it = m_childrenEntities.begin(); it != m_childrenEntities.end(); ++it)
 		{
 			if (*it == child)
 			{
-				(*it)->m_parentEntity = nullptr;
 				m_childrenEntities.erase(it);
 				return;
 			}
@@ -59,7 +53,6 @@ namespace Loopie {
 		{
 			if ((*it)->GetUuid() == childUuid)
 			{
-				(*it)->m_parentEntity = nullptr;
 				m_childrenEntities.erase(it);
 				return;
 			}
@@ -81,7 +74,7 @@ namespace Loopie {
 		return m_isActive;
 	}
 
-	Entity* Entity::GetChild(UUID uuid) const
+	std::shared_ptr<Entity> Entity::GetChild(UUID uuid) const
 	{
 		for (const auto& child : m_childrenEntities)
 		{
@@ -93,9 +86,14 @@ namespace Loopie {
 		return nullptr;
 	}
 
-	const std::vector<Entity*>& Entity::GetChildren() const
+	std::vector<std::shared_ptr<Entity>> Entity::GetChildren() const
 	{
 		return m_childrenEntities;
+	}
+
+	std::weak_ptr<Entity> Entity::GetParent() const
+	{ 
+		return m_parentEntity; 
 	}
 
 	void Entity::SetName(const std::string& name)
@@ -108,16 +106,17 @@ namespace Loopie {
 		m_isActive = active;
 	}
 
-	void Entity::SetParent(Entity* parent)
+	void Entity::SetParent(std::shared_ptr<Entity> parent)
 	{
-		if (m_parentEntity)
+		std::shared_ptr<Entity> parentEntity = m_parentEntity.lock();
+		if (parentEntity)
 		{
-			m_parentEntity->RemoveChild(this);
+			parentEntity->RemoveChild(shared_from_this());
 		}
 
-		if (parent && parent != this)
+		if (parent && (parent != shared_from_this()))
 		{
-			parent->AddChild(this);
+			parent->AddChild(shared_from_this());
 		}
 	}
 }

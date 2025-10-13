@@ -86,6 +86,11 @@ namespace Loopie {
 		return m_inputEvent;
 	}
 
+	Scene& Application::GetScene()
+	{
+		return *m_scene;
+	}
+
 	void Application::Run()
 	{
 		////TESTING VARIABLES
@@ -191,6 +196,17 @@ namespace Loopie {
 		}
 		meshes.clear();
 		/////
+	}
+
+	void Application::CreateScene(const std::string& filePath)
+	{
+		m_scene = new Scene(filePath);
+	}
+
+	void Application::LoadScene(const std::string& filePath)
+	{
+		delete m_scene;
+		m_scene = new Scene(filePath);
 	}
 
 	void Application::ProcessEvents(InputEventManager& eventController)
