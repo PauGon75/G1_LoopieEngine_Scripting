@@ -2,6 +2,7 @@
 
 #include "Loopie/Core/Log.h"
 #include "Loopie/Render/Renderer.h"
+#include "Loopie/Resources/AssetRegistry.h"
 
 #include <fstream>
 #include <iostream>
@@ -95,5 +96,9 @@ namespace Loopie {
 
 	void Mesh::Reload()
 	{
+		AssetMetadata* metadata = AssetRegistry::GetMetadata(GetUUID());
+		if (metadata && metadata->isValid) {
+			LoadFromFile(metadata->cachePath);
+		}
 	}
 }
