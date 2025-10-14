@@ -11,7 +11,7 @@ namespace Loopie {
 
 	std::unordered_map<UUID, AssetMetadata> AssetRegistry::s_Assets;
 	std::unordered_map<std::string, std::vector<UUID>> AssetRegistry::s_SourcePathToUUID;
-	std::vector<UUID> AssetRegistry::s_EmptySearch;
+	std::vector<UUID> AssetRegistry::s_EmptyUUIDVector;
 
 	void AssetRegistry::Initialize() {
 		if (LoadRegistry()) {
@@ -66,7 +66,7 @@ namespace Loopie {
 	{
 		auto it = s_SourcePathToUUID.find(sourcePath);
 		if (it == s_SourcePathToUUID.end())
-			return s_EmptySearch;
+			return s_EmptyUUIDVector;
 		return it->second;
 	}
 

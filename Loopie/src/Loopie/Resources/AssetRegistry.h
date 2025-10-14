@@ -43,7 +43,6 @@ namespace Loopie {
     private:
         static std::unordered_map<UUID, AssetMetadata> s_Assets;
         static std::unordered_map<std::string, std::vector<UUID>> s_SourcePathToUUID;
-
         static std::vector<UUID> s_EmptyUUIDVector;
     };
 }

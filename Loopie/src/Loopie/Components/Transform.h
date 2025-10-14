@@ -57,9 +57,10 @@ namespace Loopie
 
         vec3 InverseTransformPoint(const vec3& worldPoint) const;
 
-        void RecalculateCache() const;
+        void SetDirty() const;
 
-        void MarkDirty() const;
+    private:
+        void RecalculateCache() const;
    
     public:
         std::function<void()>OnTransformDirty;

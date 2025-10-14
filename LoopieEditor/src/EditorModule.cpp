@@ -22,6 +22,10 @@ namespace Loopie
 		AssetRegistry::Initialize();
 		Application::GetInstance().GetWindow().SetResizable(true);
 
+
+
+		cameraT.SetPosition({ 0,0,-50.f });
+		camera = std::make_shared<Camera>(cameraT);
 	}
 
 	void EditorModule::OnUnload()
@@ -38,36 +42,15 @@ namespace Loopie
 	{
 		InputEventManager& inputEvent = Application::GetInstance().GetInputEvent();
 
-		const float SPEED = 100.0f;
-		glm::vec3 forward(0.0f, 0.0f, 1.0f);
-		glm::vec3 up(0.0f, 1.0f, 0.0f);
-		glm::mat4 viewMatrix = glm::lookAt(position, position + forward, up);
+		
+		if (inputEvent.HasEvent(SDL_EVENT_WINDOW_RESIZED)) {
+			ivec2 windowSize = Application::GetInstance().GetWindow().GetSize();
+			camera->SetViewport(0, 0, windowSize.x, windowSize.y);
+		}
 
-		ivec2 windowSize = Application::GetInstance().GetWindow().GetSize();
-
-		glm::mat4 projectionMatrix = glm::perspective(glm::radians(FOV), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), NEAR_PLANE, FAR_PLANE);
-
-
-		if (inputEvent.HasFileBeenDropped()) {
+		if (inputEvent.HasFileBeenDropped()) { //// Move this to an AssetInspectorClass
 			const char* fileName = inputEvent.GetDroppedFile(0);
 			if (MeshImporter::CheckIfIsModel(fileName)) {
-				//for (size_t i = 0; i < meshRenderers.size(); i++)
-				//{
-				//	delete meshRenderers[i];
-				//}
-				//meshRenderers.clear();
-
-				//std::vector<std::shared_ptr<Mesh>> meshes = MeshImporter::LoadModel(fileName);
-
-				//for (size_t i = 0; i < meshes.size(); i++)
-				//{
-				//	meshRenderers.push_back(new MeshRenderer(meshes[i]));
-				//}
-
-
-				///// Generate MetaData
-				///// Generate MeshFromMetaData
-				///// Generate MeshRenderer
 
 				if (!AssetRegistry::AssetExists(fileName)) {
 					std::vector<std::string> cacheFiles = MeshImporter::LoadModel(fileName);
@@ -98,26 +81,23 @@ namespace Loopie
 
 					}
 				}
-
-				
-
-				
 			}
 		}
 
+		vec3 moveCameraInput = { 0,0,0 };
 		if (inputEvent.GetKeyStatus(SDL_SCANCODE_W) == KeyState::REPEAT)
-			position.z += 10 * dt;
-
+			moveCameraInput.z += 1;
 		if (inputEvent.GetKeyStatus(SDL_SCANCODE_S) == KeyState::REPEAT)
-			position.z -= 10 * dt;
+			moveCameraInput.z -= 1;
+		if (inputEvent.GetKeyStatus(SDL_SCANCODE_A) == KeyState::REPEAT)
+			moveCameraInput.x += 1;
+		if (inputEvent.GetKeyStatus(SDL_SCANCODE_D) == KeyState::REPEAT)
+			moveCameraInput.x -= 1;
 
-		viewMatrix = glm::lookAt(position, position + forward, up);
-		projectionMatrix = glm::perspective(glm::radians(FOV), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), NEAR_PLANE, FAR_PLANE);
-		glm::mat4 modelMatrix(1.0f);
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 modelViewProj = projectionMatrix * viewMatrix * modelMatrix;
-
-		rotation += SPEED * dt;
+		cameraT.Translate(moveCameraInput * 10.f * dt);
+		rotation = SPEED * dt;
+		meshT.Rotate({ 0,rotation,0 });
+		glm::mat4 modelViewProj = camera->GetViewProjectionMatrix() * meshT.GetTransformMatrix();
 
 		for (size_t i = 0; i < meshRenderers.size(); i++)
 		{
@@ -125,7 +105,6 @@ namespace Loopie
 			meshRenderers[i]->GetShader().SetUniformMat4("modelViewProj", modelViewProj);
 			meshRenderers[i]->Render();
 		}
-
 	}
 
 	void EditorModule::OnInterfaceRender()

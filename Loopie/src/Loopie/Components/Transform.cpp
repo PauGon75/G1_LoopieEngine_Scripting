@@ -5,7 +5,7 @@ namespace Loopie
     Transform::Transform(const vec3& position, const quaternion& rotation, const vec3& scale)
         : m_position(position), m_rotation(rotation), m_scale(scale)
     {
-        MarkDirty();
+        SetDirty();
     }
 
     matrix4 Transform::GetTransformMatrix() const
@@ -32,19 +32,19 @@ namespace Loopie
     void Transform::SetRotation(const quaternion& rotation)
     {
         m_rotation = rotation;
-        MarkDirty();
+        SetDirty();
     }
 
     void Transform::SetRotationEuler(const vec3& eulerDegrees)
     {
         m_rotation = glm::quat(glm::radians(eulerDegrees));
-        MarkDirty();
+        SetDirty();
     }
 
     void Transform::SetRotationEulerRad(const vec3& eulerRadians)
     {
         m_rotation = glm::quat(eulerRadians);
-        MarkDirty();
+        SetDirty();
     }
 
     void Transform::Rotate(const vec3& eulerDegrees)
@@ -55,7 +55,7 @@ namespace Loopie
     void Transform::RotateRad(const vec3& eulerRadians)
     {
         m_rotation = glm::normalize(glm::quat(eulerRadians) * m_rotation);
-        MarkDirty();
+        SetDirty();
     }
 
     void Transform::RotateAroundAxis(const vec3& axis, float degrees)
@@ -66,13 +66,13 @@ namespace Loopie
     void Transform::RotateAroundAxisRad(const vec3& axis, float radians)
     {
         m_rotation = glm::normalize(glm::angleAxis(radians, glm::normalize(axis)) * m_rotation);
-        MarkDirty();
+        SetDirty();
     }
 
     void Transform::SetPosition(const vec3& position)
     {
         m_position = position;
-        MarkDirty();
+        SetDirty();
     }
 
     const vec3& Transform::GetPosition() const
@@ -83,7 +83,7 @@ namespace Loopie
     void Transform::SetScale(const vec3& scale)
     {
         m_scale = scale;
-        MarkDirty();
+        SetDirty();
     }
 
     const vec3& Transform::GetScale() const
@@ -97,7 +97,7 @@ namespace Loopie
             m_position += m_rotation * translation;
         else
             m_position += translation;
-        MarkDirty();
+        SetDirty();
     }
 
     void Transform::LookAt(const vec3& target, const vec3& up)
@@ -108,7 +108,7 @@ namespace Loopie
 
         glm::mat3 rotMat(right, correctedUp, forward);
         m_rotation = glm::quat_cast(rotMat);
-        MarkDirty();
+        SetDirty();
     }
 
     const vec3& Transform::Forward() const
@@ -144,9 +144,7 @@ namespace Loopie
         if (!m_dirty)
             return;
 
-        m_matrix = glm::translate(glm::mat4(1.0f), m_position)
-            * glm::toMat4(m_rotation)
-            * glm::scale(glm::mat4(1.0f), m_scale);
+        m_matrix = glm::translate(glm::mat4(1.0f), m_position) * glm::toMat4(m_rotation) * glm::scale(glm::mat4(1.0f), m_scale);
 
         m_forward = glm::normalize(m_rotation * glm::vec3(0, 0, 1));
         m_right = glm::normalize(m_rotation * glm::vec3(1, 0, 0));
@@ -155,7 +153,7 @@ namespace Loopie
         m_dirty = false;
     }
 
-    void Transform::MarkDirty() const
+    void Transform::SetDirty() const
     {
         m_dirty = true;
         if (OnTransformDirty)

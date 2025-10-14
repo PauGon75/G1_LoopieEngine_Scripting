@@ -12,6 +12,8 @@
 
 #include "Loopie/Core/Math.h"
 #include "Loopie/Components/MeshRenderer.h"
+#include "Loopie/Components/Camera.h"
+#include "Loopie/Components/Transform.h"
 
 ///
 
@@ -36,14 +38,14 @@ namespace Loopie {
 
 
 		/// Test
+		Transform cameraT;
+		std::shared_ptr<Camera> camera; /// Create an especific CameraControllerClass????
+
+		Transform meshT;
 		std::vector<MeshRenderer*> meshRenderers;
 
-		const float FOV = 45.0f;
-		const float NEAR_PLANE = 0.1f;
-		const float FAR_PLANE = 200.0f;
-
+		const float SPEED = 100.0f;
 		float rotation = 0;
-		vec3 position = vec3(0.0f, 0.0f, -50.0f);
 		///
 	};
 }

@@ -15,8 +15,19 @@ namespace Loopie
 		const matrix4& GetProjectionMatrix()const;
 		const matrix4& GetViewProjectionMatrix()const;
 
+		void SetFov(float fov);
+		float GetFov() const;
+
+		void SetNearPlane(float nearPlane);
+		float GetNearPlane() const;
+
+		void SetFarPlane(float farPlane);
+		float GetFarPlane() const;
+
+		void SetDirty() const;
+
 	private:
-		void CalculateMatrices();
+		void CalculateMatrices() const;
 	public:
 		Transform& m_transform;
 
@@ -24,12 +35,13 @@ namespace Loopie
 		vec4 m_viewport;
 
 		float m_fov;
-		float m_near_plane;
-		float m_far_plane;
+		float m_nearPlane;
+		float m_farPlane;
 
+		mutable matrix4 m_viewMatrix;
+		mutable matrix4 m_projectionMatrix;
+		mutable matrix4 m_viewProjectionMatrix;
 
-		matrix4 m_viewMatrix;
-		matrix4 m_projectionMatrix;
-		matrix4 m_viewProjectionMatrix;
+		mutable bool m_dirty = true;
 	};
 }
