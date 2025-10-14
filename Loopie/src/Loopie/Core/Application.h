@@ -5,6 +5,7 @@
 #include "Loopie/Core/InputEventManager.h"
 #include "Loopie/Project/Project.h"
 #include "Loopie/ImGui/ImGuiManager.h"
+#include "Loopie/Scene/Scene.h"
 
 #include <vector>
 
@@ -23,9 +24,13 @@ namespace Loopie {
 		static Application& GetInstance();
 		Window& GetWindow();
 		InputEventManager& GetInputEvent();
+		Scene& GetScene();
 
 		void SetInterfaceState(bool enabled) { m_renderInterface = enabled; }
 		bool IsInterfaceVisible() const{ return m_renderInterface; }
+
+		void CreateScene(const std::string& filePath);
+		void LoadScene(const std::string& filePath);
 
 	private:
 		void ProcessEvents(InputEventManager& eventController);
@@ -34,6 +39,7 @@ namespace Loopie {
 		Project m_activeProject;
 	private:
 		static Application* s_Instance;
+		Scene* m_scene = nullptr;
 
 		std::vector<Module*> m_modules;
 		Window* m_window = nullptr;

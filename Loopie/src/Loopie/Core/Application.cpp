@@ -81,6 +81,11 @@ namespace Loopie {
 		return m_inputEvent;
 	}
 
+	Scene& Application::GetScene()
+	{
+		return *m_scene;
+	}
+
 	void Application::Run()
 	{
 		while (m_running)
@@ -115,6 +120,17 @@ namespace Loopie {
 
 			m_window->Update();		
 		}
+	}
+
+	void Application::CreateScene(const std::string& filePath)
+	{
+		m_scene = new Scene(filePath);
+	}
+
+	void Application::LoadScene(const std::string& filePath)
+	{
+		delete m_scene;
+		m_scene = new Scene(filePath);
 	}
 
 	void Application::ProcessEvents(InputEventManager& eventController)
