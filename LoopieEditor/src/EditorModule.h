@@ -42,7 +42,7 @@ namespace Loopie {
 		/// Test
 		Scene* scene;
 		std::shared_ptr<Entity> cameraEntity;
-		std::shared_ptr<Camera> camera;
+		Camera* camera;
 		std::shared_ptr<Entity> meshContainerEntity;
 
 		const float SPEED = 100.0f;

@@ -14,7 +14,7 @@ namespace Loopie {
 		Component() = default;
 		virtual ~Component();
 
-		const std::shared_ptr<Transform>& GetTransform() const;
+		Transform* GetTransform() const;
 		std::shared_ptr<Entity> GetOwner() const { return m_owner.lock(); }
 		virtual void Init() = 0;
 	private:

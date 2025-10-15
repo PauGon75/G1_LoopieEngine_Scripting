@@ -6,7 +6,7 @@
 
 namespace Loopie {
 	Component::~Component(){}
-	const std::shared_ptr<Transform>& Component::GetTransform() const
+	Transform* Component::GetTransform() const
 	{
 		return GetOwner()->GetTransform();
 	}
