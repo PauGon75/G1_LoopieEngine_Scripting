@@ -11,6 +11,8 @@
 namespace Loopie {
 	class MeshRenderer : public Component{
 	public:
+		DEFINE_TYPE(MeshRenderer)
+
 		MeshRenderer();
 		~MeshRenderer() = default;
 

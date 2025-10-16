@@ -15,17 +15,22 @@ namespace Loopie {
 		m_childrenEntities.clear();
 	}
 
-	/*std::shared_ptr<Component> Entity::AddComponent(const std::shared_ptr<Component> component)
+	bool Entity::RemoveComponent(Component* component)
 	{
-		if (component)
-		{
-			m_components.push_back(component);
-			return component;
-		}
-		return nullptr;
-	}*/
+		if (component->GetTypeID() == m_transform->GetTypeID())
+			return false;
 
-	void Entity::AddChild(std::shared_ptr<Entity> child)
+		for (size_t i = 0; i < m_components.size(); i++)
+		{
+			if (m_components[i].get() == component) {
+				m_components.erase(m_components.begin() + i);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void Entity::AddChild(const std::shared_ptr<Entity>& child)
 	{
 		if (child && child.get() != this)
 		{
@@ -40,7 +45,7 @@ namespace Loopie {
 		}
 	}
 
-	void Entity::RemoveChild(std::shared_ptr<Entity> child)
+	void Entity::RemoveChild(const std::shared_ptr<Entity>& child)
 	{
 		auto it = std::find(m_childrenEntities.begin(), m_childrenEntities.end(), child);
 		if (it != m_childrenEntities.end())
@@ -54,7 +59,7 @@ namespace Loopie {
 	{
 		for (auto it = m_childrenEntities.begin(); it != m_childrenEntities.end(); ++it)
 		{
-			if ((*it)->GetUuid() == childUuid)
+			if ((*it)->GetUUID() == childUuid)
 			{
 				(*it)->m_parentEntity.reset();
 				m_childrenEntities.erase(it);
@@ -63,7 +68,7 @@ namespace Loopie {
 		}
 	}
 
-	UUID Entity::GetUuid() const
+	const UUID& Entity::GetUUID() const
 	{
 		return m_uuid;
 	}
@@ -82,7 +87,7 @@ namespace Loopie {
 	{
 		for (const auto& child : m_childrenEntities)
 		{
-			if (child->GetUuid() == uuid)
+			if (child->GetUUID() == uuid)
 			{
 				return child;
 			}
@@ -100,12 +105,19 @@ namespace Loopie {
 		return m_parentEntity; 
 	}
 
-	std::vector<std::shared_ptr<Component>> Entity::GetComponents() const
+	std::vector<Component*> Entity::GetComponents() const
 	{
-		return m_components;
+		std::vector<Component*> outComponents;
+		outComponents.reserve(m_components.size());
+
+		for (const auto& component : m_components) {
+			outComponents.push_back(component.get());
+		}
+
+		return outComponents;
 	}
 
-	const std::shared_ptr<Transform>& Entity::GetTransform() const
+	Transform* Entity::GetTransform() const
 	{
 		return m_transform;
 	}
@@ -120,7 +132,7 @@ namespace Loopie {
 		m_isActive = active;
 	}
 
-	void Entity::SetParent(std::shared_ptr<Entity> parent)
+	void Entity::SetParent(const std::shared_ptr<Entity>& parent)
 	{
 		std::shared_ptr<Entity> parentEntity = m_parentEntity.lock();
 		if (parentEntity)

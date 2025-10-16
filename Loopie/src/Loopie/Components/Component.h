@@ -1,18 +1,20 @@
 #pragma once
 #include <memory>
 
+#include "Loopie/Core/Identificable.h"
+
 namespace Loopie {
 	class Entity;
 	class Transform;
 
-	class Component
+	class Component : public Identificable
 	{
 		friend class Entity;
 	public:
 		Component() = default;
-		~Component();
+		virtual ~Component();
 
-		const std::shared_ptr<Transform>& GetTransform() const;
+		Transform* GetTransform() const;
 		std::shared_ptr<Entity> GetOwner() const { return m_owner.lock(); }
 		virtual void Init() = 0;
 	private:

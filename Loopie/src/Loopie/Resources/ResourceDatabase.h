@@ -43,8 +43,13 @@ namespace Loopie {
 		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Resource, T>>>
 		static std::shared_ptr<T> GetResourceAs(const UUID& uuid) {
 			auto resource = GetResource(uuid);
-			if (resource)
-				return std::static_pointer_cast<T>(resource);
+			if (resource) {
+				if (resource->GetTypeID() == T::GetTypeIDStatic())
+					return std::static_pointer_cast<T>(resource);
+				else
+					return nullptr;
+
+			}
 			return nullptr;
 		}
 

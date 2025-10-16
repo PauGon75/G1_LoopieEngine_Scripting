@@ -31,10 +31,6 @@ namespace Loopie
 		camera->GetTransform()->SetPosition({ 0,0,-50.f });
 
 		meshContainerEntity = scene->CreateEntity("ModelContainer");
-
-		std::shared_ptr<MeshRenderer> meshData = cameraEntity->GetComponent<MeshRenderer>();
-		if (meshData == nullptr)
-			Log::Info("Oh nooooo");
 		////
 	
 		ivec2 windowSize = Application::GetInstance().GetWindow().GetSize();
@@ -81,7 +77,7 @@ namespace Loopie
 						if (mesh) {
 							std::shared_ptr<Entity> newEntity = scene->CreateEntity("ModelEntity");
 							newEntity->SetParent(meshContainerEntity);
-							std::shared_ptr<MeshRenderer> renderer = newEntity->AddComponent<MeshRenderer>();
+							MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
 							renderer->SetMesh(mesh);
 						}
 					}
@@ -95,7 +91,7 @@ namespace Loopie
 						if (mesh) {
 							std::shared_ptr<Entity> newEntity = scene->CreateEntity("ModelEntity");
 							newEntity->SetParent(meshContainerEntity);
-							std::shared_ptr<MeshRenderer> renderer = newEntity->AddComponent<MeshRenderer>();
+							MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
 							renderer->SetMesh(mesh);
 						}
 					}
@@ -127,7 +123,7 @@ namespace Loopie
 
 		const matrix4& viewProj = camera->GetViewProjectionMatrix();
 		for (auto& entity : scene->GetAllEntities()) {
-			std::shared_ptr<MeshRenderer> renderer = entity.second->GetComponent<MeshRenderer>();
+			MeshRenderer* renderer = entity.second->GetComponent<MeshRenderer>();
 			if (renderer) {
 				renderer->GetTransform()->Rotate({ 0,rotation,0 }); //// this should Propagete to its childs
 				glm::mat4 modelViewProj = viewProj * entity.second->GetTransform()->GetTransformMatrix();

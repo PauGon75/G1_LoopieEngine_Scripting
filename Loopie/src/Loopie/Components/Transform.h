@@ -9,7 +9,8 @@ namespace Loopie
     class Transform : public Component
     {
     public:
-        
+        DEFINE_TYPE(Transform)
+
         Transform::Transform(const vec3& position = { 0, 0, 0 }, const quaternion& rotation = { 1, 0, 0, 0 }, const vec3& scale = { 1, 1, 1 });
         
         Transform::~Transform() = default;

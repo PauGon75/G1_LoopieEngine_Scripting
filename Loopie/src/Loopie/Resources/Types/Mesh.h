@@ -20,6 +20,8 @@ namespace Loopie {
 	class Mesh : public Resource{
 		friend class MeshRenderer;
 	public :
+		DEFINE_TYPE(Mesh)
+
 		Mesh(const UUID& id);
 		~Mesh() = default;
 
