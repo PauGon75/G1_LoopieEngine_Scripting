@@ -11,6 +11,10 @@ namespace Loopie
 		
 	}
 
+	Camera::~Camera() {
+		GetTransform()->OnTransformDirty = nullptr;
+	}
+
 	void Camera::SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
 	{
 		m_viewport = vec4(x, y, width, height);

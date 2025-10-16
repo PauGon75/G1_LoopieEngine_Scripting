@@ -1,7 +1,6 @@
 #include "Mesh.h"
 
 #include "Loopie/Core/Log.h"
-#include "Loopie/Render/Renderer.h"
 #include "Loopie/Resources/AssetRegistry.h"
 
 #include <fstream>
@@ -24,7 +23,7 @@ namespace Loopie {
 		/// READ
 		std::ifstream file(path, std::ios::binary);
 		if (!file) {
-			Log::Warn("Error opening .mesh the file -> {0}", path.c_str());
+			Log::Warn("Error opening .mesh file -> {0}", path.c_str());
 			return;
 		}
 
@@ -33,7 +32,7 @@ namespace Loopie {
 		file.seekg(0, std::ios::beg);
 
 		if (size <= 0) {
-			Log::Warn("Error reading .mesh the file -> {0}", path.c_str());
+			Log::Warn("Error reading .mesh file -> {0}", path.c_str());
 			return;
 		}
 
