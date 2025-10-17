@@ -1,5 +1,6 @@
 #include "Transform.h"
 #include "Loopie/Core/Log.h"
+#include "Loopie/Scene/Entity.h"
 
 namespace Loopie
 {
@@ -36,19 +37,19 @@ namespace Loopie
         SetDirty();
     }
 
-    void Transform::SetRotationEuler(const vec3& eulerDegrees)
+    void Transform::SetRotationEulerDeg(const vec3& degrees)
     {
-        m_rotation = glm::quat(glm::radians(eulerDegrees));
+        m_rotation = glm::quat(glm::radians(degrees));
         SetDirty();
     }
 
-    void Transform::SetRotationEulerRad(const vec3& eulerRadians)
+    void Transform::SetRotationEulerRad(const vec3& radians)
     {
-        m_rotation = glm::quat(eulerRadians);
+        m_rotation = glm::quat(radians);
         SetDirty();
     }
 
-    void Transform::Rotate(const vec3& eulerDegrees)
+    void Transform::RotateDeg(const vec3& eulerDegrees)
     {
         RotateRad(glm::radians(eulerDegrees));
     }
@@ -59,7 +60,7 @@ namespace Loopie
         SetDirty();
     }
 
-    void Transform::RotateAroundAxis(const vec3& axis, float degrees)
+    void Transform::RotateAroundAxisDeg(const vec3& axis, float degrees)
     {
         RotateAroundAxisRad(axis, glm::radians(degrees));
     }
@@ -161,16 +162,16 @@ namespace Loopie
             OnTransformDirty();
     }
 
-    void Transform::RotateLocal(const vec3& eulerDegrees)
+    void Transform::RotateLocalDeg(const vec3& degrees)
     {
-        RotateLocalRad(glm::radians(eulerDegrees));
+        RotateLocalRad(glm::radians(degrees));
     }
 
     void Transform::RotateLocalRad(const vec3& eulerRadians)
     {
-        RecalculateCache(); // Ensure axes are up to date
+        RecalculateCache();
 
-        // Apply pitch (around right), yaw (around up), and roll (around forward)
+        
         if (eulerRadians.y != 0.0f)
             m_rotation = glm::normalize(glm::angleAxis(eulerRadians.y, m_right) * m_rotation);
         if (eulerRadians.x != 0.0f)
@@ -180,7 +181,6 @@ namespace Loopie
 
         SetDirty();
     }
-
 
     void Transform::Init()
     {

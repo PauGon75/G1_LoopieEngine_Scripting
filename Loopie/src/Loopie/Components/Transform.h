@@ -12,62 +12,78 @@ namespace Loopie
         DEFINE_TYPE(Transform)
 
         Transform::Transform(const vec3& position = { 0, 0, 0 }, const quaternion& rotation = { 1, 0, 0, 0 }, const vec3& scale = { 1, 1, 1 });
-        
         Transform::~Transform() = default;
+        void Init() override; //// From Component
 
+#pragma region Transform Matrix
         matrix4 GetTransformMatrix() const;
+#pragma endregion
 
-        quaternion GetRotation() const;
-
-        vec3 GetRotationEulerDeg() const;
-
-        vec3 GetRotationEulerRad() const;
-
-        void SetRotation(const quaternion& rotation);
-
-        void SetRotationEuler(const vec3& eulerDegrees);
-
-        void SetRotationEulerRad(const vec3& eulerRadians);
-
-        void Rotate(const vec3& eulerDegrees);
-
-        void RotateRad(const vec3& eulerRadians);
-
-        void RotateAroundAxis(const vec3& axis, float degrees);
-
-        void RotateAroundAxisRad(const vec3& axis, float radians);
+#pragma region Position
+        const vec3& GetPosition() const;
 
         void SetPosition(const vec3& position);
 
-        const vec3& GetPosition() const;
-
-        void SetScale(const vec3& scale);
-
-        const vec3& GetScale() const;
-
         void Translate(const vec3& translation, bool localSpace = true);
+#pragma endregion
 
+#pragma region Rotation
+        quaternion QuaternionGetRotation() const;
+        vec3 DegreesGetEulerAngles() const;
+        vec3 RadiansGetEulerAngles() const;
+
+        void Quaternion_SetRotation(const quaternion& rotation);
+        void DegreesSetRotation(const vec3& degrees);
+        void RadiansSetRotation(const vec3& radians);
+
+        void Quaternion_Rotate(const vec3& eulerDegrees);
+        void DegreesRotate(const vec3& eulerDegrees);
+        void RadiansRotate(const vec3& eulerRadians);
+
+        void DegreesRotateAroundAxis(const vec3& axis, float degrees);
+        void RadiansRotateAroundAxis(const vec3& axis, float radians);
+        
         void LookAt(const vec3& target, const vec3& up = { 0, 1, 0 });
+        
+        void DegreesRotateLocal(const vec3& degrees);
+        void RadiansRotateLocal(const vec3& radians);
+#pragma endregion
 
-        const vec3& Forward() const;
+#pragma region Scale
+        const vec3& GetScale() const;
+        
+        void SetScale(const vec3& scale);
+#pragma endregion
 
+#pragma region Vector
         const vec3& Right() const;
-
         const vec3& Up() const;
+        const vec3& Forward() const;
+#pragma endregion
+
+        
+        
+
+
+        
+
+
+
+
+
+
+
+
 
         vec3 TransformPoint(const vec3& localPoint) const;
 
         vec3 InverseTransformPoint(const vec3& worldPoint) const;
 
-        void SetDirty() const;
 
-        void RotateLocal(const vec3& eulerDegrees);
 
-        void RotateLocalRad(const vec3& eulerRadians);
-
-        void Init() override; //// From Component
 
     private:
+        void SetDirty() const;
         void RecalculateCache() const;
     public:
         std::function<void()>OnTransformDirty;

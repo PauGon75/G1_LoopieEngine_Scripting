@@ -50,7 +50,6 @@ namespace Loopie
 		}
 
 		m_inputDirection.z -= inputEvent.GetScrollDelta().y * 25;
-		
 	}
 
 	void OrbitalCamera::Update(float dt)
@@ -67,9 +66,8 @@ namespace Loopie
 
 		transform->SetRotation(yawRotation * pitchRotation);
 
-		// Move camera in local space
 		if (glm::length(m_inputDirection) > 0.001f)
-			transform->Translate(m_inputDirection * m_speedMultiplier * dt);
+			transform->Translate(m_inputDirection * m_speedMultiplier * m_directionSpeed * dt);
 	}
 
 }

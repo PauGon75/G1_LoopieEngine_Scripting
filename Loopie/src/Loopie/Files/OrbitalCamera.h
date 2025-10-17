@@ -23,6 +23,10 @@ namespace Loopie
 
 		vec3 m_inputDirection = vec3(0, 0, 0);
 		vec3 m_inputRotation = vec3(0, 0, 0);
+
+		float m_directionSpeed = 5.f;
+		float m_rotationSpeed = 0.1f;
+
 		bool m_complexMovement = false;
 
 		std::shared_ptr<Entity>m_entity;
