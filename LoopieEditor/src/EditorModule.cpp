@@ -5,7 +5,8 @@
 //// Test
 #include "Loopie/Core/Log.h"
 #include "Loopie/Render/Renderer.h"
-#include "Loopie/Files/MeshImporter.h"
+#include "Loopie/Importers/MeshImporter.h"
+#include "Loopie/Importers/TextureImporter.h"
 
 #include "Loopie/Core/Math.h"
 #include "Loopie/Resources/ResourceDatabase.h"
@@ -97,6 +98,47 @@ namespace Loopie
 							renderer->SetMesh(mesh);
 						}
 					}
+				}
+			}
+			else if(TextureImporter::CheckIfIsImage(fileName)) {
+				if (!AssetRegistry::AssetExists(fileName)) {
+					std::string cacheFile = TextureImporter::LoadImage(fileName);
+					std::filesystem::path path = cacheFile;
+
+					AssetMetadata metadata;
+					metadata.uuid = UUID(path.stem().string());
+					metadata.cachePath = cacheFile;
+					metadata.sourcePath = fileName;
+					AssetRegistry::RegisterAsset(metadata);
+
+					std::shared_ptr<Texture> texture = ResourceDatabase::LoadResource<Texture>(metadata.uuid);
+					if (texture) {
+						for (const auto& entity : meshContainerEntity->GetChildren())
+						{
+							MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+							if (renderer) {
+								renderer->SetTexture(texture);
+							}
+						}
+					}
+				}
+				else {
+					std::vector<UUID> uuids = AssetRegistry::GetUUIDFromSourcePath(fileName);
+					for (size_t i = 0; i < uuids.size(); i++)
+					{
+						AssetMetadata* metadata = AssetRegistry::GetMetadata(uuids[i]);
+						std::shared_ptr<Texture> texture = ResourceDatabase::LoadResource<Texture>(metadata->uuid);
+						if (texture) {
+							for (const auto& entity : meshContainerEntity->GetChildren())
+							{
+								MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+								if (renderer) {
+									renderer->SetTexture(texture);
+								}
+							}
+						}
+					}
+					
 				}
 			}
 		}

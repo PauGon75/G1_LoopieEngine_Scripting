@@ -2,11 +2,11 @@
 #include <string>
 namespace Loopie
 {
-	class Texture
+	class TextureBuffer
 	{
 	public:
-		Texture(const std::string& path, bool flipVertically = false);
-		~Texture();
+		TextureBuffer(const unsigned char* data, int width, int height, int channels);
+		~TextureBuffer();
 
 		void Bind(unsigned int unit = 0)const;
 		void Unbind()const;
@@ -14,8 +14,5 @@ namespace Loopie
 		unsigned int GetID()const { return m_texture_ID; }
 	private:
 		unsigned int m_texture_ID;
-		int m_width;
-		int m_height;
-		int m_channels;
 	};
 }

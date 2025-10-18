@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Loopie/Resources/Types/Mesh.h"
-
 #include <memory>
+#include <vector>
 #include <string>
 
 namespace Loopie {

@@ -2,6 +2,7 @@
 
 #include "Loopie/Core/Log.h"
 #include "Loopie/Core/Application.h"
+#include "Loopie/Resources/Types/Mesh.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
