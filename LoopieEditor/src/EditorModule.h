@@ -41,7 +41,6 @@ namespace Loopie {
 
 		/// Test
 		Scene* scene;
-		std::shared_ptr<Entity> cameraEntity;
 		OrbitalCamera* camera;
 		std::shared_ptr<Entity> meshContainerEntity;
 

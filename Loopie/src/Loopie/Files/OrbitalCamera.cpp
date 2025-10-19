@@ -58,7 +58,7 @@ namespace Loopie
 		
 		// Update pitch and yaw
 		m_yaw += - m_inputRotation.x * dt; // Yaw around world up
-		m_pitch += m_inputRotation.y * dt; // Pitch around local right
+		m_pitch += - m_inputRotation.y * dt; // Pitch around local right
 
 		// Build new rotation from yaw and pitch — no roll
 		glm::quat yawRotation = glm::normalize(glm::angleAxis(m_yaw, vec3(0, 1, 0))); // global Y up
