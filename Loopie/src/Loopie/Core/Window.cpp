@@ -31,6 +31,14 @@ namespace Loopie {
 		Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 
 		SetVsync(false, true);
+
+		const SDL_DisplayMode* display = SDL_GetCurrentDisplayMode(1);
+		if (display) {
+			if (display->w < WINDOW_DEFAULT_WIDTH || display->h < WINDOW_DEFAULT_HEIGHT) {
+				SetWindowSize(WINDOW_SMALL_DEFAULT_WIDTH, WINDOW_SMALL_DEFAULT_HEIGHT);
+			}
+		}
+		
 	}
 
 	Window::~Window()

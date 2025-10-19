@@ -8,6 +8,9 @@
 #define WINDOW_DEFAULT_WIDTH 1600
 #define WINDOW_DEFAULT_HEIGHT 900
 
+#define WINDOW_SMALL_DEFAULT_WIDTH 1280
+#define WINDOW_SMALL_DEFAULT_HEIGHT 720
+
 
 namespace Loopie {
 	class InputEventManager;
