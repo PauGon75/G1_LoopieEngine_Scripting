@@ -15,7 +15,18 @@ namespace Loopie {
 		// PSTODO: Verify if ASSERT works like this
 		ASSERT(!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS), "SDL_VIDEO could not initialize! SDL_Error: {0}", SDL_GetError());
 
-		m_window = SDL_CreateWindow("test_window_name", WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT,
+		int width = WINDOW_DEFAULT_WIDTH;
+		int height = WINDOW_DEFAULT_HEIGHT;
+
+		const SDL_DisplayMode* display = SDL_GetCurrentDisplayMode(1);
+		if (display) {
+			if (display->w < WINDOW_DEFAULT_WIDTH || display->h < WINDOW_DEFAULT_HEIGHT) {
+				width = WINDOW_SMALL_DEFAULT_WIDTH;
+				height = WINDOW_SMALL_DEFAULT_HEIGHT;
+			}
+		}
+
+		m_window = SDL_CreateWindow("test_window_name", width, height,
 			SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE /*0*/); // Flags
 
 		// Create OpenGL context
@@ -30,15 +41,7 @@ namespace Loopie {
 		// Set clear color, optional
 		Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 
-		SetVsync(false, true);
-
-		const SDL_DisplayMode* display = SDL_GetCurrentDisplayMode(1);
-		if (display) {
-			if (display->w < WINDOW_DEFAULT_WIDTH || display->h < WINDOW_DEFAULT_HEIGHT) {
-				SetWindowSize(WINDOW_SMALL_DEFAULT_WIDTH, WINDOW_SMALL_DEFAULT_HEIGHT);
-			}
-		}
-		
+		SetVsync(false, true);	
 	}
 
 	Window::~Window()
