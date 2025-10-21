@@ -2,6 +2,8 @@
 
 #include "Loopie/Core/UUID.h"
 #include "Loopie/Resources/Resource.h"
+#include "Loopie/Resources/AssetRegistry.h"
+
 
 #include <unordered_map>
 #include <memory>

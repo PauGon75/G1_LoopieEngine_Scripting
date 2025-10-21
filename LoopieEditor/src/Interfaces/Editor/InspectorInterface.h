@@ -13,6 +13,7 @@ namespace Loopie {
 	public:
 		InspectorInterface();
 		~InspectorInterface() = default;
+		void Init() override {}
 		void Render() override;
 
 	private:

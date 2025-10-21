@@ -134,6 +134,16 @@ namespace Loopie {
 		}
 	}
 
+	AssetMetadata AssetRegistry::CreateAssetMetadata(const std::string& sourcePath, const std::string& cachePath)
+	{
+		std::filesystem::path path = cachePath;
+		AssetMetadata metadata;
+		metadata.uuid = UUID(path.stem().string());
+		metadata.cachePath = cachePath;
+		metadata.sourcePath = sourcePath;
+		return metadata;
+	}
+
 	bool AssetRegistry::SaveRegistry()
 	{
 		const Project& project = Application::GetInstance().m_activeProject;

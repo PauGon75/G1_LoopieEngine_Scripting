@@ -8,6 +8,7 @@ namespace Loopie {
 	public:
 		HierarchyInterface();
 		~HierarchyInterface() = default;
+		void Init() override {}
 		void Render() override;
 
 		void SetScene(Scene* scene);

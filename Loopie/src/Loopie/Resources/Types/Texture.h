@@ -16,6 +16,8 @@ namespace Loopie {
 
 		void LoadFromFile(const std::string path) override;
 		void Reload() override;
+
+		int GetRenderId() { return m_tb->GetID(); }
 	private:
 		std::vector<unsigned char> m_pixels;
 		int m_width = 0;

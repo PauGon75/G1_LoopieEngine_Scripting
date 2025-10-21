@@ -36,6 +36,13 @@ namespace Loopie
 		ivec2 windowSize = Application::GetInstance().GetWindow().GetSize();
 		camera->GetCamera()->SetViewport(0, 0, windowSize.x, windowSize.y);
 
+		m_assetsExplorer.Init();
+		m_console.Init();
+		m_hierarchy.Init();
+		m_inspector.Init();
+		m_scene.Init();
+		m_mainMenu.Init();
+
 		m_hierarchy.SetScene(scene);
 	}
 
@@ -66,12 +73,7 @@ namespace Loopie
 
 					for (size_t i = 0; i < cacheFiles.size(); i++)
 					{
-						std::filesystem::path path = cacheFiles[i];
-
-						AssetMetadata metadata;
-						metadata.uuid = UUID(path.stem().string());
-						metadata.cachePath = cacheFiles[i];
-						metadata.sourcePath = fileName;
+						AssetMetadata metadata = AssetRegistry::CreateAssetMetadata(fileName, cacheFiles[i]);
 						AssetRegistry::RegisterAsset(metadata);
 
 						std::shared_ptr<Mesh> mesh = ResourceDatabase::LoadResource<Mesh>(metadata.uuid);
@@ -99,12 +101,8 @@ namespace Loopie
 			else if(TextureImporter::CheckIfIsImage(fileName)) {
 				if (!AssetRegistry::AssetExists(fileName)) {
 					std::string cacheFile = TextureImporter::LoadImage(fileName);
-					std::filesystem::path path = cacheFile;
-
-					AssetMetadata metadata;
-					metadata.uuid = UUID(path.stem().string());
-					metadata.cachePath = cacheFile;
-					metadata.sourcePath = fileName;
+					AssetMetadata metadata = AssetRegistry::CreateAssetMetadata(fileName, cacheFile);
+					AssetRegistry::RegisterAsset(metadata);
 					AssetRegistry::RegisterAsset(metadata);
 
 					std::shared_ptr<Texture> texture = ResourceDatabase::LoadResource<Texture>(metadata.uuid);

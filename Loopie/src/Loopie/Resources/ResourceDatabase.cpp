@@ -1,6 +1,4 @@
 #include "ResourceDatabase.h"
-#include "Loopie/Resources/AssetRegistry.h"
-
 #include "Loopie/Resources/Types/Mesh.h"
 
 #include <filesystem>

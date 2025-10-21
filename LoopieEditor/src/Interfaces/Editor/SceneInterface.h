@@ -7,6 +7,7 @@ namespace Loopie {
 	public:
 		SceneInterface();
 		~SceneInterface() = default;
+		void Init() override {}
 		void Render() override;
 	};
 }

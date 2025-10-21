@@ -34,6 +34,8 @@ namespace Loopie {
 
         static void RemoveInvalidAssets();
 
+        static AssetMetadata CreateAssetMetadata(const std::string& sourcePath, const std::string& cachePath);
+
         static void Clear() { s_Assets.clear(); s_SourcePathToUUID.clear(); }
 
     private:

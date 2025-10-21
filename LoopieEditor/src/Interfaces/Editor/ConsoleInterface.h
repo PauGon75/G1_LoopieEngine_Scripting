@@ -9,6 +9,7 @@ namespace Loopie {
 	public:
 		ConsoleInterface();
 		~ConsoleInterface() = default;
+		void Init() override;
 		void Render() override;
 	
 	private:

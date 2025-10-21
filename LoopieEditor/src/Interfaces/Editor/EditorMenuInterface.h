@@ -10,6 +10,7 @@ namespace Loopie {
 	public:
 		EditorMenuInterface();
 		~EditorMenuInterface() = default;
+		void Init() override {}
 		void Render() override;
 
 	private:

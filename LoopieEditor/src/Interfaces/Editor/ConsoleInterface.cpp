@@ -5,13 +5,18 @@
 
 namespace Loopie {
 	ConsoleInterface::ConsoleInterface() {
+        
+	}
+
+    void ConsoleInterface::Init()
+    {
         msgColor[0] = vec4(0.5f, 0.5f, 0.5f, 1.0f);
         msgColor[1] = vec4(0.0f, 1.0f, 1.0f, 1.0f);
         msgColor[2] = vec4(0.0f, 1.0f, 0.0f, 1.0f);
         msgColor[3] = vec4(1.0f, 1.0f, 0.0f, 1.0f);
         msgColor[4] = vec4(1.0f, 0.0f, 0.0f, 1.0f);
         msgColor[5] = vec4(1.0f, 0.0f, 1.0f, 1.0f);
-	}
+    }
 
 	void ConsoleInterface::Render() {
 		if (ImGui::Begin("Console")) {
