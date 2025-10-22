@@ -62,31 +62,21 @@ namespace Loopie {
 
 		auto mesh = static_cast<const aiMesh*>(meshPtr);
 
-		struct MeshData
-		{
-			//const char* Name="";
-			unsigned int verticesAmount=0;
-			unsigned int vertexElements=0;
-			unsigned int indicesAmount=0;
-			VertexComponents components;
-		};
-
 		MeshData data;
 		//data.Name = mesh->mName.C_Str();
-		data.verticesAmount = mesh->mNumVertices;
+		data.VerticesAmount = mesh->mNumVertices;
 
-		data.components.Position = mesh->mNumVertices > 0;
-		data.components.Normal = mesh->HasNormals();
-		data.components.TexCoord = mesh->mTextureCoords[0];
-		data.components.Tangent = mesh->HasTangentsAndBitangents();
-		data.components.Color = mesh->HasVertexColors(0);
+		data.HasPosition = mesh->mNumVertices > 0;
+		data.HasTexCoord = mesh->mTextureCoords[0];
+		data.HasNormal = mesh->HasNormals();
+		data.HasTangent = mesh->HasTangentsAndBitangents();
+		data.HasColor = mesh->HasVertexColors(0);
 
-		data.vertexElements = data.components.Position ? 3 : 0;
-		data.vertexElements += data.components.Normal ? 3 : 0;
-		data.vertexElements += data.components.TexCoord ? 2 : 0;
-		data.vertexElements += data.components.Tangent ? 3 : 0;
-		data.vertexElements += data.components.Color ? 4 : 0;
-
+		data.VertexElements = data.HasPosition ? 3 : 0;
+		data.VertexElements += data.HasTexCoord ? 2 : 0;
+		data.VertexElements += data.HasNormal ? 3 : 0;
+		data.VertexElements += data.HasTangent ? 3 : 0;
+		data.VertexElements += data.HasColor ? 4 : 0;
 
 
 		///// File Creation
@@ -98,22 +88,22 @@ namespace Loopie {
 		std::ofstream fs(pathToWrite, std::ios::out | std::ios::binary | std::ios::app);
 
 		//fs.write(data.Name, sizeof data.Name);
-		fs.write(reinterpret_cast<const char*>(&data.verticesAmount), sizeof data.verticesAmount);
-		fs.write(reinterpret_cast<const char*>(&data.vertexElements), sizeof data.vertexElements);
+		fs.write(reinterpret_cast<const char*>(&data.VerticesAmount), sizeof data.VerticesAmount);
+		fs.write(reinterpret_cast<const char*>(&data.VertexElements), sizeof data.VertexElements);
 
 
 		for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
 			const aiFace& face = mesh->mFaces[i];
-			data.indicesAmount += face.mNumIndices;
+			data.IndicesAmount += face.mNumIndices;
 		}
 
-		fs.write(reinterpret_cast<const char*>(&data.indicesAmount), sizeof data.indicesAmount);
+		fs.write(reinterpret_cast<const char*>(&data.IndicesAmount), sizeof data.IndicesAmount);
 
-		fs.write(reinterpret_cast<const char*>(&data.components.Position), sizeof data.components.Position);
-		fs.write(reinterpret_cast<const char*>(&data.components.Normal), sizeof data.components.Normal);
-		fs.write(reinterpret_cast<const char*>(&data.components.TexCoord), sizeof data.components.TexCoord);
-		fs.write(reinterpret_cast<const char*>(&data.components.Tangent), sizeof data.components.Tangent);
-		fs.write(reinterpret_cast<const char*>(&data.components.Color), sizeof data.components.Color);
+		fs.write(reinterpret_cast<const char*>(&data.HasPosition), sizeof data.HasPosition);
+		fs.write(reinterpret_cast<const char*>(&data.HasNormal), sizeof data.HasNormal);
+		fs.write(reinterpret_cast<const char*>(&data.HasTexCoord), sizeof data.HasTexCoord);
+		fs.write(reinterpret_cast<const char*>(&data.HasTangent), sizeof data.HasTangent);
+		fs.write(reinterpret_cast<const char*>(&data.HasColor), sizeof data.HasColor);
 
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
@@ -123,13 +113,13 @@ namespace Loopie {
 			fs.write(reinterpret_cast<const char*>(&mesh->mVertices[i].z), sizeof mesh->mVertices[i].z);
 
 			///TexCoords
-			if (data.components.TexCoord) {
+			if (data.HasTexCoord) {
 				fs.write(reinterpret_cast<const char*>(&mesh->mTextureCoords[0][i].x), sizeof mesh->mTextureCoords[0][i].x);
 				fs.write(reinterpret_cast<const char*>(&mesh->mTextureCoords[0][i].y), sizeof mesh->mTextureCoords[0][i].y);
 			}
 
 			///Normals
-			if (data.components.Normal) {
+			if (data.HasNormal) {
 
 				fs.write(reinterpret_cast<const char*>(&mesh->mNormals[i].x), sizeof mesh->mNormals[i].x);
 				fs.write(reinterpret_cast<const char*>(&mesh->mNormals[i].y), sizeof mesh->mNormals[i].y);
@@ -137,7 +127,7 @@ namespace Loopie {
 			}
 
 			///Tangent
-			if (data.components.Tangent) {
+			if (data.HasTangent) {
 
 				fs.write(reinterpret_cast<const char*>(&mesh->mTangents[i].x), sizeof mesh->mTangents[i].x);
 				fs.write(reinterpret_cast<const char*>(&mesh->mTangents[i].y), sizeof mesh->mTangents[i].y);
@@ -145,7 +135,7 @@ namespace Loopie {
 			}
 
 			///Color
-			if (data.components.Color) {
+			if (data.HasColor) {
 				const aiColor4D& c = mesh->mColors[0][i];
 
 				fs.write(reinterpret_cast<const char*>(&c.r), sizeof c.r);

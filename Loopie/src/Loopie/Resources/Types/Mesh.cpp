@@ -36,58 +36,47 @@ namespace Loopie {
 			return;
 		}
 
-		struct MeshData
-		{
-			//const char* Name = "";
-			unsigned int verticesAmount = 0;
-			unsigned int vertexElements = 0;
-			unsigned int indicesAmount = 0;
-			VertexComponents components;
-		};
-
 		MeshData data;
 
-		file.read(reinterpret_cast<char*>(&data.verticesAmount), sizeof data.verticesAmount);
-		file.read(reinterpret_cast<char*>(&data.vertexElements), sizeof data.vertexElements);
-		file.read(reinterpret_cast<char*>(&data.indicesAmount), sizeof data.indicesAmount);
+		file.read(reinterpret_cast<char*>(&data.VerticesAmount), sizeof data.VerticesAmount);
+		file.read(reinterpret_cast<char*>(&data.VertexElements), sizeof data.VertexElements);
+		file.read(reinterpret_cast<char*>(&data.IndicesAmount), sizeof data.IndicesAmount);
 
-		file.read(reinterpret_cast<char*>(&data.components.Position), sizeof data.components.Position);
-		file.read(reinterpret_cast<char*>(&data.components.Normal), sizeof data.components.Normal);
-		file.read(reinterpret_cast<char*>(&data.components.TexCoord), sizeof data.components.TexCoord);
-		file.read(reinterpret_cast<char*>(&data.components.Tangent), sizeof data.components.Tangent);
-		file.read(reinterpret_cast<char*>(&data.components.Color), sizeof data.components.Color);
+		file.read(reinterpret_cast<char*>(&data.HasPosition), sizeof data.HasPosition);
+		file.read(reinterpret_cast<char*>(&data.HasNormal), sizeof data.HasNormal);
+		file.read(reinterpret_cast<char*>(&data.HasTexCoord), sizeof data.HasTexCoord);
+		file.read(reinterpret_cast<char*>(&data.HasTangent), sizeof data.HasTangent);
+		file.read(reinterpret_cast<char*>(&data.HasColor), sizeof data.HasColor);
 
-		m_vertices.clear();
-		m_vertices = std::vector<float>(data.verticesAmount* data.vertexElements);
+		data.Vertices.clear();
+		data.Vertices = std::vector<float>(data.VerticesAmount* data.VertexElements);
 
-		for (unsigned int i = 0; i < data.verticesAmount * data.vertexElements; ++i) {
-			file.read(reinterpret_cast<char*>(&m_vertices[i]), sizeof m_vertices[i]);
+		for (unsigned int i = 0; i < data.VerticesAmount * data.VertexElements; ++i) {
+			file.read(reinterpret_cast<char*>(&data.Vertices[i]), sizeof data.Vertices[i]);
 		}
-		m_indices.clear();
-		m_indices = std::vector<unsigned int>(data.indicesAmount);
-		for (unsigned int i = 0; i < data.indicesAmount; ++i) {
-			file.read(reinterpret_cast<char*>(&m_indices[i]), sizeof m_indices[i]);
+		data.Indices.clear();
+		data.Indices = std::vector<unsigned int>(data.IndicesAmount);
+		for (unsigned int i = 0; i < data.IndicesAmount; ++i) {
+			file.read(reinterpret_cast<char*>(&data.Indices[i]), sizeof data.Indices[i]);
 		}
 		file.close();
 		///
 
-		m_components = data.components;
-
-		m_vbo = std::make_shared<VertexBuffer>(m_vertices.data(), (unsigned int)(sizeof(float) * data.verticesAmount * data.vertexElements));
-		m_ebo = std::make_shared<IndexBuffer>(m_indices.data(), data.indicesAmount);
+		m_vbo = std::make_shared<VertexBuffer>(data.Vertices.data(), (unsigned int)(sizeof(float) * data.VerticesAmount * data.VertexElements));
+		m_ebo = std::make_shared<IndexBuffer>(data.Indices.data(), data.IndicesAmount);
 		m_vao = std::make_shared<VertexArray>();
 
 		BufferLayout& layout = m_vbo->GetLayout();
 
-		if (m_components.Position)
+		if (data.HasPosition)
 			layout.AddLayoutElement(0, GLVariableType::FLOAT, 3, "a_Position");
-		if (m_components.TexCoord)
+		if (data.HasTexCoord)
 			layout.AddLayoutElement(1, GLVariableType::FLOAT, 2, "a_TexCoord");
-		if (m_components.Normal)
+		if (data.HasNormal)
 			layout.AddLayoutElement(2, GLVariableType::FLOAT, 3, "a_Normal");
-		if (m_components.Tangent)
+		if (data.HasTangent)
 			layout.AddLayoutElement(3, GLVariableType::FLOAT, 3, "a_Tangent");
-		if (m_components.Color)
+		if (data.HasColor)
 			layout.AddLayoutElement(4, GLVariableType::FLOAT, 4, "a_Color");
 
 		m_vao->AddBuffer(m_vbo.get(), m_ebo.get());

@@ -9,14 +9,21 @@
 
 namespace Loopie {
 
-	struct VertexComponents {
-		bool Position = true;
-		bool TexCoord = false;
-		bool Normal = false;
-		bool Tangent = false;
-		bool Color = false;
-	};
+	struct MeshData {
+		unsigned int VerticesAmount = 0;
+		unsigned int VertexElements = 0;
+		unsigned int IndicesAmount = 0;
 
+		bool HasPosition = true;
+		bool HasTexCoord = false;
+		bool HasNormal = false;
+		bool HasTangent = false;
+		bool HasColor = false;
+
+		std::vector<float> Vertices;
+		std::vector<unsigned int> Indices;
+	};
+	
 	class Mesh : public Resource{
 		friend class MeshRenderer;
 	public :
@@ -28,9 +35,7 @@ namespace Loopie {
 		void LoadFromFile(const std::string path) override;
 		void Reload() override;
 	private:
-		std::vector<float> m_vertices;
-		std::vector<unsigned int> m_indices;
-		VertexComponents m_components;
+		MeshData m_data;
 
 		std::shared_ptr<VertexArray> m_vao;
 		std::shared_ptr<VertexBuffer> m_vbo;
