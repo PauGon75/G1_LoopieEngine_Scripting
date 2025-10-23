@@ -88,7 +88,7 @@ namespace Loopie {
 		bool GetIsActive() const;
 		std::shared_ptr<Entity> GetChild(UUID uuid) const;
 		const std::vector<std::shared_ptr<Entity>>& GetChildren() const;
-		std::weak_ptr<Entity> GetParent() const;
+		Entity* GetParent() const;
 		std::vector<Component*> GetComponents() const;
 		Transform* GetTransform() const;
 
@@ -99,7 +99,7 @@ namespace Loopie {
 		void SetParent(const std::shared_ptr<Entity>& parent);
 
 	private:
-		std::weak_ptr<Entity> m_parentEntity;
+		Entity* m_parentEntity;
 		std::vector<std::shared_ptr<Entity>> m_childrenEntities;
 		std::vector<std::unique_ptr<Component>> m_components; // Might want to re-do this to a map for optimization
 		Transform* m_transform = nullptr;

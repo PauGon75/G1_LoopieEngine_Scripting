@@ -7,47 +7,58 @@ namespace Loopie
     class Transform : public Component
     {
     public:
-        Transform();
+        DEFINE_TYPE(Transform)
+        Transform(vec3 pos = { 0,0,0 }, quaternion rot = {1,0,0,0}, vec3 sca = {1,1,1});
         ~Transform() = default;
-
-        void translate(const vec3& translation, bool local = true);
-        void rotate(const vec3& axis, float angle, bool local = true);
-        void rotate(const vec3& eulerAngles, bool local = true);
-        void scaleBy(const vec3& scaling, bool local = true);
-
-        vec3 getForward();  
-        vec3 getUp();
-        vec3 getRight();
-
-        matrix4 getMatrix();
-        void updateMatrix();
-        matrix4 GetWorldTransform();
-
-        vec3 getPosition() const;
-        void setPosition(const vec3& newPosition);
-
-        quaternion getRotation() const;
-        quaternion getLocalRotation() const;
-
-        vec3 getEulerAngles() const;
-        vec3 getLocalEulerAngles() const;
-        void setRotation(const vec3& newRotation);
-
-        vec3 getScale() const;
-        void setScale(const vec3& newScale);
+        void Init()override;
+#pragma region Transformations
+        void Translate(const vec3& translation, bool local = true);
+        void RotateAxisAngle(const vec3& axis, float angle, bool local = true);
+        void RotateEulerAngles(const vec3& eulerAngles, bool local = true);
+        void Scale(const vec3& scaling, bool local = true);
+#pragma endregion
+#pragma region Vectors
+        vec3 Right();
+        vec3 Up();
+        vec3 Forward();  
+#pragma endregion
+#pragma region Matrix
+        matrix4 GetMatrix();
+        void UpdateMatrix();
+#pragma endregion
+#pragma region Get
+        vec3 GetPosition() const;
+        vec3 GetLocalPosition() const;
+        quaternion GetRotation() const;
+        quaternion GetLocalRotation() const;
+        vec3 GetEulerAngles() const;
+        vec3 GetLocalEulerAngles() const;
+        vec3 GetScale() const;
+        vec3 GetLocalScale() const;
+        quaternion GetQuaternion() const;
+#pragma endregion
+#pragma region Set
+        void SetPosition(const vec3& newPosition);
+        void SetRotation(const vec3& newRotation);
+        void SetQuaternion(const quaternion newQuaternion);
+        void SetScale(const vec3& newScale);
+#pragma endregion
 
         quaternion EulerAnglesToQuaternion(const vec3& eulerAngles);
+        void UpdateParent();
+    private:
+        void Recalculate();
+    private:
+        vec3 m_position;
+        vec3 m_localPosition;
+        quaternion m_rotation;
+        quaternion m_localRotation;
+        vec3 m_eulerAngles;
+        vec3 m_localEulerAngles;
+        vec3 m_scale;
+        vec3 m_localScale;
+        matrix4 m_globalMatrix;
 
-    public:
-
-        vec3 position;
-        vec3 localPosition;
-        quaternion rotation;
-        quaternion localRotation;
-        vec3 eulerAngles;
-        vec3 localEulerAngles;
-        vec3 scale;
-        vec3 localScale;
-        matrix4 globalMatrix;
+        Transform* m_parentTransform;
     };
 }

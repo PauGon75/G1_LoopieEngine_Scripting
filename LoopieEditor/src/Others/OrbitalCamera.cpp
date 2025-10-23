@@ -89,7 +89,7 @@ namespace Loopie
         glm::quat pitchRotation = glm::normalize(glm::angleAxis(m_pitch, glm::vec3(1, 0, 0)));
         glm::quat orbitRotation = glm::normalize(yawRotation * pitchRotation);
 
-        transform->QuaternionSetRotation(orbitRotation);
+        transform->SetQuaternion(orbitRotation);
 
         if (glm::length(m_inputDirection) > 0.001f)
         {
@@ -100,7 +100,7 @@ namespace Loopie
             glm::vec3 localPos = transform->GetPosition() - pivot->GetPosition();
 
             // move camera in local orbit space
-            glm::vec3 moveDir = transform->QuaternionGetRotation() * m_inputDirection * dt;
+            glm::vec3 moveDir = transform->GetQuaternion() * m_inputDirection * dt;
             localPos += moveDir;
 
             // recompute world position

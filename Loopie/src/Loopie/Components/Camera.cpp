@@ -11,10 +11,6 @@ namespace Loopie
 		
 	}
 
-	Camera::~Camera() {
-		GetTransform()->OnTransformDirty = nullptr;
-	}
-
 	void Camera::SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
 	{
 		m_viewport = vec4(x, y, width, height);
@@ -78,7 +74,7 @@ namespace Loopie
 		if (!m_dirty)
 			return;
 		
-		m_viewMatrix = glm::inverse(GetTransform()->GetTransformMatrix());
+		m_viewMatrix = glm::inverse(GetTransform()->GetMatrix());
 		m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_viewport.z / m_viewport.w, m_nearPlane, m_farPlane);
 		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 	}
@@ -88,7 +84,6 @@ namespace Loopie
 	}
 	void Camera::Init()
 	{
-		GetTransform()->OnTransformDirty = [this]() { SetDirty(); };
 		CalculateMatrices();
 	}
 }

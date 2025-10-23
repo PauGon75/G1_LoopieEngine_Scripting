@@ -66,14 +66,14 @@ namespace Loopie {
 	{
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
 			vec3 position = transform->GetPosition();
-			vec3 rotation = transform->DegreesGetEulerAngles();
+			vec3 rotation = transform->GetEulerAngles();
 			vec3 scale = transform->GetScale();
 
 			if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
 				transform->SetPosition(position);
 			}
 			if (ImGui::DragFloat3("Rotation", &rotation.x, 0.5f)) {
-				transform->DegreesSetRotation(rotation);
+				transform->SetRotation(rotation);
 			}
 			if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
 				transform->SetScale(scale);

@@ -87,7 +87,7 @@ namespace Loopie {
 
 		std::shared_ptr<Entity> entity = it->second;
 
-		if (std::shared_ptr<Entity> parent = entity->GetParent().lock())
+		if (Entity* parent = entity->GetParent())
 		{
 			parent->RemoveChild(uuid);
 		}

@@ -10,7 +10,7 @@ namespace Loopie
 		DEFINE_TYPE(Camera)
 
 		Camera(float fov = 45.0f, float near_plane = 0.1f, float far_plane = 200.0f);
-		~Camera();
+		~Camera() = default;
 
 		void SetViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 
