@@ -19,6 +19,7 @@ namespace Loopie {
 		void Render() override;
 
 	private:
+		void GetExternalFile();
 		void GoToDirectory(const std::filesystem::path& directory, bool removeSearch = true);
 		void SelectFile(const std::filesystem::path& filePath);
 		void DrawSearchBar();

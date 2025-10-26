@@ -153,6 +153,7 @@ namespace Loopie {
 		Project project = Application::GetInstance().m_activeProject;
 		std::filesystem::path pathToWrite = project.GetChachePath();
 		UUID id;
+		pathToWrite /= "Meshes";
 		pathToWrite /= id.Get() + ".mesh";
 
 		std::ofstream fs(pathToWrite, std::ios::out | std::ios::binary | std::ios::app);

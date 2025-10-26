@@ -63,6 +63,9 @@ namespace Loopie
 		if (inputEvent.GetKeyWithModifier(SDL_SCANCODE_I, KeyModifier::CTRL)) {
 			app.SetInterfaceState(!app.IsInterfaceVisible());
 		}
+		if (inputEvent.HasEvent(SDL_EVENT_WINDOW_FOCUS_GAINED)) {
+			//AssetRegistry::Reload();
+		}
 
 		if (inputEvent.HasFileBeenDropped()) { //// Move this to an AssetInspectorClass
 			const char* fileName = inputEvent.GetDroppedFile(0);
@@ -107,13 +110,22 @@ namespace Loopie
 
 					std::shared_ptr<Texture> texture = ResourceDatabase::LoadResource<Texture>(metadata.uuid);
 					if (texture) {
-						for (const auto& entity : meshContainerEntity->GetChildren())
-						{
-							MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+						if (m_hierarchy.s_SelectedEntity != nullptr) {
+							MeshRenderer* renderer = m_hierarchy.s_SelectedEntity->GetComponent<MeshRenderer>();
 							if (renderer) {
 								renderer->GetMaterial()->SetTexture(texture);
 							}
 						}
+						else {
+							for (const auto& entity : meshContainerEntity->GetChildren())
+							{
+								MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+								if (renderer) {
+									renderer->GetMaterial()->SetTexture(texture);
+								}
+							}
+						}
+						
 					}
 				}
 				else {
@@ -123,13 +135,22 @@ namespace Loopie
 						AssetMetadata* metadata = AssetRegistry::GetMetadata(uuids[i]);
 						std::shared_ptr<Texture> texture = ResourceDatabase::LoadResource<Texture>(metadata->uuid);
 						if (texture) {
-							for (const auto& entity : meshContainerEntity->GetChildren())
-							{
-								MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+							if (m_hierarchy.s_SelectedEntity != nullptr) {
+								MeshRenderer* renderer = m_hierarchy.s_SelectedEntity->GetComponent<MeshRenderer>();
 								if (renderer) {
 									renderer->GetMaterial()->SetTexture(texture);
 								}
 							}
+							else {
+								for (const auto& entity : meshContainerEntity->GetChildren())
+								{
+									MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+									if (renderer) {
+										renderer->GetMaterial()->SetTexture(texture);
+									}
+								}
+							}
+
 						}
 					}	
 				}

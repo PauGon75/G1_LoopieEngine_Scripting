@@ -45,6 +45,7 @@ namespace Loopie {
 			Project project = Application::GetInstance().m_activeProject;
 			std::filesystem::path pathToWrite = project.GetChachePath();
 			UUID id;
+			pathToWrite /= "Textures";
 			pathToWrite /= id.Get() + ".texture";
 
 			std::ofstream fs(pathToWrite, std::ios::out | std::ios::binary | std::ios::app);

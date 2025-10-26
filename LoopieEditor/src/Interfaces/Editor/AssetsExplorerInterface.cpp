@@ -2,6 +2,7 @@
 
 #include "Loopie/Core/Application.h"
 #include "Loopie/Files/DirectoryManager.h"
+#include "Loopie/Resources/AssetRegistry.h"
 #include "Loopie/Resources/ResourceDatabase.h"
 #include "Loopie/Importers/TextureImporter.h"
 #include "Loopie/Resources/Types/Texture.h"
@@ -76,6 +77,8 @@ namespace Loopie {
 
 				float footerHeight = ImGui::GetFrameHeightWithSpacing();
 				if (ImGui::BeginChild("FilesScrollView", ImVec2(0, -footerHeight), 0, 0)) {
+					if(ImGui::IsWindowHovered(ImGuiHoveredFlags_None))
+						GetExternalFile();
 					DrawFolderContent();
 				}
 				ImGui::EndChild();
@@ -88,6 +91,38 @@ namespace Loopie {
 		ImGui::End();
 
 
+	}
+
+	void AssetsExplorerInterface::GetExternalFile()
+	{
+		Application& app = Application::GetInstance();
+		InputEventManager& inputEvent = app.GetInputEvent();
+		if (!inputEvent.HasFileBeenDropped())
+			return;
+
+		std::filesystem::path assetsPath = app.m_activeProject.GetAssetsPath();
+		std::filesystem::path currentPath = m_currentDirectory;
+		std::filesystem::path droppedPath = inputEvent.GetDroppedFile(0);
+
+		currentPath = std::filesystem::absolute(currentPath);
+		droppedPath = std::filesystem::absolute(droppedPath);
+
+		std::filesystem::path targetPath = currentPath / droppedPath.filename();
+
+		bool isInAssetsFolder = droppedPath.string().rfind(assetsPath.string(), 0) == 0;
+
+		if (isInAssetsFolder) {
+			if (droppedPath == currentPath) {
+				const Project& project = Application::GetInstance().m_activeProject;
+				GoToDirectory(assetsPath);
+			}
+			DirectoryManager::Move(droppedPath, targetPath);
+		}
+		else {
+			DirectoryManager::Copy(droppedPath, targetPath);
+		}
+
+		//AssetRegistry::Reload();
 	}
 
 	void AssetsExplorerInterface::GoToDirectory(const std::filesystem::path& directory, bool removeSearch)
@@ -233,9 +268,14 @@ namespace Loopie {
 
 	void AssetsExplorerInterface::DrawFolderContent()
 	{
+		const Project& project = Application::GetInstance().m_activeProject;
+
 		if (ImGui::IsWindowHovered() && (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))) {
 			SelectFile("");
 		}
+
+		if (!DirectoryManager::Contains(m_currentDirectory))
+			GoToDirectory(project.GetAssetsPath());
 
 		int cellSize = thumbnailSize + padding;
 		float availX = ImGui::GetContentRegionAvail().x;
@@ -365,6 +405,8 @@ namespace Loopie {
 				}
 
 				DirectoryManager::Move(fromPath, newPath);
+
+				//AssetRegistry::Reload();
 			}
 			ImGui::EndDragDropTarget();
 		}

@@ -10,9 +10,8 @@ namespace Loopie {
 		}
 
 		m_projectPath = DirectoryManager::CreateFolder(projectPath, name);
-		m_assetsPath = DirectoryManager::CreateFolder(m_projectPath, "Assets");
-		m_cachePath = DirectoryManager::CreateFolder(m_projectPath, "Library");
 		m_congifPath = DirectoryManager::CreateFile(m_projectPath, "project", ".config");
+		CreateDefaultPaths();
 
 		/// Maybe some config Files???? Once Scene Exists a default One
 		return true;
@@ -24,11 +23,21 @@ namespace Loopie {
 		}
 
 		m_projectPath = projectPath;
-		m_assetsPath = DirectoryManager::CreateFolder(m_projectPath, "Assets");
-		m_cachePath = DirectoryManager::CreateFolder(m_projectPath, "Library");
 		m_congifPath = projectPath / "project.config";
+		CreateDefaultPaths();
 
 		/// Maybe read/save config Files????
 		return true;
+	}
+	const void Project::CreateDefaultPaths()
+	{
+		m_assetsPath = DirectoryManager::CreateFolder(m_projectPath, "Assets");
+
+		m_cachePath = DirectoryManager::CreateFolder(m_projectPath, "Library");
+		DirectoryManager::CreateFolder(m_cachePath, "Textures");
+		DirectoryManager::CreateFolder(m_cachePath, "Meshes");
+		DirectoryManager::CreateFolder(m_cachePath, "Materials");
+		DirectoryManager::CreateFolder(m_cachePath, "Shaders");
+
 	}
 }
