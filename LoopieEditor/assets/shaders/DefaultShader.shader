@@ -22,12 +22,10 @@ void main()
 [fragment]
 #version 460 core
 in vec2 v_TexCoord;
-in vec4 v_Color;
-
 out vec4 FragColor;
 
 uniform sampler2D u_Albedo;
-uniform vec4 u_Color=  vec4(1.0, 1.0, 1.0, 1.0);;
+uniform vec4 u_Color;
 
 void main()
 {

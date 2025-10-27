@@ -104,6 +104,8 @@ namespace Loopie
 		case UniformType_mat2: m_shader.SetUniformMat2(name, std::get<matrix2>(uniformValue.value));	break;
 		case UniformType_mat3: m_shader.SetUniformMat3(name, std::get<matrix3>(uniformValue.value));	break;
 		case UniformType_mat4: m_shader.SetUniformMat4(name, std::get<matrix4>(uniformValue.value));	break;
+		case UniformType_Sampler2D: 	break;
+		case UniformType_Sampler3D: 	break;
 		default: Log::Warn("Unknown uniform type for '{0}'", name);	break;
 		}
 	}
@@ -119,12 +121,14 @@ namespace Loopie
 		case UniformType_int:	defaultValue.value = 0;				break;
 		case UniformType_uint:	defaultValue.value = 0u;			break;
 		case UniformType_bool:	defaultValue.value = false;			break;
-		case UniformType_vec2:	defaultValue.value = vec2(0.0f);	break;
-		case UniformType_vec3:	defaultValue.value = vec3(0.0f);	break;
-		case UniformType_vec4:	defaultValue.value = vec4(0.0f);	break;
+		case UniformType_vec2:	defaultValue.value = vec2(1);	break;
+		case UniformType_vec3:	defaultValue.value = vec3(1);	break;
+		case UniformType_vec4:	defaultValue.value = vec4(1);	break;
 		case UniformType_mat2:	defaultValue.value = matrix2(1.0f);	break;
 		case UniformType_mat3:	defaultValue.value = matrix3(1.0f);	break;
 		case UniformType_mat4:	defaultValue.value = matrix4(1.0f);	break;
+		case UniformType_Sampler2D: 	break;
+		case UniformType_Sampler3D: 	break;
 		default:
 			Log::Warn("Unknown uniform type in GetDefaultValue.");
 			defaultValue.value = 0;

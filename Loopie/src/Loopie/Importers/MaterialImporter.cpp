@@ -114,6 +114,7 @@ namespace Loopie {
 			file.read(propertyName.data(), sizeof propertyNameLength);
 
 			//// ReadEnume
+
 			switch (0 /*EnumType*/)
 			{
 				////TypeReadMode

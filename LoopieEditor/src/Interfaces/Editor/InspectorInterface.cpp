@@ -113,6 +113,119 @@ namespace Loopie {
 			if (ImGui::Checkbox("Draw Triangle Normals", &drawTN))
 				meshRenderer->SetDrawNormalsPerTriangle(drawTN);
 			//ImGui::Text("Shader: %s", meshRenderer->GetShader().GetName().c_str()); ????
+
+
+			/// Draw Material Props
+			ImGui::Separator();
+			ImGui::Separator();
+			ImGui::Text("Material");
+
+			std::shared_ptr<Material> material = meshRenderer->GetMaterial();
+			const std::unordered_map<std::string, UniformValue> properties = material->GetUniforms();
+			for (auto& [name, uniform] : properties)
+			{
+
+				switch (uniform.type)
+				{
+					case UniformType_int:
+					{
+						int value = std::get<int>(uniform.value);
+						if (ImGui::DragInt(("##" + name).c_str(), &value))
+						{
+							UniformValue newVal = uniform;
+							newVal.value = value;
+							material->SetShaderVariable(name, newVal);
+						}
+						break;
+					}
+					case UniformType_uint:
+					{
+						unsigned int value = std::get<unsigned int>(uniform.value);
+						if (ImGui::DragScalar(("##" + name).c_str(), ImGuiDataType_U32, &value, 1.0f))
+						{
+							UniformValue newVal = uniform;
+							newVal.value = value;
+							material->SetShaderVariable(name, newVal);
+						}
+						break;
+					}
+					case UniformType_float:
+					{
+						float value = std::get<float>(uniform.value);
+						if (ImGui::DragFloat(("##" + name).c_str(), &value, 0.01f))
+						{
+							UniformValue newVal = uniform;
+							newVal.value = value;
+							material->SetShaderVariable(name, newVal);
+						}
+						break;
+					}
+					case UniformType_bool:
+					{
+						bool value = std::get<bool>(uniform.value);
+						if (ImGui::Checkbox(("##" + name).c_str(), &value))
+						{
+							UniformValue newVal = uniform;
+							newVal.value = value;
+							material->SetShaderVariable(name, newVal);
+						}
+						break;
+					}
+					case UniformType_vec2:
+					{
+						vec2 value = std::get<vec2>(uniform.value);
+						if (ImGui::DragFloat2(("##" + name).c_str(), &value.x, 0.01f))
+						{
+							UniformValue newVal = uniform;
+							newVal.value = value;
+							material->SetShaderVariable(name, newVal);
+						}
+						break;
+					}
+					case UniformType_vec3:
+					{
+						vec3 value = std::get<vec3>(uniform.value);
+						if (ImGui::DragFloat3(("##" + name).c_str(), &value.x))
+						{
+							UniformValue newVal = uniform;
+							newVal.value = value;
+							material->SetShaderVariable(name, newVal);
+						}
+						break;
+					}
+					case UniformType_vec4:
+					{
+						vec4 value = std::get<vec4>(uniform.value);
+						ImVec4 color(value.x, value.y, value.z, value.w);
+
+						ImGui::Text("%s", name.c_str());
+						ImGui::SameLine();
+
+						if (ImGui::ColorButton(("##btn_" + name).c_str(), color, ImGuiColorEditFlags_NoTooltip, ImVec2(100, 24)))
+							ImGui::OpenPopup(("picker_" + name).c_str());
+
+						if (ImGui::BeginPopup(("picker_" + name).c_str()))
+						{
+							ImGui::Text("Select Color");
+							if (ImGui::ColorPicker4(("##picker_" + name).c_str(), (float*)&color, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_AlphaBar))
+							{
+								vec4 newValue = vec4(color.x, color.y, color.z, color.w);
+
+								UniformValue newVal = uniform;
+								newVal.value = newValue;
+								material->SetShaderVariable(name, newVal);
+							}
+							ImGui::EndPopup();
+						}
+						break;
+					}
+					case UniformType_Sampler2D:
+						break;
+					default:
+						break;
+				}
+			}
+
 		}
 	}
 }

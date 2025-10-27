@@ -40,6 +40,8 @@ namespace Loopie {
 
 
 		/// Test
+		void DropFile(const std::string& file);
+		void CreateBakerHouse();
 		Scene* scene;
 		OrbitalCamera* camera;
 		std::shared_ptr<Entity> meshContainerEntity;

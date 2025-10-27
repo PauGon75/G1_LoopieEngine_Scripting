@@ -44,6 +44,9 @@ namespace Loopie
 		m_mainMenu.Init();
 
 		m_hierarchy.SetScene(scene);
+
+		////TEST
+		CreateBakerHouse();
 	}
 
 	void EditorModule::OnUnload()
@@ -69,92 +72,7 @@ namespace Loopie
 
 		if (inputEvent.HasFileBeenDropped()) { //// Move this to an AssetInspectorClass
 			const char* fileName = inputEvent.GetDroppedFile(0);
-			if (MeshImporter::CheckIfIsModel(fileName)) {
-
-				if (!AssetRegistry::AssetExists(fileName)) {
-					std::vector<std::string> cacheFiles = MeshImporter::ImportModel(fileName);
-
-					for (size_t i = 0; i < cacheFiles.size(); i++)
-					{
-						AssetMetadata metadata = AssetRegistry::CreateAssetMetadata(fileName, cacheFiles[i]);
-						AssetRegistry::RegisterAsset(metadata);
-
-						std::shared_ptr<Mesh> mesh = ResourceDatabase::LoadResource<Mesh>(metadata.uuid);
-						if (mesh) {
-							std::shared_ptr<Entity> newEntity = scene->CreateEntity("ModelEntity", meshContainerEntity);
-							MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
-							renderer->SetMesh(mesh);
-						}
-					}
-				}
-				else {
-					std::vector<UUID> uuids = AssetRegistry::GetUUIDFromSourcePath(fileName);
-					for (size_t i = 0; i < uuids.size(); i++)
-					{
-						AssetMetadata* metadata = AssetRegistry::GetMetadata(uuids[i]);
-						std::shared_ptr<Mesh> mesh = ResourceDatabase::LoadResource<Mesh>(metadata->uuid);
-						if (mesh) {
-							std::shared_ptr<Entity> newEntity = scene->CreateEntity("ModelEntity", meshContainerEntity);
-							MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
-							renderer->SetMesh(mesh);
-						}
-					}
-				}
-			}
-			else if(TextureImporter::CheckIfIsImage(fileName)) {
-				if (!AssetRegistry::AssetExists(fileName)) {
-					std::string cacheFile = TextureImporter::ImportImage(fileName);
-					AssetMetadata metadata = AssetRegistry::CreateAssetMetadata(fileName, cacheFile);
-					AssetRegistry::RegisterAsset(metadata);
-					AssetRegistry::RegisterAsset(metadata);
-
-					std::shared_ptr<Texture> texture = ResourceDatabase::LoadResource<Texture>(metadata.uuid);
-					if (texture) {
-						if (m_hierarchy.s_SelectedEntity != nullptr) {
-							MeshRenderer* renderer = m_hierarchy.s_SelectedEntity->GetComponent<MeshRenderer>();
-							if (renderer) {
-								renderer->GetMaterial()->SetTexture(texture);
-							}
-						}
-						else {
-							for (const auto& entity : meshContainerEntity->GetChildren())
-							{
-								MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
-								if (renderer) {
-									renderer->GetMaterial()->SetTexture(texture);
-								}
-							}
-						}
-						
-					}
-				}
-				else {
-					std::vector<UUID> uuids = AssetRegistry::GetUUIDFromSourcePath(fileName);
-					for (size_t i = 0; i < uuids.size(); i++)
-					{
-						AssetMetadata* metadata = AssetRegistry::GetMetadata(uuids[i]);
-						std::shared_ptr<Texture> texture = ResourceDatabase::LoadResource<Texture>(metadata->uuid);
-						if (texture) {
-							if (m_hierarchy.s_SelectedEntity != nullptr) {
-								MeshRenderer* renderer = m_hierarchy.s_SelectedEntity->GetComponent<MeshRenderer>();
-								if (renderer) {
-									renderer->GetMaterial()->SetTexture(texture);
-								}
-							}
-							else {
-								for (const auto& entity : meshContainerEntity->GetChildren())
-								{
-									MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
-									if (renderer) {
-										renderer->GetMaterial()->SetTexture(texture);
-									}
-								}
-							}
-
-						}
-					}	
-				}
-			}
+			DropFile(fileName);
 		}
 
 		camera->ProcessEvent(inputEvent);
@@ -188,5 +106,98 @@ namespace Loopie
 		m_hierarchy.Render();
 		m_assetsExplorer.Render();
 		m_scene.Render();
+	}
+
+	void EditorModule::CreateBakerHouse()
+	{
+		DropFile("assets/models/BakerHouse.fbx");
+		DropFile("assets/textures/Baker_house.png");
+	}
+
+	void EditorModule::DropFile(const std::string& file) {
+		if (MeshImporter::CheckIfIsModel(file.c_str())) {
+
+			if (!AssetRegistry::AssetExists(file)) {
+				std::vector<std::string> cacheFiles = MeshImporter::ImportModel(file);
+
+				for (size_t i = 0; i < cacheFiles.size(); i++)
+				{
+					AssetMetadata metadata = AssetRegistry::CreateAssetMetadata(file, cacheFiles[i]);
+					AssetRegistry::RegisterAsset(metadata);
+
+					std::shared_ptr<Mesh> mesh = ResourceDatabase::LoadResource<Mesh>(metadata.uuid);
+					if (mesh) {
+						std::shared_ptr<Entity> newEntity = scene->CreateEntity("ModelEntity", meshContainerEntity);
+						MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
+						renderer->SetMesh(mesh);
+					}
+				}
+			}
+			else {
+				std::vector<UUID> uuids = AssetRegistry::GetUUIDFromSourcePath(file);
+				for (size_t i = 0; i < uuids.size(); i++)
+				{
+					AssetMetadata* metadata = AssetRegistry::GetMetadata(uuids[i]);
+					std::shared_ptr<Mesh> mesh = ResourceDatabase::LoadResource<Mesh>(metadata->uuid);
+					if (mesh) {
+						std::shared_ptr<Entity> newEntity = scene->CreateEntity("ModelEntity", meshContainerEntity);
+						MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
+						renderer->SetMesh(mesh);
+					}
+				}
+			}
+		}
+		else if (TextureImporter::CheckIfIsImage(file.c_str())) {
+			if (!AssetRegistry::AssetExists(file)) {
+				std::string cacheFile = TextureImporter::ImportImage(file);
+				AssetMetadata metadata = AssetRegistry::CreateAssetMetadata(file, cacheFile);
+				AssetRegistry::RegisterAsset(metadata);
+				AssetRegistry::RegisterAsset(metadata);
+
+				std::shared_ptr<Texture> texture = ResourceDatabase::LoadResource<Texture>(metadata.uuid);
+				if (texture) {
+					if (m_hierarchy.s_SelectedEntity != nullptr) {
+						MeshRenderer* renderer = m_hierarchy.s_SelectedEntity->GetComponent<MeshRenderer>();
+						if (renderer) {
+							renderer->GetMaterial()->SetTexture(texture);
+						}
+					}
+					else {
+						for (const auto& entity : meshContainerEntity->GetChildren())
+						{
+							MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+							if (renderer) {
+								renderer->GetMaterial()->SetTexture(texture);
+							}
+						}
+					}
+				}
+			}
+			else {
+				std::vector<UUID> uuids = AssetRegistry::GetUUIDFromSourcePath(file);
+				for (size_t i = 0; i < uuids.size(); i++)
+				{
+					AssetMetadata* metadata = AssetRegistry::GetMetadata(uuids[i]);
+					std::shared_ptr<Texture> texture = ResourceDatabase::LoadResource<Texture>(metadata->uuid);
+					if (texture) {
+						if (m_hierarchy.s_SelectedEntity != nullptr) {
+							MeshRenderer* renderer = m_hierarchy.s_SelectedEntity->GetComponent<MeshRenderer>();
+							if (renderer) {
+								renderer->GetMaterial()->SetTexture(texture);
+							}
+						}
+						else {
+							for (const auto& entity : meshContainerEntity->GetChildren())
+							{
+								MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+								if (renderer) {
+									renderer->GetMaterial()->SetTexture(texture);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
