@@ -36,6 +36,8 @@ namespace Loopie {
 
 		void LoadFromFile(const std::string path) override;
 		void Reload() override;
+
+		const MeshData& GetData() { return m_data; }
 	private:
 		MeshData m_data;
 

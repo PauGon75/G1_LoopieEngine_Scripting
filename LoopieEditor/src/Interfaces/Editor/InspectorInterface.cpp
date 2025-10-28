@@ -104,6 +104,8 @@ namespace Loopie {
 		if (ImGui::CollapsingHeader("Mesh Renderer")) {
 			auto mesh = meshRenderer->GetMesh();
 			ImGui::Text("Mesh: %s", mesh ? "Assigned" : "None");
+			ImGui::Text("Mesh Vertices: %d", mesh->GetData().VerticesAmount);
+
 			ImGui::Separator();
 
 			bool drawFN = meshRenderer->GetDrawNormalsPerFace();
@@ -201,7 +203,7 @@ namespace Loopie {
 						ImGui::Text("%s", name.c_str());
 						ImGui::SameLine();
 
-						if (ImGui::ColorButton(("##btn_" + name).c_str(), color, ImGuiColorEditFlags_NoTooltip, ImVec2(100, 24)))
+						if (ImGui::ColorButton(("##btn_" + name).c_str(), color, ImGuiColorEditFlags_NoTooltip, ImVec2(100, 0)))
 							ImGui::OpenPopup(("picker_" + name).c_str());
 
 						if (ImGui::BeginPopup(("picker_" + name).c_str()))

@@ -1,5 +1,8 @@
 #include "HierarchyInterface.h"
 #include "Loopie/Core/Log.h"
+#include "Loopie/Components/MeshRenderer.h"
+#include "Loopie/Resources/AssetRegistry.h"
+#include "Loopie/Importers/MeshImporter.h"
 
 #include <imgui.h>
 
@@ -22,7 +25,10 @@ namespace Loopie {
 				DrawEntitySlot(entity);
 			}
 			
-			DrawContextMenu();
+			if (ImGui::BeginPopupContextWindow("HierarchyBackgroundContext", ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
+				DrawContextMenu(nullptr);
+				ImGui::EndPopup();
+			}
 			HotKeysSelectedEntiy();
 		}
 		ImGui::End();
@@ -54,7 +60,11 @@ namespace Loopie {
 			s_SelectedEntity = entity;
 		}
 
-		DrawEntityContextMenu(entity);
+		if (ImGui::BeginPopupContextItem())
+		{
+			DrawContextMenu(entity);
+			ImGui::EndPopup();
+		}
 
 		if (opened && hasChildren)
 		{
@@ -69,47 +79,102 @@ namespace Loopie {
 		
 	}
 
-	void HierarchyInterface::DrawContextMenu()
+	void HierarchyInterface::DrawContextMenu(const std::shared_ptr<Entity>& entity)
 	{
-		if (ImGui::BeginPopupContextWindow("HierarchyBackgroundContext", ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
-			if (ImGui::MenuItem("Create Entity")) {
-				m_scene->CreateEntity("Entity");
-			}
-			ImGui::EndPopup();
-		}
-	}
 
-	void HierarchyInterface::DrawEntityContextMenu(const std::shared_ptr<Entity> entity)
-	{
-		if (ImGui::BeginPopupContextItem())
+		if (ImGui::MenuItem("Create Empty"))
+		{
+			std::shared_ptr<Entity> newEntity = m_scene->CreateEntity("Entity", entity);
+			s_SelectedEntity = newEntity;
+		}	
+
+		/*if (ImGui::MenuItem("Copy"))
 		{
 
-			if (ImGui::MenuItem("Create Entity"))
+		}
+
+		if (ImGui::MenuItem("Cut"))
+		{
+
+		}
+
+		if (ImGui::MenuItem("Paste"))
+		{
+
+		}*/
+
+		if (ImGui::MenuItem("Delete",nullptr, false, entity != nullptr))
+		{
+			if (s_SelectedEntity == entity)
+				s_SelectedEntity = nullptr;
+			m_scene->RemoveEntity(entity->GetUUID());
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::BeginMenu("3D Object"))
+		{
+			if (ImGui::MenuItem("Cube"))
 			{
-				m_scene->CreateEntity("Entity", entity);
+				std::shared_ptr<Entity> newEntity = m_scene->CreateEntity("Cube", entity);
+				MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
+
+				std::string modelPath = "assets/models/primitives/cube.fbx";
+				Metadata& meta = AssetRegistry::GetOrCreateMetadata(modelPath);
+				MeshImporter::ImportModel(modelPath, meta);
+				std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(meta.UUID, 0);
+				if (mesh)
+					renderer->SetMesh(mesh);
+
+				s_SelectedEntity = newEntity;
 			}
 
-			/*if (ImGui::MenuItem("Copy"))
+			if (ImGui::MenuItem("Sphere"))
 			{
+				std::shared_ptr<Entity> newEntity = m_scene->CreateEntity("Sphere", entity);
+				MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
 
+				std::string modelPath = "assets/models/primitives/sphere.fbx";
+				Metadata& meta = AssetRegistry::GetOrCreateMetadata(modelPath);
+				MeshImporter::ImportModel(modelPath, meta);
+				std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(meta.UUID, 0);
+				if(mesh)
+					renderer->SetMesh(mesh);
+
+				s_SelectedEntity = newEntity;
 			}
 
-			if (ImGui::MenuItem("Cut"))
+			if (ImGui::MenuItem("Cone"))
 			{
+				std::shared_ptr<Entity> newEntity = m_scene->CreateEntity("Cone", entity);
+				MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
 
+				std::string modelPath = "assets/models/primitives/cone.fbx";
+				Metadata& meta = AssetRegistry::GetOrCreateMetadata(modelPath);
+				MeshImporter::ImportModel(modelPath, meta);
+				std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(meta.UUID, 0);
+				if (mesh)
+					renderer->SetMesh(mesh);
+
+				s_SelectedEntity = newEntity;
 			}
-			
-			if (ImGui::MenuItem("Paste"))
-			{
 
-			}*/
-
-			if (ImGui::MenuItem("Delete"))
+			if (ImGui::MenuItem("Cylinder"))
 			{
-				m_scene->RemoveEntity(entity->GetUUID());
+				std::shared_ptr<Entity> newEntity = m_scene->CreateEntity("Cylinder", entity);
+				MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
+
+				std::string modelPath = "assets/models/primitives/cylinder.fbx";
+				Metadata& meta = AssetRegistry::GetOrCreateMetadata(modelPath);
+				MeshImporter::ImportModel(modelPath, meta);
+				std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(meta.UUID, 0);
+				if (mesh)
+					renderer->SetMesh(mesh);
+
+				s_SelectedEntity = newEntity;
 			}
 
-			ImGui::EndPopup();
+			ImGui::EndMenu();
 		}
 	}
 
