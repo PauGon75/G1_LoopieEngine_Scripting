@@ -165,7 +165,7 @@ namespace Loopie {
 
 		std::filesystem::path pathToWrite = project.GetChachePath() / locationPath;
 
-		std::ofstream fs(pathToWrite, std::ios::out | std::ios::binary | std::ios::app);
+		std::ofstream fs(pathToWrite, std::ios::binary | std::ios::trunc);
 
 		//fs.write(data.Name, sizeof data.Name);
 		fs.write(reinterpret_cast<const char*>(&data.VerticesAmount), sizeof data.VerticesAmount);

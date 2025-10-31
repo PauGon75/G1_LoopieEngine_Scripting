@@ -23,6 +23,7 @@ namespace Loopie
     {
         m_inputDirection = vec3(0);
         m_inputRotation = vec3(0);
+        m_panDirection = vec3(0);
         m_zoomInput = 0;
 
         vec2 mouseScroll = inputEvent.GetScrollDelta();
@@ -39,7 +40,7 @@ namespace Loopie
             if (inputEvent.GetMouseButtonStatus(1) == KeyState::REPEAT)
             {
                // Log::Info("Entering Alt + Mouse 1");
-                m_inputDirection = vec3(-mouseDelta.x, mouseDelta.y, 0);
+                m_panDirection = vec3(-mouseDelta.x, mouseDelta.y, 0);
             }
             if (inputEvent.GetMouseButtonStatus(2) == KeyState::REPEAT)
             {
@@ -52,7 +53,7 @@ namespace Loopie
             if (inputEvent.GetMouseButtonStatus(1) == KeyState::REPEAT)
             {
                 m_entityToPivot = m_entity;
-                m_inputDirection = vec3(-mouseDelta.x, mouseDelta.y, 0);
+                m_panDirection = vec3(-mouseDelta.x, mouseDelta.y, 0);
             }
             if (inputEvent.GetMouseButtonStatus(2) == KeyState::REPEAT)
             {
@@ -127,6 +128,8 @@ namespace Loopie
 
             m_inputDirection.x *= dt;
             m_inputDirection.z *= dt;
+
+            m_inputDirection += m_panDirection/10.f;
             m_inputDirection.z += m_zoomInput;
 
             quaternion yawRotation = glm::normalize(glm::angleAxis(m_yaw, glm::vec3(0, 1, 0)));

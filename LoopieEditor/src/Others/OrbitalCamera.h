@@ -26,6 +26,7 @@ namespace Loopie
         float m_pitch = 0;
 
         glm::vec3 m_inputDirection = glm::vec3(0);
+        glm::vec3 m_panDirection = glm::vec3(0);
         glm::vec3 m_inputRotation = glm::vec3(0);
         float m_zoomInput = 0;
 

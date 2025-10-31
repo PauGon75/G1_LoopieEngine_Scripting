@@ -42,7 +42,7 @@ namespace Loopie {
 
 		std::filesystem::path pathToWrite = project.GetChachePath() / locationPath;
 
-		std::ofstream fs(pathToWrite, std::ios::out | std::ios::binary | std::ios::app);
+		std::ofstream fs(pathToWrite, std::ios::binary | std::ios::trunc);
 		
 
 		fs.write(shaderUUID.c_str(), UUID::UUID_SIZE);

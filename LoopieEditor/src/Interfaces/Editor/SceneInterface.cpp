@@ -1,5 +1,6 @@
 #include "SceneInterface.h"
 
+#include "Loopie/Core/Log.h"
 #include "Loopie/Core/Application.h"
 #include "Loopie/REnder/Renderer.h"
 #include "Loopie/Components/Transform.h"
@@ -15,7 +16,7 @@ namespace Loopie {
 
 	void SceneInterface::Update(float dt, const InputEventManager& inputEvent)
 	{
-		if (!m_focused)
+		if (!m_focused && !m_interacted)
 			return;
 		m_camera->ProcessEvent(inputEvent);
 		m_camera->Update(dt);
@@ -24,8 +25,10 @@ namespace Loopie {
 	void SceneInterface::Render() {
 
 		if (ImGui::Begin("Scene")) {
-			m_focused = ImGui::IsWindowFocused();
 			m_windowSize =  ImGui::GetContentRegionAvail();
+			m_focused = ImGui::IsWindowHovered();
+			m_interacted = ImGui::IsMouseDown(ImGuiMouseButton_Left) || ImGui::IsMouseDown(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Middle);
+
 			ImGui::Image((ImTextureID)m_buffer->GetTextureId(), m_windowSize, ImVec2(0,1), ImVec2(1,0));
 		}
 		ImGui::End();
