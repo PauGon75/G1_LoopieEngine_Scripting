@@ -27,7 +27,11 @@ namespace Loopie {
 		if (ImGui::Begin("Scene")) {
 			m_windowSize =  ImGui::GetContentRegionAvail();
 			m_focused = ImGui::IsWindowHovered();
-			m_interacted = ImGui::IsMouseDown(ImGuiMouseButton_Left) || ImGui::IsMouseDown(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Middle);
+
+			if (!m_focused && m_interacted || m_focused)
+				m_interacted = ImGui::IsMouseDown(ImGuiMouseButton_Left) || ImGui::IsMouseDown(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Middle);
+			else 
+				m_interacted = false;
 
 			ImGui::Image((ImTextureID)m_buffer->GetTextureId(), m_windowSize, ImVec2(0,1), ImVec2(1,0));
 		}
