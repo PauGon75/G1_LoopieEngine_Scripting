@@ -10,6 +10,7 @@ namespace Loopie {
 		ReadAndLoadSceneFile();
 
 		m_rootEntity = std::make_shared<Entity>("scene");
+		m_rootEntity->AddComponent<Transform>();
 	}
 
 	Scene::~Scene()

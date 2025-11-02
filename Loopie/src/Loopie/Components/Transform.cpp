@@ -1,204 +1,319 @@
 #include "Transform.h"
-#include "Loopie/Scene/Scene.h"
+#include "Loopie/Components/Component.h"
+#include "Loopie/Scene/Entity.h"
+#include "Loopie/Core/Math.h"
+#include <memory>
 namespace Loopie
 {
-    Transform::Transform(vec3 pos, quaternion rot, vec3 sca) :
-        m_globalMatrix(1.0f),
-        m_position(pos), m_rotation(rot), m_scale(sca), m_eulerAngles(0, 0, 0),
-        m_localPosition(0), m_localScale(1.0f), m_localRotation(1, 0, 0, 0), m_localEulerAngles(0, 0, 0)
+    Transform::Transform(vec3 position, quaternion rotation, vec3 scale)
     {
-        SetRotation(pos);
-        SetQuaternion(rot);
-        SetScale(sca);
-       
+        m_localPosition = position;
+        m_localRotation = rotation;
+        m_localScale = scale;
+    };
+
+    void Transform::Init() 
+    {
+        ForceRefreshMatrices();
     }
 
-    void Transform::Init(){
-        UpdateParent();
-        UpdateMatrix();
-    }
-#pragma region Transformations
-
-    void Transform::Translate(const vec3& translation, bool local)
-    {
-        if (local) {
-            m_localPosition += translation;
-            m_position += m_localRotation * translation;
-        }
-        else {
-            m_position += m_rotation * translation;
-        }
-        Recalculate();
-    }
-
-    void Transform::RotateAxisAngle(const vec3& axis, float angle, bool local)
-    {
-        quaternion rotationquat = glm::angleAxis(glm::radians(angle), axis);
-
-        if (local) {
-            m_localRotation = rotationquat;
-            m_localEulerAngles = glm::eulerAngles(m_localRotation);
-        }
-        else {
-            m_rotation = rotationquat;
-            m_eulerAngles = glm::eulerAngles(m_rotation);
-        }
-        Recalculate();
-    }
-
-    void Transform::RotateEulerAngles(const vec3& m_eulerAngles, bool local)
-    {
-        quaternion rotationquat = glm::quat(glm::radians(m_eulerAngles));
-
-        if (local) {
-            m_localRotation = rotationquat;
-            m_localEulerAngles = glm::eulerAngles(m_localRotation);
-        }
-        else {
-            m_rotation = rotationquat;
-            this->m_eulerAngles = glm::eulerAngles(m_rotation);
-        }
-        Recalculate();
-    }
-
-    void Transform::LookAt(const Transform* target, const vec3& up)
-    {
-        if (target == this)
-            return;
-        matrix4 lookAtMatrix = glm::lookAt(GetPosition(), target->GetPosition(), up);
-        lookAtMatrix = glm::inverse(lookAtMatrix);
-        SetQuaternion(lookAtMatrix);
-    }
-
-    void Transform::Scale(const vec3& scaling, bool local)
-    {
-        if (local) {
-            m_localScale *= scaling;
-        }
-        else {
-            m_scale *= scaling;
-        }
-
-        Recalculate();
-    }
-#pragma endregion
-#pragma region Vector
-    vec3 Transform::Forward()
-    {
-        UpdateMatrix();
-        return glm::normalize(m_globalMatrix[2]);
-    }
-
-    vec3 Transform::Up()
-    {
-        UpdateMatrix();
-        return glm::normalize(m_globalMatrix[1]);
-    }
-
-    vec3 Transform::Right()
-    {
-        UpdateMatrix();
-        return glm::normalize(m_globalMatrix[0]);
-    }
-#pragma endregion
-#pragma region Matrix
-    matrix4 Transform::GetMatrix() const
-    {
-        UpdateMatrix();
-        return m_globalMatrix;
-    }
-    void Transform::UpdateMatrix() const
-    {
-        m_globalMatrix = matrix4(1.0f);
-        m_globalMatrix = glm::translate(m_globalMatrix, m_localPosition);
-        m_globalMatrix = glm::translate(m_globalMatrix, m_position);
-        m_globalMatrix *= glm::mat4_cast(m_rotation * m_localRotation);
-        m_globalMatrix = glm::scale(m_globalMatrix, m_localScale);
-        m_globalMatrix = glm::scale(m_globalMatrix, m_scale);
-    }
-#pragma endregion
-#pragma region Get
-    vec3 Transform::GetPosition() const
-    {
-        return m_position;
-    }
-    vec3 Transform::GetLocalPosition() const
+    const vec3& Transform::GetLocalPosition() const
     {
         return m_localPosition;
     }
-    quaternion Transform::GetRotation() const
+
+    void Transform::SetLocalPosition(const vec3& position)
     {
-        return m_rotation;
+        m_localPosition = position;
+        MarkLocalDirty();
     }
+
     quaternion Transform::GetLocalRotation() const
     {
         return m_localRotation;
     }
-    vec3 Transform::GetEulerAngles() const
+
+    void Transform::SetLocalRotation(const quaternion& quat)
     {
-        vec3 m_eulerAngles = glm::eulerAngles(m_rotation);
-        return m_eulerAngles;
+        m_localRotation = normalize(quat);
+        m_cachedEulerDirty = true;
+        MarkLocalDirty();
     }
-    vec3 Transform::GetLocalEulerAngles() const
-    {
-        vec3 m_eulerAngles = glm::degrees(glm::eulerAngles(m_localRotation));
-        return m_eulerAngles;
-    }
-    vec3 Transform::GetScale() const
-    {
-        return m_scale;
-    }
+
     vec3 Transform::GetLocalScale() const
     {
         return m_localScale;
     }
-    quaternion Transform::GetQuaternion()const
+
+    void Transform::SetLocalScale(const vec3& scale)
     {
-        return m_rotation;
+        m_localScale = scale;
+        MarkLocalDirty();
     }
-#pragma endregion
-#pragma region Set
-    void Transform::SetPosition(const vec3& newPosition)
+
+    vec3 Transform::GetPosition()
     {
-        m_position = newPosition;
+        return GetWorldPosition();
     }
-    void Transform::SetRotation(const vec3& newRotation)
+
+    void Transform::SetPosition(const vec3& position)
     {
-        m_eulerAngles = newRotation;
-        m_rotation = EulerAnglesToQuaternion(m_eulerAngles);
+        SetWorldPosition(position);
     }
-    void Transform::SetScale(const vec3& newScale)
+
+    quaternion Transform::GetRotation()
     {
-        m_scale = newScale;
+        return GetWorldRotation();
     }
-    void Transform::SetQuaternion(const quaternion newQuaternion)
+
+    void Transform::SetRotation(const quaternion& quat)
     {
-        m_rotation = newQuaternion;
+        SetWorldRotation(quat);
     }
-#pragma endregion
-    void Transform::Recalculate()
+
+    vec3 Transform::GetLocalEulerAngles() const
     {
-        UpdateMatrix();
-        for (auto& child : GetOwner()->GetChildren())
+        if (m_cachedEulerDirty)
         {
-            child->GetTransform()->Recalculate();
+            m_cachedEuler = degrees(eulerAngles(m_localRotation));
+            m_cachedEulerDirty = false;
+        }
+        return m_cachedEuler;
+    }
+
+    void Transform::SetLocalEulerAngles(const vec3& euler_degrees)
+    {
+        m_localRotation = quaternion(radians(euler_degrees));
+        m_cachedEuler = euler_degrees;
+        m_cachedEulerDirty = false;
+        MarkLocalDirty();
+    }
+
+    vec3 Transform::GetEulerAngles()
+    {
+        if (auto parent = GetOwner()->GetParent().lock())
+        {
+            quaternion worldRot = GetRotation();
+            return degrees(eulerAngles(worldRot));
+        }
+        return degrees(eulerAngles(m_localRotation));
+    }
+
+    void Transform::SetEulerAngles(const vec3& euler_degrees)
+    {
+        if (auto parent = GetOwner()->GetParent().lock())
+        {
+            quaternion parentRot = parent->GetTransform()->GetRotation();
+            quaternion worldRot = quaternion(radians(euler_degrees));
+            m_localRotation = inverse(parentRot) * worldRot;
+        }
+        else
+        {
+            m_localRotation = quaternion(radians(euler_degrees));
+        }
+        MarkLocalDirty();
+    }
+
+    const matrix4& Transform::GetLocalToWorldMatrix() const
+    {
+        RefreshMatrices();
+        return m_localToWorld;
+    }
+
+    const matrix4& Transform::GetWorldToLocalMatrix() const
+    {
+        RefreshMatrices();
+        return m_worldToLocal;
+    }
+
+    vec3 Transform::GetWorldPosition() const
+    {
+        RefreshMatrices();
+        return vec3(m_localToWorld[3]);
+    }
+
+    quaternion Transform::GetWorldRotation() const
+    {
+        RefreshMatrices();
+        return glm::quat_cast(matrix3(m_localToWorld));
+    }
+
+    vec3 Transform::GetWorldScale() const
+    {
+        RefreshMatrices();
+        vec3 wx = vec3(m_localToWorld[0]);
+        vec3 wy = vec3(m_localToWorld[1]);
+        vec3 wz = vec3(m_localToWorld[2]);
+        return vec3(length(wx), length(wy), length(wz));
+    }
+
+    void Transform::SetWorldPosition(const vec3& position)
+    {
+        if (auto parent = GetOwner()->GetParent().lock())
+        {
+            Transform* transform = parent->GetTransform();
+            vec3 local = vec3(transform->GetWorldToLocalMatrix() * vec4(position, 1.0f));
+            SetLocalPosition(local);
+        }
+        else
+        {
+            SetLocalPosition(position);
         }
     }
-    void Transform::UpdateParent()
-    {
-        std::shared_ptr<Entity> parent = GetOwner()->GetParent().lock();
-        if (parent)
-            m_parentTransform = parent->GetTransform();
-        else
-            m_parentTransform = nullptr;
 
-    }
-    quaternion Transform::EulerAnglesToQuaternion(const vec3& m_eulerAngles)
+    void Transform::SetWorldRotation(const quaternion& quat)
     {
-        quaternion newRotation;
-        newRotation = glm::angleAxis(m_eulerAngles.z, vec3(0, 0, 1));
-        newRotation *= glm::angleAxis(m_eulerAngles.y, vec3(0, 1, 0));
-        newRotation *= glm::angleAxis(m_eulerAngles.x, vec3(1, 0, 0));
-        return newRotation;
+        if (auto parent = GetOwner()->GetParent().lock())
+        {
+            Transform* transform = parent->GetTransform();
+            quaternion parentWorld = transform->GetWorldRotation();
+            quaternion local = inverse(parentWorld) * quat;
+            SetLocalRotation(local);
+        }
+        else
+        {
+            SetLocalRotation(quat);
+        }
     }
-}
+
+    void Transform::SetWorldScale(const vec3& scale)
+    {
+        if (auto parent = GetOwner()->GetParent().lock())
+        {
+            Transform* transform = parent->GetTransform();
+            vec3 parentScale = transform->GetWorldScale();
+            vec3 local = scale / parentScale;
+            SetLocalScale(local);
+        }
+        else
+        {
+            SetLocalScale(scale);
+        }
+    }
+
+    void Transform::Translate(const vec3& translation, ObjectSpace space)
+    {
+        if (space == ObjectSpace::Local)
+        {
+            vec3 t = m_localRotation * translation;
+            SetLocalPosition(m_localPosition + t);
+        }
+        else
+        {
+            if (auto parent = GetOwner()->GetParent().lock())
+            {
+                Transform* transform = parent->GetTransform();
+                vec3 localT = vec3(transform->GetWorldToLocalMatrix() * vec4(translation, 0.0f));
+                SetLocalPosition(m_localPosition + localT);
+            }
+            else
+            {
+                SetLocalPosition(m_localPosition + translation);
+            }
+        }
+    }
+
+    void Transform::Rotate(const vec3& eulerRadians, ObjectSpace space)
+    {
+        quaternion quat = quaternion(eulerRadians);
+        Rotate(quat, space);
+    }
+
+    void Transform::Rotate(const quaternion& delta, ObjectSpace space)
+    {
+        if (space == ObjectSpace::Local) {
+            SetLocalRotation(m_localRotation * normalize(delta));
+        }
+        else {
+            quaternion worldRot = GetWorldRotation();
+            quaternion newWorld = normalize(delta * worldRot);
+            SetWorldRotation(newWorld);
+        }
+    }
+
+    void Transform::LookAt(const vec3& worldTarget, const vec3& worldUp)
+    {
+        vec3 pos = GetWorldPosition();
+        matrix4 look = lookAt(pos, worldTarget, worldUp);
+        matrix4 rotMat = inverse(look);
+        quaternion quat = glm::quat_cast(matrix3(rotMat));
+        SetWorldRotation(quat);
+    }
+
+    vec3 Transform::Forward() const
+    {
+        return GetWorldRotation() * vec3(0.0f, 0.0f, -1.0f);
+    }
+
+    vec3 Transform::Back() const
+    {
+        return -Forward();
+    }
+
+    vec3 Transform::Up() const
+    {
+        return GetWorldRotation() * vec3(0.0f, 1.0f, 0.0f);
+    }
+
+    vec3 Transform::Down() const
+    {
+        return -Up();
+    }
+
+    vec3 Transform::Right() const
+    {
+        return GetWorldRotation() * vec3(1.0f, 0.0f, 0.0f);
+    }
+
+    vec3 Transform::Left() const
+    {
+        return -Right();
+    }
+
+    void Transform::MarkLocalDirty()
+    {
+        m_localDirty = true;
+        MarkWorldDirty();
+    }
+
+    void Transform::MarkWorldDirty()
+    {
+        if (m_worldDirty) return;
+        m_worldDirty = true;
+        for (auto& child : GetOwner()->GetChildren()) {
+            if (child) child->GetTransform()->MarkWorldDirty();
+        }
+    }
+
+    void Transform::ForceRefreshMatrices()
+    {
+        m_localDirty = true;
+        m_worldDirty = true;
+        RefreshMatrices();
+        for (auto& child : GetOwner()->GetChildren())
+            if (child) child->GetTransform()->ForceRefreshMatrices();
+    }
+
+    void Transform::RefreshMatrices() const
+    {
+        if (!m_worldDirty) return;
+
+        matrix4 localMat = translate(matrix4(1.0f), m_localPosition) * toMat4(m_localRotation) * scale(matrix4(1.0f), m_localScale);
+
+        if (auto parent = GetOwner()->GetParent().lock())
+        {
+            Transform* transform = parent->GetTransform();
+            transform->RefreshMatrices();
+            m_localToWorld = transform->m_localToWorld * localMat;
+        }
+        else
+        {
+            m_localToWorld = localMat;
+        }
+
+        m_worldToLocal = m_localToWorld;
+
+        m_localDirty = false;
+        m_worldDirty = false;
+    }
+};

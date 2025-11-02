@@ -65,18 +65,18 @@ namespace Loopie {
 	void InspectorInterface::DrawTransform(Transform* transform)
 	{
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-			vec3 position = transform->GetPosition();
-			vec3 rotation = transform->GetEulerAngles();
-			vec3 scale = transform->GetScale();
+			vec3 position = transform->GetLocalPosition();
+			vec3 rotation = transform->GetLocalEulerAngles();
+			vec3 scale = transform->GetLocalScale();
 
 			if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
-				transform->SetPosition(position);
+				transform->SetLocalPosition(position);
 			}
 			if (ImGui::DragFloat3("Rotation", &rotation.x, 0.5f)) {
-				transform->SetRotation(rotation);
+				transform->SetLocalEulerAngles(rotation);
 			}
 			if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
-				transform->SetScale(scale);
+				transform->SetLocalScale(scale);
 			}
 		}
 	}

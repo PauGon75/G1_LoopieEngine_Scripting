@@ -74,7 +74,7 @@ namespace Loopie
 		if (!m_dirty)
 			return;
 		
-		m_viewMatrix = glm::inverse(GetTransform()->GetMatrix());
+		m_viewMatrix = glm::inverse(GetTransform()->GetLocalToWorldMatrix());
 		m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_viewport.z / m_viewport.w, m_nearPlane, m_farPlane);
 		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 	}
