@@ -13,7 +13,7 @@
 namespace Loopie {
 	void TextureImporter::ImportImage(const std::string& filepath, Metadata& metadata)
 	{
-		if (metadata.HasCache)
+		if (metadata.HasCache && !metadata.IsOutdated)
 			return;
 
 		ILuint imageID;

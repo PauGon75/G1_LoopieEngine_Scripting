@@ -15,7 +15,7 @@
 
 namespace Loopie {
 	void MeshImporter::ImportModel(const std::string& filepath, Metadata& metadata) {
-		if (metadata.HasCache)
+		if (metadata.HasCache && !metadata.IsOutdated)
 			return;
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
