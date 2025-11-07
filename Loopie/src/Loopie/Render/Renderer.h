@@ -1,6 +1,7 @@
 #pragma once
 #include "Loopie/Core/Math.h"
 #include "Loopie/Resources/Types/Material.h"
+#include "Loopie/Resources/Types/Texture.h"
 #include "Loopie/Render/VertexArray.h"
 
 #include <filesystem>
@@ -21,5 +22,10 @@ namespace Loopie {
 		static void EndScene();
 
 		static void Draw(std::shared_ptr<VertexArray> vao, std::shared_ptr<Material> material, const Transform* transform);
+
+		static void SetDefaultTexture(std::shared_ptr<Texture> texture) { s_DefaultTexture = texture; }
+
+	public:
+		static std::shared_ptr<Texture> s_DefaultTexture;
 	};
 }

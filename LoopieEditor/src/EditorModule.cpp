@@ -27,6 +27,11 @@ namespace Loopie
 		AssetRegistry::Initialize();
 		Application::GetInstance().GetWindow().SetResizable(true);
 
+		std::string defaultTeturePath = "assets/textures/simpleWhiteTexture.png";
+		Metadata& meta = AssetRegistry::GetOrCreateMetadata(defaultTeturePath);
+		TextureImporter::ImportImage(defaultTeturePath, meta);
+		Renderer::SetDefaultTexture(std::make_shared<Texture>(meta.UUID));
+
 		/////SCENE
 		Application::GetInstance().CreateScene(""); /// Maybe default One
 		scene = &Application::GetInstance().GetScene();

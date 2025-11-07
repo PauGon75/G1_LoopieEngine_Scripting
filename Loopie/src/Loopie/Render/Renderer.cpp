@@ -11,6 +11,8 @@
 
 namespace Loopie {
 
+	std::shared_ptr<Texture> Renderer::s_DefaultTexture = nullptr;
+
 	void Renderer::Init(void* context) {
 		ASSERT(!gladLoadGLLoader((GLADloadproc)context), "Failed to Initialize GLAD!");
 
