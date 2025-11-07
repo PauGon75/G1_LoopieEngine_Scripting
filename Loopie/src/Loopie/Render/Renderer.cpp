@@ -22,6 +22,9 @@ namespace Loopie {
 		ilInit();
 		iluInit();
 
+		ilSetInteger(IL_KEEP_DXTC_DATA, IL_FALSE);
+		ilSetInteger(IL_ORIGIN_MODE, IL_ORIGIN_LOWER_LEFT);
+
 		// Gizmo Data Structure Init
 		Gizmo::Init();
 	}
