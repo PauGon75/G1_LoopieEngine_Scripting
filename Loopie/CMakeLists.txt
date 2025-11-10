@@ -17,6 +17,7 @@ find_package(nfd REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(assimp REQUIRED)
 find_package(lz4 REQUIRED)
+find_package(imguizmo REQUIRED)
 find_package(imgui REQUIRED)
 find_package(DevIL REQUIRED)
 
@@ -37,6 +38,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	nlohmann_json::nlohmann_json
 	assimp::assimp
 	lz4::lz4
+	imguizmo::imguizmo
 	imgui::imgui
 	DevIL::IL
 	DevIL::ILU
