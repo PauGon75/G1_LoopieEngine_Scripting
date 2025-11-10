@@ -88,10 +88,6 @@ namespace Loopie
         if (glm::length2(m_inputRotation) > 0.0001) {
             rotated = true;
         }
-
-        
-
-        
         if (m_entityToPivot != m_entity)
         {
 
@@ -114,11 +110,8 @@ namespace Loopie
             vec3 newPos = pivotPos + offset;
             transform->SetPosition(newPos);
 
-            /*matrix4 lookAt = glm::lookAt(newPos, pivotPos, vec3(0, 1, 0));
-            quaternion lookRot = glm::quat_cast(glm::inverse(lookAt));
-
-            transform->SetQuaternion(lookRot);*/
-            transform->LookAt(m_entityToPivot->GetTransform(), { 0,1,0 });
+            
+            transform->LookAt(m_entityToPivot->GetTransform()->GetPosition(), {0,1,0});
         }
         else
         {
@@ -130,8 +123,8 @@ namespace Loopie
             quaternion pitchRotation = glm::normalize(glm::angleAxis(m_pitch, glm::vec3(1, 0, 0)));
             quaternion orbitRotation = yawRotation * pitchRotation;
 
-            transform->Translate(m_inputDirection*dt, false);
-            transform->SetQuaternion(orbitRotation);
+            transform->Translate(m_inputDirection*dt, ObjectSpace::Local);
+            transform->SetLocalRotation(orbitRotation);
         }
     }
 
