@@ -11,7 +11,7 @@ namespace Loopie
 		m_entity = std::make_shared<Entity>("OrbitalCamera");
         m_entityToPivot = m_entity;
 		m_entity->AddComponent<Transform>();
-		m_camera = m_entity->AddComponent<Camera>( 45.0f,  0.1f, 1000.0f);
+		m_camera = m_entity->AddComponent<Camera>( 45.0f,  0.1f, 1000.0f, false);
 	}
 
 	OrbitalCamera::~OrbitalCamera()
@@ -40,12 +40,12 @@ namespace Loopie
             if (inputEvent.GetMouseButtonStatus(1) == KeyState::REPEAT)
             {
                // Log::Info("Entering Alt + Mouse 1");
-                m_panDirection = vec3(-mouseDelta.x, mouseDelta.y, 0);
+                m_panDirection = vec3(mouseDelta.x, mouseDelta.y, 0);
             }
             if (inputEvent.GetMouseButtonStatus(2) == KeyState::REPEAT)
             {
                 //Log::Info("Entering Alt + Mouse 2");
-                m_zoomInput = -mouseScroll.y * m_cameraZoomSpeed;
+                m_zoomInput = mouseScroll.y * m_cameraZoomSpeed;
             }
         }
         else
@@ -53,7 +53,7 @@ namespace Loopie
             if (inputEvent.GetMouseButtonStatus(1) == KeyState::REPEAT)
             {
                 m_entityToPivot = m_entity;
-                m_panDirection = vec3(-mouseDelta.x, mouseDelta.y, 0);
+                m_panDirection = vec3(mouseDelta.x, mouseDelta.y, 0);
             }
             if (inputEvent.GetMouseButtonStatus(2) == KeyState::REPEAT)
             {
@@ -65,10 +65,10 @@ namespace Loopie
                 else
                     m_speedMultiplier = 1.0f;  
             }
-            if (inputEvent.GetKeyStatus(SDL_SCANCODE_W) == KeyState::REPEAT) m_inputDirection.z -= m_cameraMovementSpeed;
-            if (inputEvent.GetKeyStatus(SDL_SCANCODE_S) == KeyState::REPEAT) m_inputDirection.z += m_cameraMovementSpeed;
-            if (inputEvent.GetKeyStatus(SDL_SCANCODE_A) == KeyState::REPEAT) m_inputDirection.x -= m_cameraMovementSpeed;
-            if (inputEvent.GetKeyStatus(SDL_SCANCODE_D) == KeyState::REPEAT) m_inputDirection.x += m_cameraMovementSpeed;
+            if (inputEvent.GetKeyStatus(SDL_SCANCODE_W) == KeyState::REPEAT) m_inputDirection.z += m_cameraMovementSpeed;
+            if (inputEvent.GetKeyStatus(SDL_SCANCODE_S) == KeyState::REPEAT) m_inputDirection.z -= m_cameraMovementSpeed;
+            if (inputEvent.GetKeyStatus(SDL_SCANCODE_A) == KeyState::REPEAT) m_inputDirection.x += m_cameraMovementSpeed;
+            if (inputEvent.GetKeyStatus(SDL_SCANCODE_D) == KeyState::REPEAT) m_inputDirection.x -= m_cameraMovementSpeed;
         }
         if (inputEvent.GetKeyStatus(SDL_SCANCODE_F) == KeyState::DOWN)
         {
@@ -77,7 +77,7 @@ namespace Loopie
         }
 
         if (mouseScroll.y != 0)
-            m_zoomInput = -mouseScroll.y * m_cameraZoomSpeed;
+            m_zoomInput = mouseScroll.y * m_cameraZoomSpeed;
 
         m_inputDirection *= m_speedMultiplier;
         m_inputRotation *= m_cameraRotationSpeed;
@@ -94,7 +94,7 @@ namespace Loopie
         {
 
             m_yaw = -m_inputRotation.x;
-            m_pitch = -m_inputRotation.y;
+            m_pitch = m_inputRotation.y;
 
             quaternion yawRotation = glm::normalize(glm::angleAxis(m_yaw, glm::vec3(0, 1, 0)));
             quaternion pitchRotation = glm::normalize(glm::angleAxis(m_pitch, glm::vec3(1, 0, 0)));
@@ -117,7 +117,7 @@ namespace Loopie
         {
 
             m_yaw += -m_inputRotation.x;
-            m_pitch += -m_inputRotation.y;
+            m_pitch += m_inputRotation.y;
 
             m_inputDirection.x *= dt;
             m_inputDirection.z *= dt;

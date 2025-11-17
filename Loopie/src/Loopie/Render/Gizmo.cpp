@@ -52,6 +52,7 @@ namespace Loopie {
 		s_Data.LineRender.VertexBuffer->SetData(s_Data.LineBufferModel, dataSize);
 
 		Flush();
+		StartBatch();
 	}
 
 	void Gizmo::DrawLine(const vec3& p0, const vec3& p1, const vec4& color)
@@ -124,9 +125,9 @@ namespace Loopie {
 				}	
 			}
 
-			Gizmo::DrawLine({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, s_Data.GridHalfSize * s_Data.GridSpacing }, {0,1,0,1});
+			Gizmo::DrawLine({ 0.0f, 0.0f, 0.0f }, { 0.0f,s_Data.GridHalfSize * s_Data.GridSpacing, 0.0f }, {0,1,0,1});
 			Gizmo::DrawLine({ 0.0f, 0.0f, 0.0f }, { s_Data.GridHalfSize * s_Data.GridSpacing, 0.0f, 0.0f }, {1,0,0,1});
-			Gizmo::DrawLine({ 0.0f, 0.0f, 0.0f }, {0.0f,  s_Data.GridHalfSize * s_Data.GridSpacing, 0.0f }, {0,0,1,1});
+			Gizmo::DrawLine({ 0.0f, 0.0f, 0.0f }, {0.0f, 0.0f,  s_Data.GridHalfSize * s_Data.GridSpacing }, {0,0,1,1});
 		}
 	}
 }

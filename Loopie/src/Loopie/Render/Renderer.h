@@ -33,7 +33,7 @@ namespace Loopie {
 		static void UnregisterCamera(Camera& camera);
 		static const std::vector<Camera*>& GetRendererCameras() { return s_renderCameras; }
 
-		static void BeginScene(const matrix4& viewMatrix, const matrix4& projectionMatrix);
+		static void BeginScene(const matrix4& viewMatrix, const matrix4& projectionMatrix, bool gizmo = true);
 		static void EndScene();
 
 		static void AddRenderItem(std::shared_ptr<VertexArray> vao, std::shared_ptr<Material> material, const Transform* transform);

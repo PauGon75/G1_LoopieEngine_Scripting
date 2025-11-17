@@ -12,7 +12,6 @@
 #include "Loopie/Resources/ResourceManager.h"
 #include "Loopie/Importers/TextureImporter.h"
 
-
 #include "Loopie/Components/MeshRenderer.h"
 #include "Loopie/Components/Transform.h"
 ///
@@ -36,12 +35,15 @@ namespace Loopie
 		Application::GetInstance().CreateScene(""); /// Maybe default One
 		scene = &Application::GetInstance().GetScene();
 		CreateBakerHouse();
+
+		scene->CreateEntity({ 0,0,-10 }, { 1,0,0,0 }, {1,1,1}, nullptr, "MainCamera")->AddComponent<Camera>();
 		////
 
 		m_assetsExplorer.Init();
 		m_console.Init();
 		m_hierarchy.Init();
 		m_inspector.Init();
+		m_game.Init();
 		m_scene.Init();
 		m_mainMenu.Init();
 
@@ -59,9 +61,6 @@ namespace Loopie
 		Application& app = Application::GetInstance();
 		InputEventManager& inputEvent = app.GetInputEvent();
 
-		if (inputEvent.GetKeyWithModifier(SDL_SCANCODE_I, KeyModifier::CTRL)) {
-			app.SetInterfaceState(!app.IsInterfaceVisible());
-		}
 		if (inputEvent.HasEvent(SDL_EVENT_WINDOW_FOCUS_GAINED)) {
 			AssetRegistry::RefreshAssetRegistry();
 		}
@@ -70,30 +69,54 @@ namespace Loopie
 		m_assetsExplorer.Update(dt, inputEvent);
 		m_scene.Update(dt, inputEvent);
 
-		m_scene.StartScene();
-		for (const auto& cam : Renderer::GetRendererCameras())
+		const std::vector<Camera*>& cameras = Renderer::GetRendererCameras();
+		for (const auto cam : cameras)
 		{
-			if (!cam->GetOwner()->GetIsActive() || !cam->GetIsActive())
+			std::shared_ptr<FrameBuffer> buffer = cam->GetRenderTarget();
+			if (buffer)
+			{
+				buffer->Bind();
+				buffer->Clear();
+				buffer->Unbind();
+			}
+		}
+
+		/// RenderToTarget
+		for (const auto cam : cameras)
+		{
+			if (!cam->GetIsActive())
 				continue;
 
-			cam->GetFramebuffer()->Bind();
-			cam->GetFramebuffer()->Clear();
+			std::shared_ptr<FrameBuffer> buffer = cam->GetRenderTarget();
+			if (!buffer)
+				continue;
+
 			Renderer::BeginScene(cam->GetViewMatrix(), cam->GetProjectionMatrix());
-
-			/// FILTER OBJECTS TO RENDER
-
-			for (auto& [uuid, entity] : scene->GetAllEntities()) {
-				if (!entity->GetIsActive())
-					continue;
-				MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
-				if (!renderer->GetIsActive())
-					continue;
-				Renderer::AddRenderItem(renderer->GetMesh()->GetVAO(), renderer->GetMaterial(), entity->GetTransform());
-			}
+			Renderer::SetViewport(0, 0, buffer->GetWidth(), buffer->GetWidth());
+			buffer->Bind();
+			RenderWorld(cam);
 			Renderer::EndScene();
-			cam->GetFramebuffer()->Unbind();
+
+			if (buffer) {
+				buffer->Unbind();
+			}
 		}
+
+		/// SceneWindowRender
+		m_scene.StartScene();
+		Renderer::BeginScene(m_scene.GetCamera()->GetViewMatrix(), m_scene.GetCamera()->GetProjectionMatrix());
+		RenderWorld(m_scene.GetCamera());
+		Renderer::EndScene();
 		m_scene.EndScene();
+
+		/// GameWindowRender
+		m_game.StartScene();
+		if (m_game.GetCamera() && m_game.GetCamera()->GetIsActive()) {
+			Renderer::BeginScene(m_game.GetCamera()->GetViewMatrix(), m_game.GetCamera()->GetProjectionMatrix(), false);
+			RenderWorld(m_game.GetCamera());
+			Renderer::EndScene();
+		}
+		m_game.EndScene();
 	}
 
 	void EditorModule::OnInterfaceRender()
@@ -105,7 +128,20 @@ namespace Loopie
 		m_console.Render();
 		m_hierarchy.Render();
 		m_assetsExplorer.Render();
+		m_game.Render();
 		m_scene.Render();
+	}
+
+	void EditorModule::RenderWorld(Camera* camera)
+	{
+		for (auto& [uuid, entity] : scene->GetAllEntities()) {
+			if (!entity->GetIsActive())
+				continue;
+			MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+			if (!renderer || !renderer->GetIsActive())
+				continue;
+			Renderer::AddRenderItem(renderer->GetMesh()->GetVAO(), renderer->GetMaterial(), entity->GetTransform());
+		}
 	}
 
 	void EditorModule::CreateBakerHouse()

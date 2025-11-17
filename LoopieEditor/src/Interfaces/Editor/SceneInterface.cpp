@@ -19,8 +19,8 @@
 namespace Loopie {
 	SceneInterface::SceneInterface() {
 		m_camera = std::make_shared<OrbitalCamera>();
-		m_buffer = m_camera->GetCamera()->GetFramebuffer();
-		m_camera->GetCamera()->GetTransform()->SetPosition({ 0,10,50.f });
+		m_buffer = std::make_shared<FrameBuffer>(1,1);
+		m_camera->GetCamera()->GetTransform()->SetPosition({ 0,5,-10.f });
 
 		std::vector<std::string> iconsToLoad = {
 			"assets/icons/icon_move.png",
@@ -107,9 +107,10 @@ namespace Loopie {
 		m_buffer->Bind();
 
 		ImVec2 textureSize = ImVec2((float)m_buffer->GetWidth(), (float)m_buffer->GetHeight());
+		Renderer::SetViewport(0, 0, m_windowSize.x, m_windowSize.y);
 		if (m_windowSize.x != textureSize.x || m_windowSize.y != textureSize.y) {
-			Renderer::SetViewport(0, 0, m_windowSize.x, m_windowSize.y);
 			m_camera->GetCamera()->SetViewport(0, 0, m_windowSize.x, m_windowSize.y);
+			m_buffer->Resize(m_windowSize.x, m_windowSize.y);
 		}
 
 		m_buffer->Clear();	

@@ -73,12 +73,13 @@ namespace Loopie {
 		}
 	}
 
-	void Renderer::BeginScene(const matrix4& viewMatrix, const matrix4& projectionMatrix)
+	void Renderer::BeginScene(const matrix4& viewMatrix, const matrix4& projectionMatrix, bool gizmo)
 	{
 		s_matricesUniformBuffer->SetData(&projectionMatrix[0][0], 0);
 		s_matricesUniformBuffer->SetData(&viewMatrix[0][0], 1);
 
-		Gizmo::BeginGizmo();
+		if(gizmo)
+			Gizmo::BeginGizmo();
 	}
 
 	void Renderer::EndScene()

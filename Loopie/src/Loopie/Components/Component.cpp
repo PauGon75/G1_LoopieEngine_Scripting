@@ -18,7 +18,7 @@ namespace Loopie {
 
 	bool Component::GetIsActive() const
 	{
-		return m_isActive;
+		return m_isActive && m_owner.lock()->GetIsActive();
 	}
 
 	void Component::SetIsActive(bool active)

@@ -30,7 +30,7 @@ namespace Loopie
         glm::vec3 m_inputRotation = glm::vec3(0);
         float m_zoomInput = 0;
 
-        glm::vec3 m_orbitOffset = glm::vec3(0, 0, 5);
+        glm::vec3 m_orbitOffset = glm::vec3(0, 0, -5);
 
         bool m_complexMovement = false;
 
