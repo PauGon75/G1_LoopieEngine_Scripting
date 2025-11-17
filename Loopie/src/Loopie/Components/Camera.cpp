@@ -30,7 +30,7 @@ namespace Loopie
 			for (const auto camera : cameras) {
 				if (camera->CanBeMainCamera())
 				{
-					s_Main = camera;
+					SetMainCamera(camera);
 					return;
 				}
 			}
@@ -123,6 +123,7 @@ namespace Loopie
 	bool Camera::SetMainCamera(Camera* camera) {
 		if (camera->m_canBeMainCamera) {
 			s_Main = camera;
+			camera->SetDirty();
 			return true;
 		}
 		else

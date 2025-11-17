@@ -27,6 +27,7 @@ namespace Loopie
 
 		void SetFarPlane(float farPlane);
 		float GetFarPlane() const;
+		vec4 GetViewport() const { return m_viewport; }
 
 		void SetDirty() const;
 

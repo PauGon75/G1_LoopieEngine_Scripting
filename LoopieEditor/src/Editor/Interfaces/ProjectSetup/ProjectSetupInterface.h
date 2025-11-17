@@ -1,5 +1,5 @@
 #pragma once
-#include  "src/Interfaces/Interface.h"
+#include  "Editor/Interfaces/Interface.h"
 #include "Loopie/Files/Json.h"
 
 #include <string>

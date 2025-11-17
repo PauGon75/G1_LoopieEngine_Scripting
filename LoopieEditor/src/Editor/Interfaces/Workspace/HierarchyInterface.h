@@ -1,6 +1,5 @@
 #pragma once 
-
-#include "src/Interfaces/Interface.h"
+#include "Editor/Interfaces/Interface.h"
 #include "Loopie/Scene/Scene.h"
 
 namespace Loopie {

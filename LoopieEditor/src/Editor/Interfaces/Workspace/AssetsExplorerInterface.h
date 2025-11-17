@@ -1,8 +1,8 @@
 #pragma once 
 
 #include "Loopie/Resources/Types/Texture.h"
-#include "src/Interfaces/Interface.h"
-#include "src/ImGuiHelpers/ImGuiHelpers.h"
+#include "Editor/Interfaces/Interface.h"
+#include "Editor/ImGuiHelpers/ImGuiHelpers.h"
 
 #include <filesystem>
 #include <vector>
@@ -20,6 +20,13 @@ namespace Loopie {
 		void Render() override;
 
 	private:
+		struct CachedDirectoryNode
+		{
+			std::filesystem::path path;
+			bool isEmpty = true;
+			std::vector<CachedDirectoryNode> children;
+		};
+
 		void HotKeysControls(const InputEventManager& inputEvent);
 
 		void GetExternalFile();
@@ -27,7 +34,8 @@ namespace Loopie {
 		void SelectFile(const std::filesystem::path& filePath);
 		void DrawSearchBar();
 		void ClearSearch();
-		void DrawDirectoryTree(const std::filesystem::path& directory, int indent = 0);
+		void DrawDirectoryTree();
+		void DrawDirectoryTreeNode(const CachedDirectoryNode& node, int indent = 0);
 		void DrawPathBar();
 		void DrawFolderContent();
 		void DrawFooter();
@@ -35,6 +43,12 @@ namespace Loopie {
 
 		void DragFile(const std::string& from);
 		void DropFile(const std::string& to);
+
+		void Refresh(bool folderTree = true, bool folderFiles = true, bool searchFiles = true);
+		void RebuildTreeFolderCache();
+		CachedDirectoryNode BuildDirectoryNode(const std::filesystem::path& directory);
+		void RebuildFolderFilesCache();
+		void RebuildSearchFilesCache();
 
 	private:
 		std::filesystem::path m_currentDirectory;
@@ -54,5 +68,13 @@ namespace Loopie {
 		std::shared_ptr<Texture> m_fileIcon;
 		std::shared_ptr<Texture> m_emptyFolderIcon;
 		std::shared_ptr<Texture> m_folderIcon;
+
+		bool m_dirtyFoldersTree = true;
+		bool m_dirtyFolderFiles = true;
+		bool m_dirtyFileSearch = true;
+
+		CachedDirectoryNode m_cachedTreeFolder;
+		std::vector<std::filesystem::path> m_cachedFolderFiles;
+		std::vector<std::filesystem::path> m_cachedSearchFiles;
 	};
 }

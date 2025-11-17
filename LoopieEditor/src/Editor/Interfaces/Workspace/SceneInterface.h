@@ -2,9 +2,9 @@
 
 #include "Loopie/Resources/Types/Texture.h"
 
-#include "src/Interfaces/Interface.h"
+#include "Editor/Interfaces/Interface.h"
+#include "Editor/Others/OrbitalCamera.h"
 #include "Loopie/Render/FrameBuffer.h"
-#include "src/Others/OrbitalCamera.h"
 
 #include <array>
 

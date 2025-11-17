@@ -11,7 +11,7 @@
 #include "Loopie/Importers/TextureImporter.h"
 #include "Loopie/Components/MeshRenderer.h"
 
-#include "src/Interfaces/Editor/HierarchyInterface.h"
+#include "Editor/Interfaces/Workspace/HierarchyInterface.h"
 
 #include <imgui.h>
 #include <ImGuizmo.h>

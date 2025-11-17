@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "src/Interfaces/Interface.h"
+#include "Editor/Interfaces/Interface.h"
 #include "Loopie/Core/Math.h"
 
 namespace Loopie {
@@ -22,6 +22,6 @@ namespace Loopie {
 		void DrawCamera(Camera* camera);
 		void DrawMeshRenderer(MeshRenderer* meshRenderer);
 
-		void PushMultiItemsWidths(int components, float width);
+		void AddComponent(const std::shared_ptr<Entity>& entity);
 	};
 }

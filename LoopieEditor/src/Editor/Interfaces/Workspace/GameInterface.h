@@ -1,5 +1,4 @@
-#include "src/Interfaces/Interface.h"
-#include "Loopie/Render/FrameBuffer.h"
+#include "Editor/Interfaces/Interface.h"
 #include "Loopie/Render/FrameBuffer.h"
 
 namespace Loopie {

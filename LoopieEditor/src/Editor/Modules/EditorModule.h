@@ -2,13 +2,13 @@
 
 #include "Loopie/Core/Module.h"
 
-#include "Interfaces/Editor/InspectorInterface.h"
-#include "Interfaces/Editor/ConsoleInterface.h"
-#include "Interfaces/Editor/HierarchyInterface.h"
-#include "Interfaces/Editor/SceneInterface.h"
-#include "Interfaces/Editor/GameInterface.h"
-#include "Interfaces/Editor/EditorMenuInterface.h"
-#include "Interfaces/Editor/AssetsExplorerInterface.h"
+#include "Editor/Interfaces/Workspace/InspectorInterface.h"
+#include "Editor/Interfaces/Workspace/ConsoleInterface.h"
+#include "Editor/Interfaces/Workspace/HierarchyInterface.h"
+#include "Editor/Interfaces/Workspace/SceneInterface.h"
+#include "Editor/Interfaces/Workspace/GameInterface.h"
+#include "Editor/Interfaces/Workspace/EditorMenuInterface.h"
+#include "Editor/Interfaces/Workspace/AssetsExplorerInterface.h"
 
 namespace Loopie {
 

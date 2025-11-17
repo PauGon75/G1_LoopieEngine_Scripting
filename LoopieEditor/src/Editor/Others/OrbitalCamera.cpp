@@ -1,7 +1,7 @@
 #include "OrbitalCamera.h"
 #include "Loopie/Scene/Entity.h"
 #include "Loopie/Components/Transform.h"
-#include "src/Interfaces/Editor/HierarchyInterface.h"
+#include "Editor/Interfaces/Workspace/HierarchyInterface.h"
 #include "Loopie/Core/Log.h"
 
 namespace Loopie

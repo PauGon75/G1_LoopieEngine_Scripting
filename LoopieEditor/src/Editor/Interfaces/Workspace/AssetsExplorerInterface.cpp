@@ -46,6 +46,9 @@ namespace Loopie {
 	void AssetsExplorerInterface::Update(float dt, const InputEventManager& inputEvent) {
 		if (m_focused)
 			HotKeysControls(inputEvent);
+
+		if (inputEvent.HasEvent(SDL_EVENT_WINDOW_FOCUS_GAINED))
+			Refresh();
 	}
 
 	void AssetsExplorerInterface::Render() {
@@ -67,7 +70,7 @@ namespace Loopie {
 
 			if (ImGui::BeginChild("AssetsTree", ImVec2(sizeLeft, avail.y), 0, ImGuiWindowFlags_HorizontalScrollbar)) {
 				ImGui::Separator();
-				DrawDirectoryTree(project.GetAssetsPath());
+				DrawDirectoryTree();
 			}
 			ImGui::EndChild();
 
@@ -103,26 +106,36 @@ namespace Loopie {
 			return;
 		}
 
+		bool actionDone = false;
 		if (inputEvent.GetKeyStatus(SDL_SCANCODE_DELETE) == KeyState::DOWN) {
 			DirectoryManager::Delete(m_selectedFile);
-			AssetRegistry::RefreshAssetRegistry();
+			actionDone = true;
 		}
 
 		if (inputEvent.GetKeyWithModifier(SDL_SCANCODE_C, KeyModifier::CTRL)) {
 			/// Copy
+			actionDone = true;
 		}
 
 		if (inputEvent.GetKeyWithModifier(SDL_SCANCODE_V, KeyModifier::CTRL)) {
 			/// Paste
+			actionDone = true;
 		}
 
 		if (inputEvent.GetKeyWithModifier(SDL_SCANCODE_X, KeyModifier::CTRL)) {
 			/// Cut
+			actionDone = true;
 		}
+
+		if(actionDone)
+			Refresh();
 	}
 
 	void AssetsExplorerInterface::GetExternalFile()
 	{
+		if (m_isSearching)
+			return;
+
 		Application& app = Application::GetInstance();
 		InputEventManager& inputEvent = app.GetInputEvent();
 		if (!inputEvent.HasFileBeenDropped())
@@ -155,7 +168,9 @@ namespace Loopie {
 				DirectoryManager::Copy(droppedPath, targetPath);
 			}
 		}
-		AssetRegistry::RefreshAssetRegistry();
+
+
+		Refresh(true, true, false);
 	}
 
 	void AssetsExplorerInterface::GoToDirectory(const std::filesystem::path& directory, bool removeSearch)
@@ -181,6 +196,8 @@ namespace Loopie {
 				m_relativePathSteps.push_back(p.string());
 			}
 		}
+
+		Refresh(false, true, false);
 	}
 
 	void AssetsExplorerInterface::SelectFile(const std::filesystem::path& filePath)
@@ -214,6 +231,7 @@ namespace Loopie {
 		ImGui::SetNextItemWidth(inputWidth);
 		if (ImGui::InputTextWithHint("##search", "Search files...", m_searchBuffer, sizeof(m_searchBuffer))) {
 			m_isSearching = strlen(m_searchBuffer) > 0;
+			Refresh(false, false, true);
 		}
 	}
 
@@ -222,51 +240,49 @@ namespace Loopie {
 	{
 		m_isSearching = false;
 		m_searchBuffer[0] = '\0';
+		Refresh(false, false, true);
 	}
 
-	void AssetsExplorerInterface::DrawDirectoryTree(const std::filesystem::path& directory, int indent)
+	void AssetsExplorerInterface::DrawDirectoryTree()
 	{
-		if (!exists(directory) || !is_directory(directory))
-			return;
+		if (m_dirtyFoldersTree)
+			RebuildTreeFolderCache();
 
-		bool isEmpty = true;
-		for (const auto& entry : std::filesystem::directory_iterator(directory)) {
-			if (entry.is_directory())
-				isEmpty =  false;
-		}
+		DrawDirectoryTreeNode(m_cachedTreeFolder, 0);
+	}
 
-		bool isRoot = indent == 0;
-		std::string name = directory.filename().string();
+	void AssetsExplorerInterface::DrawDirectoryTreeNode(const CachedDirectoryNode& node, int indent)
+	{
+		bool isRoot = (indent == 0);
 
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
-		if (isEmpty)
+
+		if (node.isEmpty)
 			flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 		else
 			flags |= ImGuiTreeNodeFlags_OpenOnArrow;
 
-		if (directory == m_currentDirectory)
+		if (node.path == m_currentDirectory)
 			flags |= ImGuiTreeNodeFlags_Selected;
 
+		std::string name = node.path.filename().string();
 		if (name.empty())
-			name = directory.root_name().string();
+			name = node.path.root_name().string();
 
 		bool opened = ImGui::TreeNodeEx(name.c_str(), flags);
 
-		if(!isRoot)
-			DragFile(directory.string());
-		DropFile(directory.string());
+		if (!isRoot)
+			DragFile(node.path.string());
+		DropFile(node.path.string());
 
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			GoToDirectory(node.path);
+
+		if (opened && !node.isEmpty)
 		{
-			GoToDirectory(directory);
-		}
-		
-		if (opened && !isEmpty)
-		{
-			for (auto& entry : std::filesystem::directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied))
-			{
-				DrawDirectoryTree(entry.path(), indent+1);
-			}
+			for (const auto& child : node.children)
+				DrawDirectoryTreeNode(child, indent + 1);
+
 			ImGui::TreePop();
 		}
 	}
@@ -318,28 +334,22 @@ namespace Loopie {
 
 		ImGui::Columns(columnCount, nullptr, false);
 
-		std::vector<std::filesystem::path> filesToShow;
+		std::vector<std::filesystem::path>* filesToShow;
 		
 		if (m_isSearching) {
-			filesToShow = GetFilteredFiles();
-
-			if (filesToShow.empty()) {
-				ImGui::Columns(1);
-				ImGui::TextDisabled("No results found");
-				return;
-			}
+			if (m_dirtyFileSearch)
+				RebuildSearchFilesCache();
+			filesToShow = &m_cachedSearchFiles;
 		}
-		else {		
-			for (auto& entry : std::filesystem::directory_iterator(m_currentDirectory, std::filesystem::directory_options::skip_permission_denied)) {
-				if(MetadataRegistry::IsMetadataFile(entry.path()))
-					continue;
-				filesToShow.push_back(entry.path());
-			}
+		else {
+			if (m_dirtyFolderFiles)
+				RebuildFolderFilesCache();
+			filesToShow = &m_cachedFolderFiles;
 		}
 
-		for (size_t i = 0; i < filesToShow.size(); ++i) {
+		for (size_t i = 0; i < filesToShow->size(); ++i) {
 
-			const auto& directory = filesToShow[i];
+			const auto& directory = (*filesToShow)[i];
 			const bool isDir = std::filesystem::is_directory(directory);
 
 			ImGui::PushID(i);
@@ -449,9 +459,85 @@ namespace Loopie {
 				DirectoryManager::Move(fromPath, newPath);
 				DirectoryManager::Move(fromPath += ".meta", newPath += ".meta");
 
-				AssetRegistry::RefreshAssetRegistry();
+				Refresh();
 			}
 			ImGui::EndDragDropTarget();
 		}
+	}
+	void AssetsExplorerInterface::Refresh(bool folderTree, bool folderFiles, bool searchFiles)
+	{
+		AssetRegistry::RefreshAssetRegistry();
+
+		if(!m_dirtyFoldersTree)
+			m_dirtyFoldersTree = folderTree;
+		if(!m_dirtyFolderFiles)
+			m_dirtyFolderFiles = folderFiles;
+		if(!m_dirtyFileSearch)
+			m_dirtyFileSearch = searchFiles;
+	}
+
+	void AssetsExplorerInterface::RebuildTreeFolderCache()
+	{
+		const Project& project = Application::GetInstance().m_activeProject;
+		m_cachedTreeFolder = BuildDirectoryNode(project.GetAssetsPath());
+		m_dirtyFoldersTree = false;
+	}
+
+	AssetsExplorerInterface::CachedDirectoryNode AssetsExplorerInterface::BuildDirectoryNode(const std::filesystem::path& directory)
+	{
+		CachedDirectoryNode node;
+		node.path = directory;
+
+		for (auto& entry :
+			std::filesystem::directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied))
+		{
+			if (entry.is_directory())
+			{
+				node.isEmpty = false;
+				node.children.push_back(BuildDirectoryNode(entry.path()));
+			}
+		}
+		return node;
+	}
+
+	void AssetsExplorerInterface::RebuildFolderFilesCache()
+	{
+		m_cachedFolderFiles.clear();
+		if (!std::filesystem::exists(m_currentDirectory))
+			return;
+
+		for (auto& entry :
+			std::filesystem::directory_iterator(m_currentDirectory, std::filesystem::directory_options::skip_permission_denied))
+		{
+			if (!MetadataRegistry::IsMetadataFile(entry.path())) {
+				m_cachedFolderFiles.push_back(entry.path());
+			}
+		}
+
+		m_dirtyFolderFiles = false;
+	}
+	void AssetsExplorerInterface::RebuildSearchFilesCache()
+	{
+		m_cachedSearchFiles.clear();
+
+		const Project& project = Application::GetInstance().m_activeProject;
+
+		std::string query = m_searchBuffer;
+		std::transform(query.begin(), query.end(), query.begin(), ::tolower);
+
+		for (auto& entry :
+			std::filesystem::recursive_directory_iterator(project.GetAssetsPath(), std::filesystem::directory_options::skip_permission_denied))
+		{
+			if (MetadataRegistry::IsMetadataFile(entry.path()))
+				continue;
+
+			std::string name = entry.path().filename().string();
+			std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+			if (name.find(query) != std::string::npos)
+				m_cachedSearchFiles.push_back(entry.path());
+		}
+
+		m_dirtyFileSearch = false;
 	}
 }

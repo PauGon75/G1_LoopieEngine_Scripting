@@ -37,6 +37,7 @@ namespace Loopie
 		CreateBakerHouse();
 
 		scene->CreateEntity({ 0,0,-10 }, { 1,0,0,0 }, {1,1,1}, nullptr, "MainCamera")->AddComponent<Camera>();
+		scene->CreateEntity({ 0,0,-20 }, { 1,0,0,0 }, {1,1,1}, nullptr, "SecondaryCamera")->AddComponent<Camera>();
 		////
 
 		m_assetsExplorer.Init();
@@ -121,6 +122,7 @@ namespace Loopie
 
 	void EditorModule::OnInterfaceRender()
 	{
+
 		ImGui::DockSpaceOverViewport();
 
 		m_mainMenu.Render();

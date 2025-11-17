@@ -1,5 +1,5 @@
 #include "InspectorInterface.h"
-#include "src/Interfaces/Editor/HierarchyInterface.h"
+#include "Editor/Interfaces/Workspace/HierarchyInterface.h"
 
 #include "Loopie/Components/Transform.h"
 #include "Loopie/Components/Camera.h"
@@ -34,6 +34,7 @@ namespace Loopie {
 					DrawMeshRenderer(static_cast<MeshRenderer*>(component));
 				}
 			}
+			AddComponent(entitySelected);
 		}
 		ImGui::End();
 	}
@@ -87,6 +88,7 @@ namespace Loopie {
 			float fov = camera->GetFov();
 			float nearPlane = camera->GetNearPlane();
 			float farPlane = camera->GetFarPlane();
+			bool isMainCamera = Camera::GetMainCamera() == camera;
 
 			if (ImGui::DragFloat("Fov", &fov, 1.0f, 1.0f, 179.0f))
 				camera->SetFov(fov);
@@ -96,6 +98,11 @@ namespace Loopie {
 
 			if (ImGui::DragFloat("Far Plane", &farPlane, 1.0f, nearPlane + 0.1f, 10000.0f))
 				camera->SetFarPlane(farPlane);
+
+			if (ImGui::Checkbox("Main Camera", &isMainCamera)) {
+				if(isMainCamera)
+					camera->SetAsMainCamera();
+			}
 		}
 	}
 
@@ -265,5 +272,10 @@ namespace Loopie {
 			}
 
 		}
+	}
+
+	void InspectorInterface::AddComponent(const std::shared_ptr<Entity>& entity)
+	{
+
 	}
 }

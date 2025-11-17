@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "src/Interfaces/Interface.h"
+#include "Editor/Interfaces/Interface.h"
 
 #include <string>
 #include <vector>
