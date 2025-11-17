@@ -86,32 +86,26 @@ namespace Loopie
     void OrbitalCamera::Update(float dt)
     {
         Transform* transform = m_entity->GetTransform();
-        bool rotated = false;
-        if (glm::length2(m_inputRotation) > 0.0001) {
-            rotated = true;
-        }
+ 
         if (m_entityToPivot != m_entity)
         {
 
-            m_yaw = -m_inputRotation.x;
-            m_pitch = m_inputRotation.y;
+            m_yaw += -m_inputRotation.x;
+            m_pitch += m_inputRotation.y;
 
-            quaternion yawRotation = glm::normalize(glm::angleAxis(m_yaw, glm::vec3(0, 1, 0)));
-            quaternion pitchRotation = glm::normalize(glm::angleAxis(m_pitch, glm::vec3(1, 0, 0)));
-            quaternion orbitRotation = yawRotation * pitchRotation;
+            quaternion rotation = quaternion((vec3{ m_pitch, m_yaw, 0.f }));
 
             Transform* pivotTransform = m_entityToPivot->GetTransform();
             vec3 pivotPos = pivotTransform->GetPosition();
 
             vec3 camPos = transform->GetPosition();
-            vec3 offset = camPos - pivotPos;
-            offset = orbitRotation * offset;
+
+            vec3 offset = rotation * m_orbitOffset;
 
             vec3 newPos = pivotPos + offset;
             transform->SetPosition(newPos);
+            transform->SetRotation(rotation);
 
-            
-            transform->LookAt(m_entityToPivot->GetTransform()->GetPosition(), {0,1,0});
         }
         else
         {
