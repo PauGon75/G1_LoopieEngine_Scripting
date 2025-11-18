@@ -19,13 +19,17 @@ namespace Loopie {
 			if(m_drawNormalsPerTriangle)
 				RenderNormalsPerTriangle(0.5f,{1,1,0,1});
 
+			if (m_drawAABB || m_drawOBB) {
+				AABB localAABB = m_mesh->GetData().BoundingBox;
+				OBB worldOBB = localAABB.ToOBB().Transform(GetTransform()->GetLocalToWorldMatrix());
+				AABB worldAABB = worldOBB.ToAABB();
 
-			AABB localAABB = m_mesh->GetData().BoundingBox;
-			OBB worldOBB = localAABB.ToOBB().Transform(GetTransform()->GetLocalToWorldMatrix());
-			AABB worldAABB = worldOBB.ToAABB();
-
-			Gizmo::DrawCube(worldAABB.minPoint, worldAABB.maxPoint);
-			Gizmo::DrawCube(worldOBB.GetCorners());
+				if(m_drawAABB)
+					Gizmo::DrawCube(worldAABB.minPoint, worldAABB.maxPoint);
+				if(m_drawOBB)
+					Gizmo::DrawCube(worldOBB.GetCorners());
+			}
+			
 
 		}
 		

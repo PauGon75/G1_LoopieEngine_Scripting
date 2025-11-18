@@ -29,6 +29,10 @@ namespace Loopie {
 		bool GetDrawNormalsPerFace() { return m_drawNormalsPerFace; }
 		void SetDrawNormalsPerTriangle(bool value) { m_drawNormalsPerTriangle = value; }
 		bool GetDrawNormalsPerTriangle() { return m_drawNormalsPerTriangle; }
+		void SetDrawAABB(bool value) { m_drawAABB = value; }
+		bool GetDrawAABB() { return m_drawAABB; }
+		void SetDrawOBB(bool value) { m_drawOBB = value; }
+		bool GetDrawOBB() { return m_drawOBB; }
 		///TEST
 	private:
 		///TEST
@@ -37,6 +41,8 @@ namespace Loopie {
 		void RenderNormalsPerTriangle(float length, const vec4& color);
 		bool m_drawNormalsPerFace = false;
 		bool m_drawNormalsPerTriangle = false;
+		bool m_drawAABB = false;
+		bool m_drawOBB = false;
 		///TEST
 
 	private:

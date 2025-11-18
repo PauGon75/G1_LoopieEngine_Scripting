@@ -118,10 +118,16 @@ namespace Loopie {
 
 			bool drawFN = meshRenderer->GetDrawNormalsPerFace();
 			bool drawTN = meshRenderer->GetDrawNormalsPerTriangle();
+			bool drawAABB = meshRenderer->GetDrawAABB();
+			bool drawOBB = meshRenderer->GetDrawOBB();
 			if (ImGui::Checkbox("Draw Face Normals", &drawFN))
 				meshRenderer->SetDrawNormalsPerFace(drawFN);
 			if (ImGui::Checkbox("Draw Triangle Normals", &drawTN))
 				meshRenderer->SetDrawNormalsPerTriangle(drawTN);
+			if (ImGui::Checkbox("Draw AABB", &drawAABB))
+					meshRenderer->SetDrawAABB(drawAABB);
+			if (ImGui::Checkbox("Draw OBB", &drawOBB))
+				meshRenderer->SetDrawOBB(drawOBB);
 			//ImGui::Text("Shader: %s", meshRenderer->GetShader().GetName().c_str()); ????
 
 
