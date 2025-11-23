@@ -46,7 +46,7 @@ namespace Loopie {
 	}
 
 	void Renderer::Clear() {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
 	void Renderer::SetClearColor(const vec4& color) {
@@ -93,6 +93,15 @@ namespace Loopie {
 		s_RenderQueue.emplace_back(RenderItem{ vao, vao->GetIndexBuffer().GetCount(), material, transform});
 	}
 
+	void Renderer::FlushRenderItem(std::shared_ptr<VertexArray> vao, std::shared_ptr<Material> material, const Transform* transform)
+	{
+		vao->Bind();
+		material->Bind();
+		SetRenderUniforms(material, transform);
+		glDrawElements(GL_TRIANGLES, vao->GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr);
+		vao->Unbind();
+	}
+
 	void Renderer::FlushRenderQueue()
 	{
 		/// SORT By Material
@@ -116,14 +125,32 @@ namespace Loopie {
 	{
 		material->GetShader().SetUniformMat4("lp_Transform", transform->GetLocalToWorldMatrix());
 	}
-
 	void Renderer::EnableDepth()
 	{
 			glEnable(GL_DEPTH_TEST);
 	}
-
 	void Renderer::DisableDepth()
 	{
 			glDisable(GL_DEPTH_TEST);
+	}
+	void Renderer::EnableStencil()
+	{
+		glEnable(GL_STENCIL_TEST);
+	}
+	void Renderer::DisableStencil()
+	{
+		glDisable(GL_STENCIL_TEST);
+	}
+	void Renderer::SetStencilMask(GLuint mask)
+	{
+		glStencilMask(mask);
+	}
+	void Renderer::SetStencilOp(GLenum stencil_fail, GLenum depth_fail, GLenum pass)
+	{
+		glStencilOp(stencil_fail, depth_fail, pass);
+	}
+	void Renderer::SetStencilFunc(GLenum cond, GLint ref, GLuint mask)
+	{
+		glStencilFunc(cond, ref, mask);
 	}
 }

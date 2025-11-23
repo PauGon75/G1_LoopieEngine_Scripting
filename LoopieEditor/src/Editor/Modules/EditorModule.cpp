@@ -14,10 +14,11 @@
 
 #include "Loopie/Components/MeshRenderer.h"
 #include "Loopie/Components/Transform.h"
+#include "Loopie/Resources/Types/Material.h"
 ///
 
-
 #include <imgui.h>
+#include <glad/glad.h>
 
 namespace Loopie
 {
@@ -38,6 +39,9 @@ namespace Loopie
 
 		scene->CreateEntity({ 0,0,-10 }, { 1,0,0,0 }, {1,1,1}, nullptr, "MainCamera")->AddComponent<Camera>();
 		scene->CreateEntity({ 0,0,-20 }, { 1,0,0,0 }, {1,1,1}, nullptr, "SecondaryCamera")->AddComponent<Camera>();
+		selectedObjectMaterial = std::make_shared<Material>();
+		selectedObjectShader = new Shader("assets/shaders/SelectionOutline.shader");
+		selectedObjectMaterial->SetShader(*selectedObjectShader);
 		////
 
 		m_assetsExplorer.Init();
@@ -141,7 +145,13 @@ namespace Loopie
 
 	void EditorModule::RenderWorld(Camera* camera)
 	{	
-
+		Renderer::EnableStencil();
+		Renderer::EnableDepth();
+		Renderer::Clear();
+		Renderer::SetStencilFunc(GL_ALWAYS, 1, 0xFF);
+		Renderer::SetStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		Renderer::SetStencilMask(0xFF);
+		//Renderer::DisableStencil();
 		for (auto& [uuid, entity] : scene->GetAllEntities()) {
 			if (!entity->GetIsActive())
 				continue;
@@ -151,15 +161,21 @@ namespace Loopie
 
 			if (!camera->GetFrustum().Intersects(renderer->GetWorldAABB()))
 				continue;
+			renderer->Render();
 
 			if (entity == HierarchyInterface::s_SelectedEntity) {
-				Renderer::EnableStencil();
-				Renderer::AddRenderItem(renderer->GetMesh()->GetVAO(), /*outlineMaterial*/, entity->GetTransform());
+				Renderer::FlushRenderItem(renderer->GetMesh()->GetVAO(), renderer->GetMaterial(), entity->GetTransform());
+				Renderer::SetStencilFunc(GL_NOTEQUAL,1,0xFF);
+				Renderer::SetStencilMask(0x00);
+				Renderer::FlushRenderItem(renderer->GetMesh()->GetVAO(), selectedObjectMaterial, entity->GetTransform());
+				Renderer::SetStencilMask(0xFF);
+				Renderer::EnableDepth();
 				Renderer::DisableStencil();
 			}
-
-			renderer->Render();
-			Renderer::AddRenderItem(renderer->GetMesh()->GetVAO(), renderer->GetMaterial(), entity->GetTransform());
+			else
+			{
+				Renderer::AddRenderItem(renderer->GetMesh()->GetVAO(), renderer->GetMaterial(), entity->GetTransform());
+			}
 		}
 	}
 

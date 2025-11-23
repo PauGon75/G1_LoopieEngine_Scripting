@@ -7,7 +7,9 @@
 #include "Loopie/Components/Camera.h"
 
 #include <filesystem>
-
+typedef unsigned int GLenum;
+typedef unsigned int GLuint;
+typedef int GLint;
 namespace Loopie {
 	class Transform;
 
@@ -37,6 +39,7 @@ namespace Loopie {
 		static void EndScene();
 
 		static void AddRenderItem(std::shared_ptr<VertexArray> vao, std::shared_ptr<Material> material, const Transform* transform);
+		static void FlushRenderItem(std::shared_ptr<VertexArray> vao, std::shared_ptr<Material> material, const Transform* transform);
 
 		static void SetDefaultTexture(std::shared_ptr<Texture> texture) { s_DefaultTexture = texture; }
 
@@ -45,8 +48,9 @@ namespace Loopie {
 
 		static void EnableStencil();
 		static void DisableStencil();
-		static void SetStencilMask(/**/);
-		static void SetStencilFunc(/**/);
+		static void SetStencilMask(GLuint mask);
+		static void SetStencilOp(GLenum stencil_fail, GLenum depth_fail, GLenum pass);
+		static void SetStencilFunc(GLenum cond, GLint ref, GLuint mask);
 
 	private:
 		static void SetRenderUniforms(std::shared_ptr<Material> material, const Transform* transform);

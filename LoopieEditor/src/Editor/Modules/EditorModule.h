@@ -13,6 +13,8 @@
 namespace Loopie {
 
 	class Camera;
+	class Material;
+	class Shader;
 
 	class EditorModule : public Module {
 	public:
@@ -38,6 +40,9 @@ namespace Loopie {
 		GameInterface m_game;
 		EditorMenuInterface m_mainMenu;
 		AssetsExplorerInterface m_assetsExplorer;
+
+		std::shared_ptr<Material> selectedObjectMaterial;
+		Shader* selectedObjectShader;
 
 		Scene* scene;
 	};
