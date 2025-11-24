@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Loopie/Render/Shader.h"
+#include "Loopie/Resources/Resource.h"
 #include "Loopie/Resources/Types/Texture.h"
 
 #include <variant>
@@ -13,10 +14,11 @@ namespace Loopie
 		std::variant<int, float, bool, unsigned int, vec2, vec3, vec4, matrix2, matrix3, matrix4> value;
 	};
 
-	class Material
+	class Material : public Resource
 	{
 	public:
-		Material();
+		DEFINE_TYPE(Material)
+		Material(const UUID& id);
 		~Material();
 
 		void InitMaterial();
@@ -28,7 +30,6 @@ namespace Loopie
 		const Shader& GetShader() const { return m_shader; }
 		std::shared_ptr<Texture> GetTexture() const { return m_texture; } /// Remove
 		UniformValue* GetShaderVariable(const std::string& name);
-		const UniformValue* GetShaderVariable(const std::string& name) const;
 		const std::unordered_map<std::string, UniformValue>& GetUniforms() const { return m_uniformValues; }
 
 		// Setters
@@ -39,8 +40,12 @@ namespace Loopie
 		void Bind();
 		void Unbind() const;
 
+		void LoadFromFile(const std::string path) override;
+		void Reload() override;
+
 	private:
 		void ApplyUniform(const std::string& name, const UniformValue& uniformValue);
+		void SaveToFile();
 		
 
 	private:
@@ -50,5 +55,8 @@ namespace Loopie
 		// adjust them for different textures (maybe we want a variable of type roughness
 		// to be different for all different kinds of textures, which can be changed like this)
 		std::unordered_map<std::string, UniformValue> m_uniformValues;
+
+		void LoadFromFile(const std::string path) override;
+		void Reload() override;
 	};
 }

@@ -7,8 +7,6 @@
 #include "Loopie/Resources/Types/Texture.h"
 
 #include "Loopie/Importers/TextureImporter.h"
-#include "Loopie/Importers/MaterialImporter.h"
-#include "Loopie/Importers/MeshImporter.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>

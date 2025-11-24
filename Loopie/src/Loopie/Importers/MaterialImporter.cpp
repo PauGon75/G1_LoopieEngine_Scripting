@@ -111,6 +111,120 @@ namespace Loopie {
 
 	}
 
+	void MaterialImporter::SaveMaterial(const std::string& filepath, Material& material, Metadata& metadata)
+	{
+		JsonData jsonData;
+
+		Shader& shaderUUID = material.GetShader();
+		UUID randomUUID;
+		//std::string shaderUUIDString = shaderUUID.Get();
+
+		jsonData.SetValue("shader", randomUUID.Get());
+		JsonNode propertiesNode = jsonData.CreateObjectField("properties");
+
+		const auto& props = material.GetUniforms();
+		for (const auto& [id, uniformValue] : props)
+		{
+			std::string typeString;
+			std::string valueString;
+
+			switch (uniformValue.type)
+			{
+				case UniformType_int:
+				{
+					typeString = "Int";
+					int v = std::get<int>(uniformValue.value);
+					valueString = std::to_string(v);
+					break;
+				}
+				case UniformType_float:
+				{
+					typeString = "Float";
+					float v = std::get<float>(uniformValue.value);
+					valueString = std::to_string(v);
+					break;
+				}
+				case UniformType_uint:
+				{
+					typeString = "UInt";
+					unsigned int v = std::get<unsigned int>(uniformValue.value);
+					valueString = std::to_string(v);
+					break;
+				}
+				case UniformType_bool:
+				{
+					typeString = "Bool";
+					bool v = std::get<bool>(uniformValue.value);
+					valueString = v ? "True" : "False";
+					break;
+				}
+				case UniformType_vec2:
+				{
+					typeString = "Vec2";
+					auto v = std::get<glm::vec2>(uniformValue.value);
+					valueString = GLMToString(v);
+					break;
+				}
+				case UniformType_vec3:
+				{
+					typeString = "Vec3";
+					auto v = std::get<glm::vec3>(uniformValue.value);
+					valueString = GLMToString(v);
+					break;
+				}
+				case UniformType_vec4:
+				{
+					typeString = "Vec4";
+					auto v = std::get<glm::vec4>(uniformValue.value);
+					valueString = GLMToString(v);
+					break;
+				}
+				case UniformType_mat2:
+				{
+					typeString = "Mat2";
+					auto m = std::get<glm::mat2>(uniformValue.value);
+					valueString = GLMToString(m);
+					break;
+				}
+
+				case UniformType_mat3:
+				{
+					typeString = "Mat3";
+					auto m = std::get<glm::mat3>(uniformValue.value);
+					valueString = GLMToString(m);
+					break;
+				}
+
+				case UniformType_mat4:
+				{
+					typeString = "Mat4";
+					auto m = std::get<glm::mat4>(uniformValue.value);
+					valueString = GLMToString(m);
+					break;
+				}
+
+				case UniformType_Sampler2D:
+				case UniformType_Sampler3D:
+				case UniformType_SamplerCube:
+				{
+					typeString = (uniformValue.type == UniformType_Sampler2D ? "Sampler2D" : uniformValue.type == UniformType_Sampler3D ? "Sampler3D" : "SamplerCube");
+
+					//UUID texID = std::get<UUID>(uniformValue.value);
+					//valueString = texID.Get();
+					break;
+				}
+				default:
+					break;
+
+				propertiesNode.AddArrayElement("type", typeString);
+				propertiesNode.AddArrayElement("value", valueString);
+			}
+		}
+
+		jsonData.ToFile(filepath);
+		metadata.IsOutdated = true;
+	}
+
 	void MaterialImporter::LoadMaterial(const std::string& path, Material& material) {
 		Project project = Application::GetInstance().m_activeProject;
 		std::filesystem::path filepath = project.GetChachePath() / path;

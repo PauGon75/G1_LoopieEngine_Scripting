@@ -27,6 +27,19 @@ namespace Loopie {
         return mesh;
     }
 
+    std::shared_ptr<Material> ResourceManager::GetMaterial(const Metadata& metadata)
+    {
+        ResourceKey key{ metadata, 0 };
+        auto resource = GetResource(key);
+        if (resource) {
+            return std::static_pointer_cast<Material>(resource);
+        }
+
+        auto material = std::make_shared<Material>(metadata.UUID);
+        m_Resources[key] = material;
+        return material;
+    }
+
     std::shared_ptr<Resource> ResourceManager::GetResource(const ResourceKey& key) {
         auto it = m_Resources.find(key);
         if (it != m_Resources.end()) {

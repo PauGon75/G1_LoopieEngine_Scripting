@@ -7,6 +7,7 @@
 
 #include "Loopie/Importers/TextureImporter.h"
 #include "Loopie/Importers/MeshImporter.h"
+#include "Loopie/Importers/MaterialImporter.h"
 
 #include <filesystem>
 
@@ -46,6 +47,9 @@ namespace Loopie {
 				}
 				else if (MeshImporter::CheckIfIsModel(pathString.c_str())) {
 					MeshImporter::ImportModel(pathString, metadata);
+				}
+				else if (MaterialImporter::CheckIfIsMaterial(pathString.c_str())) {
+					MaterialImporter::ImportMaterial(pathString, metadata);
 				}
 
 				///

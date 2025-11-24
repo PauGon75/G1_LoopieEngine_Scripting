@@ -2,12 +2,13 @@
 
 #include "Loopie/Resources/AssetRegistry.h"
 #include "Loopie/Importers/TextureImporter.h"
+#include "Loopie/Importers/MaterialImporter.h"
 #include "Loopie/Core/Log.h"
 #include "Loopie/Render/Renderer.h"
 
 namespace Loopie
 {
-	Material::Material()
+	Material::Material(const UUID& id) : Resource(id)
 	{
 		InitMaterial();
 	}
@@ -90,6 +91,25 @@ namespace Loopie
 		case UniformType_Sampler2D: 	break;
 		case UniformType_Sampler3D: 	break;
 		default: Log::Warn("Unknown uniform type for '{0}'", name);	break;
+		}
+	}
+
+	void Material::LoadFromFile(const std::string path)
+	{
+		m_path = path;
+		MaterialImporter::LoadMaterial(path, *this);
+	}
+
+	void Material::SaveToFile() 
+	{
+		//// Save
+	}
+
+	void Material::Reload()
+	{
+		Metadata* metadata = AssetRegistry::GetMetadata(GetUUID());
+		if (metadata->HasCache) {
+			LoadFromFile(metadata->CachesPath[0]);
 		}
 	}
 
