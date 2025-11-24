@@ -15,6 +15,8 @@
 namespace Loopie {
 
 	class Camera;
+	class Material;
+	class Shader;
 
 	class EditorModule : public Module, public IObserver<EngineNotification> {
 	public:
@@ -44,5 +46,7 @@ namespace Loopie {
 		AssetsExplorerInterface m_assetsExplorer;
 
 		Scene* scene = nullptr;
+		std::shared_ptr<Material> selectedObjectMaterial;
+		Shader* selectedObjectShader;
 	};
 }

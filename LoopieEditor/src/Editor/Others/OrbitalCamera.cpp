@@ -82,14 +82,14 @@ namespace Loopie
 
         m_inputDirection *= m_speedMultiplier;
         m_inputRotation *= m_cameraRotationSpeed;
+        Log::Info("{0} {1}", inputEvent.GetMousePosition().x, inputEvent.GetMousePosition().y);
     }
 
     void OrbitalCamera::Update()
     {
-
         if (m_inputRotation == vec3{ 0.f, 0.f ,0.f} && m_inputDirection == vec3{ 0.f, 0.f, 0.f } && m_panDirection == vec3{ 0.f, 0.f, 0.f } && m_zoomInput == 0.f)
             return;
-
+        
         Transform* transform = m_entity->GetTransform();
  
         if (m_entityToPivot != m_entity)

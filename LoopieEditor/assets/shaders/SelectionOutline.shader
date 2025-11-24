@@ -1,5 +1,6 @@
 [vertex]
 #version 460 core
+/// DO NOT MODIFY
 layout (location = 0) in vec3 a_Position;
 layout (location = 1) in vec2 a_TexCoord;
 layout (location = 2) in vec3 a_Normal;
@@ -12,28 +13,22 @@ layout (std140, binding = 0) uniform Matrices
     mat4 lp_View;
 };
 
-out vec2  v_TexCoord;
-
 uniform mat4 lp_Transform;
+///
 
 void main()
 {
-	gl_Position = lp_Projection * lp_View* lp_Transform * vec4(a_Position, 1.0);
-	v_TexCoord = a_TexCoord;
+    gl_Position = lp_Projection * lp_View* lp_Transform * vec4(a_Position, 1.0);
 }
+
 
 [fragment]
 #version 460 core
-in vec2 v_TexCoord;
-
 out vec4 FragColor;
 
-uniform sampler2D u_Albedo;
+uniform vec4 u_Color = vec4(1, 0.757,0,1.0);
 
 void main()
 {
-	vec4 texColor = texture(u_Albedo, v_TexCoord);
-	if(texColor.a < 0.5f)
-		discard;
-	FragColor = texColor;
-}
+    FragColor = u_Color;
+} 

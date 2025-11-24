@@ -11,7 +11,6 @@ namespace Loopie
 
     class Transform : public Component
     {
-
     public:
         DEFINE_TYPE(Transform)
 
@@ -68,14 +67,15 @@ namespace Loopie
         
 
     private:
-
         vec3 GetWorldPosition() const;
         quaternion GetWorldRotation() const;
         vec3 GetWorldScale() const;
 
         void RefreshMatrices() const;
+
     public:
         Event<TransformNotification> m_transformNotifier;
+
     private:
         vec3 m_localPosition = vec3(0);
         quaternion m_localRotation = quaternion(1, 0, 0, 0);
