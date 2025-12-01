@@ -11,37 +11,36 @@ namespace Loopie {
 	class MaterialImporter {
 	public:
 		static void ImportMaterial(const std::string& filepath, Metadata& metadata);
-		static void SaveMaterial(const std::string& filepath, Material& material, Metadata& metadata);
 		static void LoadMaterial(const std::string& path, Material& material);
+		static void SaveMaterial(const std::string& filepath, Material& material, Metadata& metadata);
 		static bool CheckIfIsMaterial(const char* path);
 	private:
-		template<typename T>		
+        template<typename T>
         static std::string GLMVectorToString(const T& value)
         {
             std::string out;
-            unsigned int columns = value.length();
 
-            for (int c = 0; c < columns; c++)
-            {
-                out += std::to_string(value[c]) + ",";
-            }
+            constexpr glm::length_t count = T::length();
+
+            for (glm::length_t i = 0; i < count; i++)
+                out += std::to_string(value[i]) + ",";
 
             if (!out.empty())
                 out.pop_back();
 
             return out;
         }
-
         template<typename T>
         static std::string GLMMatrixToString(const T& value)
         {
             std::string out;
-            unsigned int columns = value.length();
-            unsigned int rows = value[0].length();
 
-            for (int c = 0; c < columns; c++)
+            constexpr unsigned int columns = T::length();
+            constexpr unsigned int rows = T::col_type::length();
+
+            for (unsigned int c = 0; c < columns; c++)
             {
-                for (int r = 0; r < rows; r++)
+                for (unsigned int r = 0; r < rows; r++)
                     out += std::to_string(value[c][r]) + ",";
             }
 

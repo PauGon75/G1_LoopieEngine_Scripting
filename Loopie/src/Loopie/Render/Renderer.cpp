@@ -11,8 +11,6 @@
 
 namespace Loopie {
 
-	std::shared_ptr<Texture> Renderer::s_DefaultTexture = nullptr;
-	std::shared_ptr<Material> Renderer::s_DefaultMaterial = nullptr;
 	std::vector<Renderer::RenderItem> Renderer::s_RenderQueue = std::vector<Renderer::RenderItem>();
 	std::vector<Camera*> Renderer::s_renderCameras = std::vector<Camera*>();
 	std::shared_ptr<UniformBuffer> Renderer::s_matricesUniformBuffer = nullptr;

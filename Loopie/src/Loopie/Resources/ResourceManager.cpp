@@ -1,5 +1,7 @@
 #include "ResourceManager.h"
 
+
+
 namespace Loopie {
 	std::unordered_map<ResourceKey, std::shared_ptr<Resource>, ResourceKeyHash> ResourceManager::m_Resources;
 
@@ -9,7 +11,6 @@ namespace Loopie {
         if (resource) {
             return std::static_pointer_cast<Texture>(resource);
         }
-
         auto texture = std::make_shared<Texture>(metadata.UUID);
         m_Resources[key] = texture;
         return texture;
@@ -21,7 +22,6 @@ namespace Loopie {
         if (resource) {
             return std::static_pointer_cast<Mesh>(resource);
         }
-
         auto mesh = std::make_shared<Mesh>(metadata.UUID, index);
         m_Resources[key] = mesh;
         return mesh;
@@ -34,7 +34,6 @@ namespace Loopie {
         if (resource) {
             return std::static_pointer_cast<Material>(resource);
         }
-
         auto material = std::make_shared<Material>(metadata.UUID);
         m_Resources[key] = material;
         return material;

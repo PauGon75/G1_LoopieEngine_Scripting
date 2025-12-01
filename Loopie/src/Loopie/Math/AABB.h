@@ -5,8 +5,8 @@ namespace Loopie{
     struct OBB;
 
     struct AABB {
-        vec3 MinPoint;
-        vec3 MaxPoint;
+        vec3 MinPoint = vec3(0);
+        vec3 MaxPoint = vec3(0);
 
         void SetNegativeInfinity();
         void Enclose(const AABB& other);

@@ -4,6 +4,7 @@
 #include "Loopie/Components/Transform.h"
 #include "Loopie/Components/Camera.h"
 #include "Loopie/Components/MeshRenderer.h"
+#include "Loopie/Helpers/LoopieHelpers.h"
 
 #include <unordered_set>
 
@@ -320,25 +321,13 @@ namespace Loopie {
 		if (!parentEntity)
 			return desiredName;
 
-		std::unordered_set<std::string> existingNames;
+		std::vector<std::string> existingNames;
 		for (const auto& sibling : GetAllSiblings(parentEntity))
 		{
-			existingNames.insert(sibling->GetName());
+			existingNames.emplace_back(sibling->GetName());
 		}
 
-		if (existingNames.find(desiredName) == existingNames.end())
-			return desiredName;
-
-		int counter = 1;
-		std::string uniqueName;
-
-		do
-		{
-			uniqueName = desiredName + " (" + std::to_string(counter) + ")";
-			counter++;
-		} while (existingNames.find(uniqueName) != existingNames.end());
-
-		return uniqueName;
+		return Helper::MakeUniqueName(desiredName, existingNames);
 	}
 
 	void Scene::CollectEntitiesRecursive(std::shared_ptr<Entity> entity,

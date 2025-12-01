@@ -17,7 +17,9 @@ namespace Loopie {
 		std::string Name;
 
 		AABB BoundingBox;
-		matrix4 Matrix = matrix4(1); /// Still NotWorking
+		vec3 Position = vec3(0); /// Still NotWorking
+		quaternion Rotation = quaternion(1,0,0,0); /// Still NotWorking
+		vec3 Scale = vec3(0); /// Still NotWorking
 
 		unsigned int VerticesAmount = 0;
 		unsigned int VertexElements = 0;
@@ -43,8 +45,7 @@ namespace Loopie {
 		Mesh(const UUID& id, unsigned int index);
 		~Mesh() = default;
 
-		void LoadFromFile(const std::string path) override;
-		void Reload() override;
+		bool Load() override;
 
 		const MeshData& GetData() { return m_data; }
 		unsigned int GetMeshIndex() { return m_meshIndex; }

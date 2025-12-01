@@ -178,20 +178,24 @@ namespace Loopie {
 		MeshImporter::ImportModel(modelPath, meta);
 		std::shared_ptr<Entity> parent;
 
+		if (meta.CachesPath.size() > 0) {
+			parent = Application::GetInstance().GetScene().CreateEntity("ModelEntity", HierarchyInterface::s_SelectedEntity);
+		}
 		for (size_t i = 0; i < meta.CachesPath.size(); i++)
-		{
-			
+		{			
 			std::shared_ptr<Mesh> mesh = ResourceManager::GetMesh(meta, (int)i);
-
 			if (mesh) {
 				std::shared_ptr<Entity> newEntity;
 				if (!parent) {
-					newEntity = Application::GetInstance().GetScene().CreateEntity("ModelEntity",HierarchyInterface::s_SelectedEntity);
-					parent = newEntity;
+					newEntity = Application::GetInstance().GetScene().CreateEntity(mesh->GetData().Name,HierarchyInterface::s_SelectedEntity);
 				}else
-					newEntity = Application::GetInstance().GetScene().CreateEntity("ModelEntity", parent);
+					newEntity = Application::GetInstance().GetScene().CreateEntity(mesh->GetData().Name, parent);
+
 				MeshRenderer* renderer = newEntity->AddComponent<MeshRenderer>();
 				renderer->SetMesh(mesh);
+				renderer->GetTransform()->SetLocalPosition(mesh->GetData().Position);
+				renderer->GetTransform()->SetLocalRotation(mesh->GetData().Rotation);
+				renderer->GetTransform()->SetLocalScale(mesh->GetData().Scale);
 			}
 		}
 	}

@@ -140,6 +140,15 @@ namespace Loopie {
 		return GetMetadata(it->second);
 	}
 
+	const std::string AssetRegistry::GetSourcePath(const UUID& uuid)
+	{
+		auto it = s_UUIDToPath.find(uuid);
+		if (it == s_UUIDToPath.end())
+			return "";
+
+		return it->second;
+	}
+
 	bool AssetRegistry::UpdateMetadata(const Metadata& metadata, const std::filesystem::path& assetPath)
 	{
 		Register(assetPath.string(), metadata);

@@ -61,8 +61,8 @@ namespace Loopie {
 		std::shared_ptr<Material> m_material;
 		std::shared_ptr<Mesh> m_mesh;
 
-		mutable AABB m_worldAABB;
-		mutable OBB m_worldOBB;
+		mutable AABB m_worldAABB = AABB();
+		mutable OBB m_worldOBB = OBB();
 		mutable bool m_boundingBoxesDirty = true;
 	};
 }

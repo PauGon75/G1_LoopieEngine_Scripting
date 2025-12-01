@@ -304,17 +304,19 @@ namespace Loopie
     {
         m_localDirty = true;
         MarkWorldDirty();
-        m_transformNotifier.Notify(TransformNotification::OnDirty);
     }
 
     void Transform::MarkWorldDirty()
     {
-        if (m_worldDirty) return;
+        if (m_worldDirty) 
+            return;
         m_worldDirty = true;
+        m_transformNotifier.Notify(TransformNotification::OnDirty);
+
         for (auto& child : GetOwner()->GetChildren()) {
             if (child) child->GetTransform()->MarkWorldDirty();
         }
-        m_transformNotifier.Notify(TransformNotification::OnDirty);
+
     }
 
     bool Transform::IsDirty() const{

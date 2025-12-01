@@ -21,9 +21,14 @@ namespace Loopie
 		Material(const UUID& id);
 		~Material();
 
-		void InitMaterial();
+		static std::shared_ptr<Material> GetDefault();
+
+		void Bind();
+		void Unbind() const;
+
+		bool Load() override;
+		void Save();
 		void ResetMaterial();
-		void Apply(); // Applies all uniform values to the shader
 
 		// Getters
 		Shader& GetShader() { return m_shader; }
@@ -37,20 +42,14 @@ namespace Loopie
 		bool SetShaderVariable(const std::string& name, const UniformValue& value);
 		void SetTexture(std::shared_ptr<Texture> texture); /// Remove
 
-		void Bind();
-		void Unbind() const;
-
-		void LoadFromFile(const std::string path) override;
-		void Reload() override;
 
 		void SetIfEditable(bool isEditable) { m_editable = isEditable; }
 		bool IsEditable() { return m_editable; }
 
+
 	private:
 		void ApplyUniform(const std::string& name, const UniformValue& uniformValue);
-		void SaveToFile();
 		
-
 	private:
 		Shader m_shader = Shader("assets/shaders/DefaultShader.shader");
 		std::shared_ptr<Texture> m_texture;
@@ -59,5 +58,8 @@ namespace Loopie
 		// to be different for all different kinds of textures, which can be changed like this)
 		std::unordered_map<std::string, UniformValue> m_uniformValues;
 		bool m_editable = true;
+
+
+		static std::shared_ptr<Material> s_Material;
 	};
 }

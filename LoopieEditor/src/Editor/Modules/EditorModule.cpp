@@ -27,17 +27,6 @@ namespace Loopie
 		AssetRegistry::Initialize();
 		Application::GetInstance().GetWindow().SetResizable(true);
 
-		std::string defaultTeturePath = "assets/textures/simpleWhiteTexture.png";
-		Metadata& meta = AssetRegistry::GetOrCreateMetadata(defaultTeturePath);
-		TextureImporter::ImportImage(defaultTeturePath, meta);
-		Renderer::SetDefaultTexture(ResourceManager::GetTexture(meta));
-
-		std::string defaultMaterialPath = "assets/materials/defaultMaterial.mat";
-		meta = AssetRegistry::GetOrCreateMetadata(defaultMaterialPath);
-		MaterialImporter::ImportMaterial(defaultMaterialPath, meta);
-		Renderer::SetDefaultMaterial(ResourceManager::GetMaterial(meta));
-		Renderer::GetDefaultMaterial()->SetIfEditable(false);
-
 		/////SCENE
 		Application::GetInstance().CreateScene(""); /// Maybe default One
 		scene = &Application::GetInstance().GetScene();
@@ -45,13 +34,13 @@ namespace Loopie
 
 		scene->CreateEntity({ 0,0,-10 }, { 1,0,0,0 }, {1,1,1}, nullptr, "MainCamera")->AddComponent<Camera>();
 		scene->CreateEntity({ 0,0,-20 }, { 1,0,0,0 }, {1,1,1}, nullptr, "SecondaryCamera")->AddComponent<Camera>();
-		
-		std::string outlineMaterialPath = "assets/materials/outlineMaterial.mat";
-		meta = AssetRegistry::GetOrCreateMetadata(outlineMaterialPath);
-		MaterialImporter::ImportMaterial(outlineMaterialPath, meta);
-		selectedObjectMaterial = ResourceManager::GetMaterial(meta);
+
+		Metadata& metadata = AssetRegistry::GetOrCreateMetadata("assets/materials/outlineMaterial.mat");
+		selectedObjectMaterial = ResourceManager::GetMaterial(metadata);
+		selectedObjectMaterial->SetIfEditable(false);
 		selectedObjectShader = new Shader("assets/shaders/SelectionOutline.shader");
 		selectedObjectMaterial->SetShader(*selectedObjectShader);
+
 		////
 
 		m_assetsExplorer.Init();

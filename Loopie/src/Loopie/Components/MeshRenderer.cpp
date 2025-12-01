@@ -1,6 +1,7 @@
 #include "MeshRenderer.h"
 
 #include "Loopie/Render/Renderer.h"
+#include "Loopie/Core/Log.h"
 #include "Loopie/Render/Gizmo.h"
 #include "Loopie/Math/MathTypes.h"
 #include "Loopie/Components/Transform.h"
@@ -27,8 +28,9 @@ namespace Loopie {
 
 	void MeshRenderer::OnNotify(const TransformNotification& id)
 	{
-		if(id == TransformNotification::OnChanged)
+		if (id == TransformNotification::OnChanged || id == TransformNotification::OnDirty) {
 			SetBoundingBoxesDirty();
+		}
 	}
 
 	void MeshRenderer::Render() {
@@ -65,7 +67,7 @@ namespace Loopie {
 	std::shared_ptr<Material> MeshRenderer::GetMaterial() {
 		if (m_material)
 			return m_material;
-		return Renderer::GetDefaultMaterial();
+		return Material::GetDefault();
 	}
 
 	const AABB& MeshRenderer::GetWorldAABB() const
@@ -106,12 +108,14 @@ namespace Loopie {
 			UUID id = UUID(data["mesh_uuid"].get<std::string>());
 			unsigned int index = data["mesh_index"].get<unsigned int>();
 			Metadata* meta = AssetRegistry::GetMetadata(id);
-			m_mesh = ResourceManager::GetMesh(*meta, index);
+			if(meta)
+				m_mesh = ResourceManager::GetMesh(*meta, index);
 		}
 		if (data.contains("material_uuid")) {
 			UUID id = UUID(data["material_uuid"].get<std::string>());
 			Metadata* meta = AssetRegistry::GetMetadata(id);
-			m_material = ResourceManager::GetMaterial(*meta);
+			if (meta)
+				m_material = ResourceManager::GetMaterial(*meta);
 		}
 	}
 

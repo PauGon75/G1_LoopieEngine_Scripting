@@ -1,16 +1,20 @@
 #include "Material.h"
 
-#include "Loopie/Resources/AssetRegistry.h"
-#include "Loopie/Importers/TextureImporter.h"
+#include "Loopie/Resources/ResourceManager.h"
 #include "Loopie/Importers/MaterialImporter.h"
+
 #include "Loopie/Core/Log.h"
 #include "Loopie/Render/Renderer.h"
 
 namespace Loopie
 {
-	Material::Material(const UUID& id) : Resource(id)
+
+	std::shared_ptr<Material> Material::s_Material = nullptr;
+
+	Material::Material(const UUID& id) : Resource(id, ResourceType::MATERIAL)
 	{
-		InitMaterial();
+		ResetMaterial();
+		Load();
 	}
 
 	Material::~Material()
@@ -18,17 +22,69 @@ namespace Loopie
 
 	}
 
-	void Material::InitMaterial()
+	std::shared_ptr<Material> Material::GetDefault()
 	{
-		m_uniformValues.clear();
+		if (s_Material)
+			return s_Material;
+		Metadata& metadata = AssetRegistry::GetOrCreateMetadata("assets/materials/defaultMaterial.mat");
+		if (!metadata.HasCache) {
+			MaterialImporter::ImportMaterial("assets/textures/simpleWhiteTexture.png", metadata);
+		}
+		s_Material = ResourceManager::GetMaterial(metadata);
+		s_Material->Load();
+		s_Material->m_editable = false;
+		return s_Material;
+	}
 
+	void Material::Bind()
+	{
 		if (!m_shader.GetIsValidShader())
 		{
-			Log::Error("Cannot initialize material with invalid shader.");
+			Log::Error("Cannot apply material with invalid shader.");
 			return;
 		}
 
-		ResetMaterial();
+		m_shader.Bind();
+
+		if (m_texture)
+		{
+			m_texture->m_tb->Bind();
+		}
+		else
+		{
+			Texture::GetDefault()->m_tb->Bind();
+		}
+
+		for (const auto& [name, uniformValue] : m_uniformValues)
+		{
+			ApplyUniform(name, uniformValue);
+		}
+	}
+
+	void Material::Unbind() const
+	{
+		m_shader.Unbind();
+	}
+
+	bool Material::Load()
+	{
+		Metadata* metadata = AssetRegistry::GetMetadata(GetUUID());
+		if (metadata->HasCache) {
+			MaterialImporter::LoadMaterial(metadata->CachesPath[0], *this);
+			return true;
+		}
+		return false;
+	}
+
+	void Material::Save()
+	{
+		//// Save
+		Metadata* metadata = AssetRegistry::GetMetadata(GetUUID());
+		if (metadata) {
+			MaterialImporter::SaveMaterial(AssetRegistry::GetSourcePath(GetUUID()), *this, *metadata);
+			AssetRegistry::RefreshAssetRegistry();
+			Load();
+		}
 	}
 
 	void Material::ResetMaterial()
@@ -50,31 +106,6 @@ namespace Loopie
 		Log::Info("Material reset to default values");
 	}
 
-	void Material::Apply()
-	{
-		if (!m_shader.GetIsValidShader())
-		{
-			Log::Error("Cannot apply material with invalid shader.");
-			return;
-		}
-
-		m_shader.Bind();
-
-		if (m_texture)
-		{
-			m_texture->m_tb->Bind();
-		}
-		else
-		{
-			Renderer::GetDefaultTexture()->m_tb->Bind();
-		}
-
-		for (const auto& [name, uniformValue] : m_uniformValues)
-		{
-			ApplyUniform(name, uniformValue);
-		}
-	}
-
 	void Material::ApplyUniform(const std::string& name, const UniformValue& uniformValue)
 	{
 		switch (uniformValue.type)
@@ -92,30 +123,6 @@ namespace Loopie
 		case UniformType_Sampler2D: 	break;
 		case UniformType_Sampler3D: 	break;
 		default: Log::Warn("Unknown uniform type for '{0}'", name);	break;
-		}
-	}
-
-	void Material::LoadFromFile(const std::string path)
-	{
-		m_path = path;
-		MaterialImporter::LoadMaterial(path, *this);
-	}
-
-	void Material::SaveToFile() 
-	{
-		//// Save
-		Metadata* metadata = AssetRegistry::GetMetadata(GetUUID());
-		if (metadata) {
-			MaterialImporter::SaveMaterial(m_path, *this, *metadata);
-			Reload();
-		}
-	}
-
-	void Material::Reload()
-	{
-		Metadata* metadata = AssetRegistry::GetMetadata(GetUUID());
-		if (metadata->HasCache) {
-			LoadFromFile(metadata->CachesPath[0]);
 		}
 	}
 
@@ -139,7 +146,7 @@ namespace Loopie
 		}
 
 		m_shader = shader;
-		InitMaterial();
+		ResetMaterial();
 	}
 
 	bool Material::SetShaderVariable(const std::string& name, const UniformValue& value)
@@ -169,15 +176,5 @@ namespace Loopie
 		if (!m_editable)
 			return;
 		m_texture = texture;
-	}
-
-	void Material::Bind()
-	{
-		Apply(); 
-	}
-
-	void Material::Unbind() const
-	{
-		m_shader.Unbind();
 	}
 }
