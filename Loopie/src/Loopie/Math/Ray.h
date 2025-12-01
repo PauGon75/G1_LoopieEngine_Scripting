@@ -7,7 +7,7 @@ namespace Loopie
 	{
 	public:
 		Ray(vec3 startPoint, vec3 endPoint);
-		Ray(vec3 startPoint, vec3 direction, float length = 100);
+		Ray(vec3 startPoint, vec3 direction, float length);
 		vec3 StartPoint() { return startPoint; }
 		vec3 EndPoint() { return endPoint; }
         bool Intersects(const std::vector<vec3>& vertex, bool bounded_by_vertex, vec3& intersection_point);

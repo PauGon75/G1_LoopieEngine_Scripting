@@ -11,7 +11,7 @@
 
 #include "Loopie/Resources/ResourceManager.h"
 #include "Loopie/Importers/TextureImporter.h"
-
+#include "Loopie/Math/Ray.h"
 #include "Loopie/Components/MeshRenderer.h"
 #include "Loopie/Components/Transform.h"
 #include "Loopie/Resources/Types/Material.h"
@@ -192,6 +192,32 @@ namespace Loopie
 	{
 		m_scene.ChargeModel("assets/models/BakerHouse.fbx");
 		m_scene.ChargeTexture("assets/textures/Baker_house.png");
+	}
+
+	void EditorModule::MousePick(Camera* camera)
+	{
+		Ray ray = Ray{ vec3(0), vec3(1) };
+
+		for (auto& [uuid, entity] : scene->GetAllEntities()) {
+			if (!entity->GetIsActive())
+				continue;
+			MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+			if (!renderer || !renderer->GetIsActive() || !renderer->GetMesh())
+				continue;
+
+			if (!camera->GetFrustum().Intersects(renderer->GetWorldAABB()))
+				continue;
+
+			const AABB& worldAABB = renderer->GetWorldAABB();
+			vec3 hitPoint;
+			if (!worldAABB.IntersectsRay(ray.StartPoint(), ray.EndPoint(), hitPoint)) {
+				continue;
+			}
+
+			const MeshData& data = renderer->GetMesh()->GetData();
+			data.
+			if()
+		}
 	}
 
 	void EditorModule::OnNotify(const EngineNotification& type)

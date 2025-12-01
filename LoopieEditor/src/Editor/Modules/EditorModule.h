@@ -35,6 +35,7 @@ namespace Loopie {
 		void RenderWorld(Camera* camera);
 		/// Test
 		void CreateBakerHouse();
+		void MousePick(Camera* camera);
 		///
 	private:
 		InspectorInterface m_inspector;
