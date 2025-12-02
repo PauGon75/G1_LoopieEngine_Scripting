@@ -10,6 +10,7 @@
 #include "Loopie/Importers/MaterialImporter.h"
 
 #include <filesystem>
+#include <unordered_set>
 
 namespace Loopie {
 
@@ -42,13 +43,13 @@ namespace Loopie {
 				Log::Info("{0}", pathString);
 				/// DO REIMPORTS
 
-				if (TextureImporter::CheckIfIsImage(pathString.c_str())) {
+				if (metadata.Type == ResourceType::TEXTURE || TextureImporter::CheckIfIsImage(pathString.c_str())) {
 					TextureImporter::ImportImage(pathString, metadata);
 				}
-				else if (MeshImporter::CheckIfIsModel(pathString.c_str())) {
+				else if (metadata.Type == ResourceType::MESH || MeshImporter::CheckIfIsModel(pathString.c_str())) {
 					MeshImporter::ImportModel(pathString, metadata);
 				}
-				else if (MaterialImporter::CheckIfIsMaterial(pathString.c_str())) {
+				else if (metadata.Type == ResourceType::MATERIAL || MaterialImporter::CheckIfIsMaterial(pathString.c_str())) {
 					MaterialImporter::ImportMaterial(pathString, metadata);
 				}
 
@@ -56,6 +57,8 @@ namespace Loopie {
 				UpdateMetadata(metadata, pathString);
 			}
 		}
+
+		CleanOrphanedLibraryFiles();
 
 		Application::GetInstance().m_notifier.Notify(EngineNotification::OnAssetRegistryReload);
 	}
@@ -103,9 +106,52 @@ namespace Loopie {
 
 				if (!std::filesystem::exists(sourceFile))
 				{
-					std::filesystem::remove(entry.path());
-					///Remove cache files also?
+					DirectoryManager::Delete(entry.path());
+					Log::Warn("Removing orphaned meta file: {}", entry.path().string());
 				}
+			}
+		}
+	}
+
+	void AssetRegistry::CleanOrphanedLibraryFiles()
+	{
+		const Project& project = Application::GetInstance().m_activeProject;
+		const std::filesystem::path libraryPath = project.GetChachePath();
+
+		if (!std::filesystem::exists(libraryPath))
+			return;
+
+		std::unordered_set<std::string> validCacheFiles;
+		validCacheFiles.reserve(s_Assets.size() * 4);
+
+		for (auto& [uuid, metadata] : s_Assets)
+		{
+			for (const std::string& cachePath : metadata.CachesPath)
+			{
+				if (cachePath.empty())
+					continue;
+
+
+				std::filesystem::path abs = libraryPath /cachePath;
+
+				if (std::filesystem::exists(abs))
+					validCacheFiles.insert(abs.string());
+			}
+		}
+
+		for (auto& entry : std::filesystem::recursive_directory_iterator(libraryPath))
+		{
+			if (!entry.is_regular_file())
+				continue;
+
+			std::filesystem::path filePath = std::filesystem::absolute(entry.path());
+			std::string fileStr = filePath.string();
+
+
+			if (!validCacheFiles.count(fileStr))
+			{
+				Log::Warn("Removing orphaned library file: {}", fileStr);
+				DirectoryManager::Delete(fileStr);
 			}
 		}
 	}

@@ -29,6 +29,7 @@ namespace Loopie {
 
 		metadata.CachesPath.clear();
 		metadata.HasCache = true;
+		metadata.Type = ResourceType::MESH;
 		ProcessNode(scene->mRootNode, scene, metadata.CachesPath);
 
 		MetadataRegistry::SaveMetadata(filepath, metadata);

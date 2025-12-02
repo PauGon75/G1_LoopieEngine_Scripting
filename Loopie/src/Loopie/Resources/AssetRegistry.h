@@ -30,6 +30,7 @@ namespace Loopie {
         static void ScanEngineDirectory();
         static void ScanAssetDirectory();
         static void CleanOrphanedMetadata();
+        static void CleanOrphanedLibraryFiles();
         static void Register(const std::string& path,const Metadata& metadata);
 
     private:

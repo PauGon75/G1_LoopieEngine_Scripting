@@ -89,6 +89,8 @@ namespace Loopie {
         metadata.HasCache = true;
         metadata.CachesPath.clear();
         metadata.CachesPath.push_back(locationPath.string());
+        metadata.Type = ResourceType::TEXTURE;
+
         MetadataRegistry::SaveMetadata(filepath, metadata);
 
         Log::Trace("Texture Imported -> {0} (Compressed: {1:.2f}MB -> {2:.2f}MB, Ratio: {3:.1f}%)", filepath, imageSize / (1024.0 * 1024.0), compressedSize / (1024.0 * 1024.0), (compressedSize * 100.0) / imageSize);

@@ -107,6 +107,8 @@ namespace Loopie {
 		metadata.HasCache = true;
 		metadata.CachesPath.clear();
 		metadata.CachesPath.push_back(locationPath.string());
+		metadata.Type = ResourceType::MATERIAL;
+
 		MetadataRegistry::SaveMetadata(filepath, metadata);
 
 	}

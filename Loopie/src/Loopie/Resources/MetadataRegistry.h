@@ -16,7 +16,7 @@ namespace Loopie {
 
     struct Metadata {
         UUID UUID;
-        ResourceType Type;
+        ResourceType Type = ResourceType::UNKNOWN;
         std::vector<std::string> CachesPath;
 
         bool HasCache = false;
