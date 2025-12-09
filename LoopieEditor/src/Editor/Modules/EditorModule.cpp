@@ -150,7 +150,13 @@ namespace Loopie
 		Renderer::SetStencilOp(Renderer::StencilOp::KEEP, Renderer::StencilOp::KEEP, Renderer::StencilOp::REPLACE);
 		Renderer::SetStencilMask(0xFF);
 		//Renderer::DisableStencil();
-		for (auto& [uuid, entity] : scene->GetAllEntities()) {
+
+		// POST
+		std::vector<std::shared_ptr<Entity>> entities;
+		scene->GetOctree().CollectVisibleEntitiesFrustum(camera->GetFrustum(), entities);
+
+		for (const auto& entity : entities)
+		{
 			if (!entity->GetIsActive())
 				continue;
 			MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
@@ -164,7 +170,7 @@ namespace Loopie
 			if (entity == HierarchyInterface::s_SelectedEntity) {
 				Renderer::FlushRenderItem(renderer->GetMesh()->GetVAO(), renderer->GetMaterial(), entity->GetTransform());
 
-				Renderer::SetStencilFunc(Renderer::StencilFunc::NOTEQUAL,1,0xFF);
+				Renderer::SetStencilFunc(Renderer::StencilFunc::NOTEQUAL, 1, 0xFF);
 				Renderer::SetStencilMask(0x00);
 
 				float outlineScale = 1.05f;
@@ -186,6 +192,8 @@ namespace Loopie
 				Renderer::AddRenderItem(renderer->GetMesh()->GetVAO(), renderer->GetMaterial(), entity->GetTransform());
 			}
 		}
+
+		scene->GetOctree().DebugDraw(vec4{255, 0, 0, 255});
 	}
 
 	void EditorModule::CreateBakerHouse()

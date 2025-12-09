@@ -19,10 +19,14 @@ namespace Loopie {
 
 		void RenderOpenProjectPopUp();
 		void RenderCreateProjectPopUp();
+		void RenderSaveScenePopUp();
+		void RenderLoadScenePopUp();
 
 	private:
 		char m_projectName[128] = "";
+		char m_sceneName[128] = "";
 		std::string m_projectPath = "";
+		std::string m_newScenePath = "";
 
 
 		/// Menus States

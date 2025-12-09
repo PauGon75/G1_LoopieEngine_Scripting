@@ -43,7 +43,7 @@ namespace Loopie {
 		void Update(std::shared_ptr<Entity> entity);
 		void Clear();
 		void Rebuild();
-		void DebugDraw(vec3 color);
+		void DebugDraw(const vec4& color);
 		void DebugPrintOctreeStatistics();
 		OctreeStatistics GetStatistics() const;
 		void CollectIntersectingObjectsWithRay(vec3 rayOrigin, vec3 rayDirection,
@@ -67,9 +67,9 @@ namespace Loopie {
 		void InsertRecursively(OctreeNode* node, std::shared_ptr<Entity> entity, const AABB& entityAABB, int depth);
 		void RemoveRecursively(OctreeNode* node, std::shared_ptr<Entity> entity, const AABB& entityAABB);
 		void Subdivide(OctreeNode* node);
-		void RedistributeEntities(OctreeNode* node);
+		void RedistributeEntities(OctreeNode* node, int depth);
 		std::array<AABB, MAX_ENTITIES_PER_NODE> ComputeChildAABBs(const AABB& parentAABB) const;
-		void DebugDrawRecursively(OctreeNode* node, vec3 color);
+		void DebugDrawRecursively(OctreeNode* node, const vec4& color, int depth);
 		void GatherStatisticsRecursively(OctreeNode* node, OctreeStatistics& stats, int depth) const;
 
 		void CollectAllEntitiesFromNode(OctreeNode* node, std::vector<std::shared_ptr<Entity>>& entities);

@@ -31,8 +31,8 @@ namespace Loopie {
 		void SetUUID(const std::string uuid);
 
 		// Serialize & Deserialize
-		virtual JsonNode Serialize(JsonNode& parent) const =0;
-		virtual void Deserialize(const JsonNode& data) =0;
+		virtual JsonNode Serialize(JsonNode& parent) const = 0;
+		virtual void Deserialize(const JsonNode& data) = 0;
 
 		virtual void Init() = 0;
 

@@ -5,6 +5,8 @@
 #include "Loopie/Components/Transform.h"
 #include "Loopie/Scene/Entity.h"
 #include "Loopie/Core/Log.h"
+#include "Loopie/Render/Gizmo.h"
+
 
 namespace Loopie
 {
@@ -46,7 +48,10 @@ namespace Loopie
 
 	void Octree::Clear()
 	{
-		m_rootNode.reset();
+		if (m_rootNode)
+		{
+			m_rootNode.reset();
+		}
 	}
 
 	// *** How Rebuild works *** - PSS 30/11/2025
@@ -72,9 +77,9 @@ namespace Loopie
 
 	// This debug draws the whole Octree. We might consider doing optimizations, 
 	// like frustrum, and expand it to debug from a certain Octree downwards
-	void Octree::DebugDraw(vec3 color)
+	void Octree::DebugDraw(const vec4& color)
 	{
-		DebugDrawRecursively(m_rootNode.get(), color);
+		DebugDrawRecursively(m_rootNode.get(), color, 0);
 	}
 
 	void Octree::DebugPrintOctreeStatistics()
@@ -149,8 +154,15 @@ namespace Loopie
 		}
 		else
 		{
+			vec3 entityPosition = entity->GetTransform()->GetPosition();
 			AABB aabb;
-			aabb.Enclose(entity->GetTransform()->GetPosition());
+			aabb.MaxPoint = entityPosition;
+			aabb.MinPoint = entityPosition;
+
+			// This line is not working since it ecloses it between 0, 0, 0 and its position.
+			//AABB aabb;
+			//aabb.Enclose(entity->GetTransform()->GetPosition()); 
+			
 			return aabb;
 		}
 	}
@@ -172,7 +184,7 @@ namespace Loopie
 			if (node->m_entities.size() > MAX_ENTITIES_PER_NODE && depth < MAXIMUM_DEPTH)
 			{
 				Subdivide(node);
-				RedistributeEntities(node);
+				RedistributeEntities(node, depth);
 			}
 			return;
 		}
@@ -186,6 +198,11 @@ namespace Loopie
 			{
 				InsertRecursively(node->m_children[i].get(), entity, entityAABB, depth + 1);
 				inserted = true;
+
+				// *** Entities pertaining to more than one octant *** - PSS 03/12/2025
+				// With this break each entity is limited to only one node. Remove it
+				// so that entities can pertain to multiple octants (nodes) at once.
+				break;
 			}
 		}
 
@@ -244,7 +261,7 @@ namespace Loopie
 
 	}
 
-	void Octree::RedistributeEntities(OctreeNode* node)
+	void Octree::RedistributeEntities(OctreeNode* node, int depth)
 	{
 		// Redistribute entities into those 8 different nodes
 		if (node->m_isLeaf)
@@ -263,19 +280,33 @@ namespace Loopie
 			{
 				if (node->m_children[i] && node->m_children[i]->m_aabb.Intersects(entityAABB))
 				{
-					InsertRecursively(node->m_children[i].get(), entity, entityAABB, 0);
+					node->m_children[i]->m_entities.push_back(entity);
 					redistributed = true;
-					break;
+
+					// *** Entities pertaining to more than one octant *** - PSS 03/12/2025
+					// With this break each entity is limited to only one node. Remove it
+					// so that entities can pertain to multiple octants (nodes) at once.
+					break; 
 				}
 			}
 
-			// If entity doesn't fit it any child, keep it at the parent
+			// Edge case - If an entity doesn't fit it any child, keep it at the parent
 			if (!redistributed)
 			{
 				node->m_entities.push_back(entity);
 			}
 		}
 
+		// After redistribution, check each child if it needs further subdivision
+		for (int i = 0; i < MAX_ENTITIES_PER_NODE; ++i)
+		{
+			if (node->m_children[i] &&
+				node->m_children[i]->m_entities.size() > MAX_ENTITIES_PER_NODE && depth + 1 < MAXIMUM_DEPTH)
+			{
+				Subdivide(node->m_children[i].get());
+				RedistributeEntities(node->m_children[i].get(), depth + 1);
+			}
+		}
 	}
 
 	std::array<AABB, MAX_ENTITIES_PER_NODE> Octree::ComputeChildAABBs(const AABB& parentAABB) const
@@ -305,20 +336,27 @@ namespace Loopie
 		return children;
 	}
 
-	void Octree::DebugDrawRecursively(OctreeNode* node, vec3 color)
+	void Octree::DebugDrawRecursively(OctreeNode* node, const vec4& color, int depth)
 	{
 		if (!node)
 		{
 			return;
 		}
 
-		// TODO (PSS - 27/11/25): Draw node->m_children[i]->m_aabb
+		if (depth % 2 == 0)
+		{
+			Gizmo::DrawCube(node->m_aabb.MinPoint, node->m_aabb.MaxPoint, vec4{ 255,255,255,255 });
+		}
+		else
+		{
+			Gizmo::DrawCube(node->m_aabb.MinPoint, node->m_aabb.MaxPoint, color);
+		}
 
 		for (int i = 0; i < MAX_ENTITIES_PER_NODE; ++i)
-		{
+		{			
 			if (node->m_children[i])
 			{
-				DebugDrawRecursively(node->m_children[i].get(), color);
+				DebugDrawRecursively(node->m_children[i].get(), color, depth + 1);
 			}
 		}
 	}

@@ -4,6 +4,7 @@
 #include "Loopie/Core/Time.h"
 #include "Loopie/Core/Window.h"
 #include "Loopie/Files/FileDialog.h"
+#include "Loopie/Files/DirectoryManager.h"
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
@@ -21,6 +22,8 @@ namespace Loopie {
 
 		ImGuiID openProjectPopUpId = ImGui::GetID("###OpenProjectPopUp");
 		ImGuiID createProjectPopUpId = ImGui::GetID("###CreateProjectPopUp");
+		ImGuiID saveScenePopUpId = ImGui::GetID("###SaveScenePopUp");
+		ImGuiID loadScenePopUpId = ImGui::GetID("###LoadScenePopUp");
 
 		if (ImGui::BeginMainMenuBar())
 		{
@@ -39,21 +42,27 @@ namespace Loopie {
 					m_projectName[0] = '\0';
 				}
 
-				if (ImGui::MenuItem("Save [WIP]"))
+				// *** How Save Scene should work  *** - PSS 08/12/25
+				// I believe that when creating a new project a scene should be generated
+				// and a default save should be created for it.
+				// So saving should never create a pop-up, but instead save on the already
+				// existing save file.
+				if (ImGui::MenuItem("Save Scene [WIP]"))
 				{
-					// TODO: save all scenes and config
-					Application::GetInstance().GetScene().SaveScene();
+					Application::GetInstance().GetScene().SaveScene(Application::GetInstance().GetScene().GetFilePath());
 				}
 
-				//if (ImGui::MenuItem("Save as... [WIP]"))
-				//{
-				//	// TODO: save all scenes and config to a specific file
-				//	Application::GetInstance().GetScene().SaveScene();
-				//}
-
-				if (ImGui::MenuItem("Reload Scene... [WIP][TEMP]"))
+				if (ImGui::MenuItem("Save Scene As [WIP]"))
 				{
-					Application::GetInstance().GetScene().ReadAndLoadSceneFile("TESTSavedScene.json");
+					ImGui::OpenPopup(saveScenePopUpId);
+					m_newScenePath = "";
+					m_sceneName[0] = '\0';
+				}
+
+				if (ImGui::MenuItem("Load Scene [WIP]"))
+				{
+					ImGui::OpenPopup(loadScenePopUpId);
+					m_newScenePath = "";
 				}
 
 				if (ImGui::MenuItem("Exit"))
@@ -76,6 +85,27 @@ namespace Loopie {
 				if (ImGui::MenuItem("Configuration"))
 				{
 					m_showInfoConfigMenu = true;
+				}
+
+				ImGui::EndMenu();
+			}
+
+			// *** PSS - Created this menu for testing features 08/12/25 ***
+			if (ImGui::BeginMenu("Debug"))
+			{
+				if (ImGui::MenuItem("Octree Console Information"))
+				{
+					Application::GetInstance().GetScene().GetOctree().DebugPrintOctreeStatistics();
+				}
+
+				if (ImGui::MenuItem("Rebuild Octree"))
+				{
+					Application::GetInstance().GetScene().GetOctree().Rebuild();
+				}
+
+				if (ImGui::MenuItem("Reload Last Saved Scene... "))
+				{
+					Application::GetInstance().GetScene().ReadAndLoadSceneFile(Application::GetInstance().GetScene().GetFilePath());
 				}
 
 				ImGui::EndMenu();
@@ -121,6 +151,12 @@ namespace Loopie {
 
 		ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 		RenderCreateProjectPopUp();
+
+		ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+		RenderSaveScenePopUp();
+
+		ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+		RenderLoadScenePopUp();
 		
 	}
 
@@ -298,6 +334,70 @@ namespace Loopie {
 					ImGui::CloseCurrentPopup();
 				}
 			}
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel")) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+	}
+
+	void EditorMenuInterface::RenderSaveScenePopUp()
+	{
+		if (ImGui::BeginPopupModal("Save Scene###SaveScenePopUp", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize)) {
+
+			ImGui::InputText("Scene Name", m_sceneName, IM_ARRAYSIZE(m_sceneName));
+
+			ImGui::InputText("Folder Path", &m_newScenePath, ImGuiInputTextFlags_ReadOnly);
+			ImGui::SameLine();
+			if (ImGui::Button("##", { 20,20 }))
+			{
+				DialogResult result = FileDialog::SelectFolder();
+				if (result.Status == DialogResultType::SUCCESS)
+				{
+					m_newScenePath = result.Paths[0].string();
+				}
+			}
+
+			if (ImGui::Button("Save Scene", { 150,20 }))
+			{
+				DirectoryManager::CreateFile(m_newScenePath, m_sceneName, ".json");
+				m_newScenePath = m_newScenePath + "\\" + m_sceneName + ".json";
+				Application::GetInstance().GetScene().SetFilePath(m_newScenePath);
+
+				Application::GetInstance().GetScene().SaveScene(Application::GetInstance().GetScene().GetFilePath());
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel")) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+	}
+
+	void EditorMenuInterface::RenderLoadScenePopUp()
+	{
+		if (ImGui::BeginPopupModal("Load Scene###LoadScenePopUp", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::InputText("File Path", &m_newScenePath, ImGuiInputTextFlags_ReadOnly);
+			ImGui::SameLine();
+			if (ImGui::Button("##", { 20,20 }))
+			{
+				DialogResult result = FileDialog::SelectFile();
+				if (result.Status == DialogResultType::SUCCESS)
+				{
+					m_newScenePath = result.Paths[0].string();
+				}
+			}
+
+			if (ImGui::Button("Open Scene", { 150,20 }))
+			{
+				// TODO: Check if new scene is valid - PSS 08/12/25
+				Application::GetInstance().GetScene().SetFilePath(m_newScenePath);
+				Application::GetInstance().GetScene().ReadAndLoadSceneFile(Application::GetInstance().GetScene().GetFilePath());
+				ImGui::CloseCurrentPopup();
+			}
+
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel")) {
 				ImGui::CloseCurrentPopup();
