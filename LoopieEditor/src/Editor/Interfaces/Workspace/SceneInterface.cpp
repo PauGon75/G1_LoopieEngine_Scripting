@@ -11,8 +11,10 @@
 #include "Loopie/Importers/TextureImporter.h"
 #include "Loopie/Components/MeshRenderer.h"
 
+
 #include "Editor/Interfaces/Workspace/HierarchyInterface.h"
 
+#include <limits>
 #include <imgui.h>
 #include <ImGuizmo.h>
 
@@ -55,7 +57,8 @@ namespace Loopie {
 		
 		m_camera->ProcessEvent(inputEvent);
 		m_camera->Update();
-
+		if (inputEvent.GetMouseButtonStatus(0) == KeyState::DOWN)
+			MousePick();
 	}
 
 	void SceneInterface::Render() {
@@ -72,7 +75,10 @@ namespace Loopie {
 			m_focused = ImGui::IsWindowHovered();
 			ImVec2 cursorScreenPos = ImGui::GetCursorScreenPos();
 			ImVec2 cursorPos = ImGui::GetCursorPos();
-			
+			ImVec2 mousePos = ImGui::GetMousePos();
+			ImVec2 imageMin = cursorScreenPos;      // top-left of the Image
+			ImVec2 imageMax = ImVec2(imageMin.x + size.x, imageMin.y + size.y);
+			m_mousePosition = ivec2(mousePos.x - imageMin.x, mousePos.y - imageMin.y);
 
 			if (!m_focused && m_interacted || m_focused)
 				m_interacted = ImGui::IsMouseDown(ImGuiMouseButton_Left) || ImGui::IsMouseDown(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Middle);
@@ -101,8 +107,6 @@ namespace Loopie {
 			}
 
 		}
-
-		
 		ImGui::End();
 	}
 
@@ -168,6 +172,28 @@ namespace Loopie {
 		ImGui::PopStyleVar(2);
 	}
 
+	Ray SceneInterface::MouseRay()
+	{
+		float ndcX = (2.0f * m_mousePosition.x) / m_buffer->GetWidth() - 1.0f;
+		float ndcY = 1.0f - (2.0f * m_mousePosition.y) / m_buffer->GetHeight(); // flip Y for GL
+
+		vec4 rayClipNear(ndcX, ndcY, -1.0f, 1.0f);
+		vec4 rayClipFar(ndcX, ndcY, 1.0f, 1.0f);
+
+		matrix4 invViewProj = glm::inverse(m_camera->GetCamera()->GetViewProjectionMatrix());
+
+		vec4 rayWorldNear = invViewProj * rayClipNear;
+		rayWorldNear /= rayWorldNear.w;
+
+		vec4 rayWorldFar = invViewProj * rayClipFar;
+		rayWorldFar /= rayWorldFar.w;
+
+		vec3 origin = vec3(rayWorldNear);
+		vec3 end = vec3(rayWorldFar);
+
+		return Ray{ origin, normalize(end - origin), std::numeric_limits<float>::max()};
+	}
+
 	void SceneInterface::ChargeModel(const std::string& modelPath)
 	{
 		Metadata& meta = AssetRegistry::GetOrCreateMetadata(modelPath);
@@ -214,5 +240,49 @@ namespace Loopie {
 				}
 			}
 		}
+	}
+	void SceneInterface::MousePick()
+	{
+		Ray mouseRay = MouseRay();
+		float minDistance = std::numeric_limits<float>::max();
+		std::shared_ptr<Entity> selectedEntity;
+		std::vector<vec3> triVertexData;
+		triVertexData.reserve(3);
+		triVertexData.resize(3);
+		vec3 meshHitPoint;
+		for (const auto& [uuid, entity] : Application::GetInstance().GetScene().GetAllEntities())
+		{
+			if (!entity->GetIsActive())
+				continue;
+			MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+			if (!renderer || !renderer->GetIsActive() || !renderer->GetMesh())
+				continue;
+			const AABB& aabb = renderer->GetWorldAABB();
+			if (!m_camera->GetCamera()->GetFrustum().Intersects(aabb))
+				continue;
+			if(!aabb.IntersectsRay(mouseRay.StartPoint(), mouseRay.EndPoint()))
+				continue;
+			const MeshData& meshData = renderer->GetMesh()->GetData();
+			Triangle triangle;
+
+			unsigned int  triangleCount = meshData.Indices.size() / 3;
+
+			for (unsigned int i = 0; i < triangleCount; i++)
+			{
+				if (!renderer->GetTriangle(i, triangle)) continue;
+				triVertexData[0] = triangle.v0;
+				triVertexData[1] = triangle.v1;
+				triVertexData[2] = triangle.v2;
+				if (!mouseRay.Intersects(triVertexData, true, meshHitPoint))
+					continue;
+				float distance = glm::distance(mouseRay.StartPoint(), meshHitPoint);
+				if (distance < minDistance)
+				{
+					minDistance = distance;
+					selectedEntity = entity;
+				}
+			}
+		}
+		HierarchyInterface::SelectEntity(selectedEntity);
 	}
 }

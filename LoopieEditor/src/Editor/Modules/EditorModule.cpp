@@ -194,7 +194,7 @@ namespace Loopie
 		m_scene.ChargeTexture("assets/textures/Baker_house.png");
 	}
 
-	void EditorModule::MousePick(Camera* camera)
+	/*void EditorModule::MousePick(Camera* camera)
 	{
 		Ray ray = Ray{ vec3(0), vec3(1) };
 		float distance = -1;
@@ -232,7 +232,7 @@ namespace Loopie
 				}
 			}
 		}
-	}
+	}*/
 
 	void EditorModule::OnNotify(const EngineNotification& type)
 	{

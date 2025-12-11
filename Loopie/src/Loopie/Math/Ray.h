@@ -1,3 +1,4 @@
+#pragma once
 #include "Loopie/Math/MathTypes.h"
 #include <vector>
 
