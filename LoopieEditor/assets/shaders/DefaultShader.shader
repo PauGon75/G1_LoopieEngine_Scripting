@@ -1,4 +1,4 @@
-  [vertex]
+[vertex]
 #version 460 core
 /// DO NOT MODIFY
 layout (location = 0) in vec3 a_Position;

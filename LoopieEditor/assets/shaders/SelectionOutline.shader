@@ -1,5 +1,6 @@
 [vertex]
 #version 460 core
+/// DO NOT MODIFY
 layout (location = 0) in vec3 a_Position;
 layout (location = 1) in vec2 a_TexCoord;
 layout (location = 2) in vec3 a_Normal;
@@ -13,6 +14,8 @@ layout (std140, binding = 0) uniform Matrices
 };
 
 uniform mat4 lp_Transform;
+///
+
 uniform float outlineThickness = 0.03;
 
 void main()
