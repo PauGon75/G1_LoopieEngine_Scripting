@@ -164,26 +164,23 @@ namespace Loopie
 		return SetMainCamera(this);
 	}
 
-	json Camera::Serialize() const
+	JsonNode Camera::Serialize(JsonNode& parent) const
 	{
-		json cameraObj = json::object();
-		cameraObj["is_main_camera"] = m_isMainCamera;
-		cameraObj["fov"] = m_fov;
-		cameraObj["near_plane"] = m_nearPlane;
-		cameraObj["far_plane"] = m_farPlane;
+		JsonNode cameraObj = parent.CreateObjectField("camera");
+		cameraObj.CreateField<bool>("is_main_camera", m_isMainCamera);
+		cameraObj.CreateField<float>("fov", m_fov);
+		cameraObj.CreateField<float>("near_plane", m_nearPlane);
+		cameraObj.CreateField<float>("far_plane", m_farPlane);
 
-		json componentWrapper = json::object();
-		componentWrapper["camera"] = cameraObj;
-
-		return componentWrapper;
+		return cameraObj;
 	}
 
-	void Camera::Deserialize(const json& data)
+	void Camera::Deserialize(const JsonNode& data)
 	{
-		m_fov = data.value("fov", 60.0f);
-		m_nearPlane = data.value("near_plane", 0.1f);
-		m_farPlane = data.value("far_plane", 100.0f);
-		m_isMainCamera = data.value("is_main_camera", false);
+		m_fov = data.GetValue<float>("fov", 60.0f).Result;
+		m_nearPlane = data.GetValue<float>("near_plane", 0.1f).Result;
+		m_farPlane = data.GetValue<float>("far_plane", 100.0f).Result;
+		m_isMainCamera = data.GetValue<bool>("is_main_camera", false).Result;
 			
 		if (m_isMainCamera)
 		{

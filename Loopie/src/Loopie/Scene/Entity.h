@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Loopie/Core/UUID.h"
-#include "Loopie/Core/Identificable.h"
+#include "Loopie/Core/IIdentificable.h"
 
 #include <string>
 #include <vector>

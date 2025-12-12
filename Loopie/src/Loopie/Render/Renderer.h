@@ -73,8 +73,6 @@ namespace Loopie {
 		static void FlushRenderItem(std::shared_ptr<VertexArray> vao, std::shared_ptr<Material> material, const Transform* transform);
 		static void FlushRenderItem(std::shared_ptr<VertexArray> vao, std::shared_ptr<Material> material, const matrix4& modelMatrix);
 
-		static void SetDefaultTexture(std::shared_ptr<Texture> texture) { s_DefaultTexture = texture; }
-
 		static void EnableDepth();
 		static void DisableDepth();
 
@@ -90,8 +88,8 @@ namespace Loopie {
 		static void FlushRenderQueue();
 
 	public:
-		static std::shared_ptr<Texture> s_DefaultTexture;
 	private:
+
 		static std::vector<RenderItem> s_RenderQueue;
 		static std::vector<Camera*> s_renderCameras;
 		static std::shared_ptr<UniformBuffer> s_matricesUniformBuffer;

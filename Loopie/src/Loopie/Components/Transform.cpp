@@ -304,17 +304,19 @@ namespace Loopie
     {
         m_localDirty = true;
         MarkWorldDirty();
-        m_transformNotifier.Notify(TransformNotification::OnDirty);
     }
 
     void Transform::MarkWorldDirty()
     {
-        if (m_worldDirty) return;
+        if (m_worldDirty) 
+            return;
         m_worldDirty = true;
+        m_transformNotifier.Notify(TransformNotification::OnDirty);
+
         for (auto& child : GetOwner()->GetChildren()) {
             if (child) child->GetTransform()->MarkWorldDirty();
         }
-        m_transformNotifier.Notify(TransformNotification::OnDirty);
+
     }
 
     bool Transform::IsDirty() const{
@@ -330,72 +332,67 @@ namespace Loopie
             if (child) child->GetTransform()->ForceRefreshMatrices();
     }
 
-    json Transform::Serialize() const
+    JsonNode Transform::Serialize(JsonNode& parent) const
     {
-        json transformObj = json::object();
+        JsonNode transformObj = parent.CreateObjectField("transform");
+        
+        JsonNode node = transformObj.CreateObjectField("position");
+        node.CreateField("x", m_localPosition.x);
+        node.CreateField("y", m_localPosition.y);
+        node.CreateField("z", m_localPosition.z);
 
-        transformObj["position"] =
-        {
-            {"x", m_localPosition.x },
-            {"y", m_localPosition.y},
-            {"z", m_localPosition.z}
-        };
-        transformObj["rotation"] =
-        {
-            {"x", m_localRotation.x },
-            {"y", m_localRotation.y},
-            {"z", m_localRotation.z}
-        };
-        transformObj["scale"] =
-        {
-            {"x", m_localScale.x},
-            {"y", m_localScale.y},
-            {"z", m_localScale.z}
-        };
+        node = transformObj.CreateObjectField("rotation");
+        node.CreateField("x", m_localRotation.x);
+        node.CreateField("y", m_localRotation.y);
+        node.CreateField("z", m_localRotation.z);
+        node.CreateField("w", m_localRotation.w);
+
+        node = transformObj.CreateObjectField("scale");
+        node.CreateField("x", m_localScale.x);
+        node.CreateField("y", m_localScale.y);
+        node.CreateField("z", m_localScale.z);
 
         vec3 localEulerAngles = GetLocalEulerAngles();
-        transformObj["local_euler_angles"] =
-        {
+        node = transformObj.CreateObjectField("euler_angles");
+        node.CreateField("x", localEulerAngles.x);
+        node.CreateField("y", localEulerAngles.y);
+        node.CreateField("z", localEulerAngles.z);
 
-            {"x", localEulerAngles.x},
-            {"y", localEulerAngles.y},
-            {"z", localEulerAngles.z}
-        };
-
-        json componentWrapper = json::object();
-        componentWrapper["transform"] = transformObj;
-
-        return componentWrapper;
+        return transformObj;
     }
 
-    void Transform::Deserialize(const json& data)
+    void Transform::Deserialize(const JsonNode& data)
     {
-        if (data.contains("position") && data["position"].is_object())
-        {
-            m_localPosition.x = data["position"].value("x", 0.0f); 
-            m_localPosition.y = data["position"].value("y", 0.0f);
-            m_localPosition.z = data["position"].value("z", 0.0f);
+        JsonNode node = data.Child("position");
+        if (node.IsValid() && node.IsObject())
+        {     
+            m_localPosition.x = node.GetValue<float>("x", 0.0f).Result; 
+            m_localPosition.y = node.GetValue<float>("y", 0.0f).Result;
+            m_localPosition.z = node.GetValue<float>("z", 0.0f).Result;
         }
 
-        if (data.contains("rotation") && data["rotation"].is_object()) 
+        node = data.Child("rotation");
+        if (node.IsValid() && node.IsObject())
         {
-            m_localRotation.x = data["rotation"].value("x", 0.0f);
-            m_localRotation.y = data["rotation"].value("y", 0.0f);
-            m_localRotation.z = data["rotation"].value("z", 0.0f);
+            m_localRotation.x = node.GetValue<float>("x", 0.0f).Result;
+            m_localRotation.y = node.GetValue<float>("y", 0.0f).Result;
+            m_localRotation.z = node.GetValue<float>("z", 0.0f).Result;
         }
 
-        if (data.contains("scale") && data["scale"].is_object()) 
+        node = data.Child("scale");
+        if (node.IsValid() && node.IsObject())
         {
-            m_localScale.x = data["scale"].value("x", 1.0f);
-            m_localScale.y = data["scale"].value("y", 1.0f);
-            m_localScale.z = data["scale"].value("z", 1.0f);
+            m_localScale.x = node.GetValue<float>("x", 1.0f).Result;
+            m_localScale.y = node.GetValue<float>("y", 1.0f).Result;
+            m_localScale.z = node.GetValue<float>("z", 1.0f).Result;
         }
 
-        if (data.contains("local_euler_angles") && data["local_euler_angles"].is_object())
+        node = data.Child("euler_angles");
+        if (node.IsValid() && node.IsObject())
         {
-            SetEulerAngles({data["local_euler_angles"].value("x", 0.0f),
-                            data["local_euler_angles"].value("y", 0.0f),
-                            data["local_euler_angles"].value("z", 0.0f) });
+            SetEulerAngles({node.GetValue<float>("x", 0.0f).Result,
+                            node.GetValue<float>("y", 0.0f).Result,
+                            node.GetValue<float>("z", 0.0f).Result });
         }
     }
 

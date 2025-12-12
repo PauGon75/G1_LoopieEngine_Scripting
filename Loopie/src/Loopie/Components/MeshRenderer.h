@@ -27,7 +27,7 @@ namespace Loopie {
 		std::shared_ptr<Mesh> GetMesh() { return m_mesh; }
 		void SetMesh(std::shared_ptr<Mesh> mesh);
 
-		std::shared_ptr<Material> GetMaterial() { return m_material; }
+		std::shared_ptr<Material> GetMaterial();
 		void SetMaterial(std::shared_ptr <Material> material);
 		
 
@@ -46,8 +46,8 @@ namespace Loopie {
 		bool GetDrawOBB() { return m_drawOBB; }
 		///TEST
 
-		json Serialize() const override;
-		void Deserialize(const json& data) override;
+		JsonNode Serialize(JsonNode& parent) const override;
+		void Deserialize(const JsonNode& data) override;
 
 		bool GetTriangle(int triangleIndex, Triangle& triangle);
 
@@ -65,11 +65,11 @@ namespace Loopie {
 		///TEST
 
 	private:
-		std::shared_ptr <Material> m_material;
+		std::shared_ptr<Material> m_material;
 		std::shared_ptr<Mesh> m_mesh;
 
-		mutable AABB m_worldAABB;
-		mutable OBB m_worldOBB;
+		mutable AABB m_worldAABB = AABB();
+		mutable OBB m_worldOBB = OBB();
 		mutable bool m_boundingBoxesDirty = true;
 	};
 }

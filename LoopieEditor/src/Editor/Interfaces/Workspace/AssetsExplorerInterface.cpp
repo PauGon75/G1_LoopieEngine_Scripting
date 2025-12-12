@@ -1,14 +1,13 @@
 #include "AssetsExplorerInterface.h"
 
 #include "Loopie/Core/Application.h"
+#include "Loopie/Helpers/LoopieHelpers.h"
 #include "Loopie/Core/Log.h"
 #include "Loopie/Files/DirectoryManager.h"
 #include "Loopie/Resources/ResourceManager.h"
 #include "Loopie/Resources/Types/Texture.h"
 
 #include "Loopie/Importers/TextureImporter.h"
-#include "Loopie/Importers/MaterialImporter.h"
-#include "Loopie/Importers/MeshImporter.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -84,9 +83,17 @@ namespace Loopie {
 				float footerHeight = ImGui::GetFrameHeightWithSpacing();
 				if (ImGui::BeginChild("FilesScrollView", ImVec2(0, -footerHeight), 0, 0)) {
 					m_focused = ImGui::IsWindowHovered(ImGuiHoveredFlags_None);
+
+					if (ImGui::BeginPopupContextWindow("HierarchyBackgroundContext", ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
+						DrawCreateAssetMenu();
+						ImGui::EndPopup();
+					}
+
 					if (m_focused)
 						GetExternalFile();
 					DrawFolderContent();
+
+					
 				}
 				ImGui::EndChild();
 				ImGui::Separator();
@@ -363,6 +370,7 @@ namespace Loopie {
 				icon = m_fileIcon;
 
 			ImVec2 cursor = ImGui::GetCursorScreenPos();
+
 			ImGui::Image((ImTextureID)icon->GetRendererId(), iconSize);
 
 			if (ImGui::IsItemHovered()) {
@@ -378,8 +386,15 @@ namespace Loopie {
 				}
 				else if (ImGui::IsItemClicked()) {
 					SelectFile(node.Path);
-				}
+				}					
 			}
+
+			if (ImGui::BeginPopupContextItem("FileContext", ImGuiPopupFlags_MouseButtonRight)) {
+				DrawContextMenu(node.Path);
+				ImGui::EndPopup();
+			}
+
+			
 
 			DragFile(node.Path.string());
 			if (node.IsDirectory)
@@ -392,6 +407,8 @@ namespace Loopie {
 			if (ImGui::Selectable("##file", false, flags, ImVec2((float)thumbnailSize, (float)thumbnailSize))) { }
 
 			ImGuiHelpers::TextCentered(ImGuiHelpers::TruncateText(node.Path.stem().string(), (float)thumbnailSize).c_str(), 0.5f);
+
+			
 
 			ImGui::NextColumn();
 			ImGui::PopID();
@@ -561,5 +578,55 @@ namespace Loopie {
 			m_cachedFooterText = "";
 		
 		m_dirtyFooterText = false;
+	}
+
+	void AssetsExplorerInterface::DrawContextMenu(const std::filesystem::path& file)
+	{
+		if (ImGui::MenuItem("Copy"))
+		{
+			
+		}
+
+		if (ImGui::MenuItem("Cut"))
+		{
+
+		}
+
+		if (ImGui::MenuItem("Delete"))
+		{
+			DirectoryManager::Delete(file);
+			Refresh();
+		}
+
+		if (ImGui::MenuItem("Rename"))
+		{
+
+		}
+	}
+
+	void AssetsExplorerInterface::DrawCreateAssetMenu() {
+		if (ImGui::MenuItem("Create Material"))
+		{
+			CreateMaterial(m_currentDirectory, "NewMaterial");
+		}
+	}
+
+	std::string AssetsExplorerInterface::CreateMaterial(const std::filesystem::path& directory, const std::string& name)
+	{
+
+		std::vector<std::string> names;
+		for (const auto& entry : std::filesystem::directory_iterator(directory))
+		{
+			if (entry.is_regular_file()) {
+				names.push_back(entry.path().stem().string());
+			}
+		}		 
+		std::filesystem::path filePath = directory / Helper::MakeUniqueName(name, names);
+		filePath += ".mat";
+		if (!DirectoryManager::Contains(filePath)) {
+			DirectoryManager::Copy("assets/materials/defaultMaterial.mat", filePath);
+			Refresh();
+		}
+		return filePath.string();
 	}
 }

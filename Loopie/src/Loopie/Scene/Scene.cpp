@@ -4,6 +4,7 @@
 #include "Loopie/Components/Transform.h"
 #include "Loopie/Components/Camera.h"
 #include "Loopie/Components/MeshRenderer.h"
+#include "Loopie/Helpers/LoopieHelpers.h"
 
 #include <unordered_set>
 
@@ -28,7 +29,7 @@ namespace Loopie {
 	void Scene::SaveScene(const std::string* filePath)
 	{
 		JsonData saveData;
-		saveData.CreateArrayField("entities");
+		JsonNode entitiesObj = saveData.CreateArrayField("entities");
 
 		// Pol comment to understand json::objects and json::arrays
 		// Array field = values
@@ -36,26 +37,28 @@ namespace Loopie {
 		
 		for (const auto& [id, entity] : GetAllEntities())
 		{
-			json entityObj = json::object();
+			//json entityObj = json::object();
+			JsonData entityObj = JsonData();
+			
+			entityObj.CreateField<std::string>("uuid", id.Get());
+			entityObj.CreateField<std::string>("name", entity->GetName());
+			entityObj.CreateField<bool>("active", entity->GetIsActive());
 
-			entityObj["uuid"] = id.Get();
-			entityObj["name"] = entity->GetName();
-			entityObj["active"] = entity->GetIsActive();
 
 			if (std::shared_ptr<Entity> parentEntity = entity->GetParent().lock())
-				entityObj["parent_uuid"] = parentEntity->GetUUID().Get();
-			else
-				entityObj["parent_uuid"] = nullptr;
+				entityObj.CreateField<std::string>("parent_uuid", parentEntity->GetUUID().Get());
 
 			// Creates an array of components
-			entityObj["components"] = json::array();
-
+			JsonNode componentsObj = entityObj.CreateArrayField("components");
+			
 			for (auto const& component : entity->GetComponents())
 			{
-				entityObj["components"].push_back(component->Serialize());
+				JsonData componentObj = JsonData();
+				component->Serialize(componentObj.Node());
+				componentsObj.AddArrayElement(componentObj.GetRoot());
 			}
 
-			saveData.AddArrayElement("entities", entityObj);
+			saveData.AddArrayElement("entities", entityObj.GetRoot());
 		}
 
 		saveData.ToFile("TESTSavedScene.json");
@@ -232,81 +235,87 @@ namespace Loopie {
 			return;
 		}
 
-		json& rootNode = saveData.GetRoot();
+		JsonNode rootNode = saveData.Child("entities");
 
-		if (!rootNode.contains("entities") || !rootNode["entities"].is_array())
+		if (!rootNode.IsValid() || !rootNode.IsArray())
 		{
 			Log::Error("No entities array in scene file.");
 			return;
 		}
 
-		json& entitiesArray = rootNode["entities"];
-
 		// Map used to store created entities by UUID for later linking
 
 		// First iteration: Create all entities
-		for (size_t i = 0; i < entitiesArray.size(); ++i)
+		for (unsigned int i = 0; i < rootNode.Size(); ++i)
 		{
-			json& entityJson = entitiesArray[i];
+			JsonResult<json> entityJson = rootNode.GetArrayElement<json>(i);
+			JsonNode entityNode = JsonNode(&entityJson.Result);
 
-			if (!entityJson.contains("uuid") || !entityJson.contains("name"))
+			if (!entityNode.IsValid() || !entityNode.Contains("uuid") || !entityNode.Contains("name"))
 				continue;
 
-			UUID uuid = UUID(entityJson["uuid"].get<std::string>());
-			std::string name = entityJson["name"].get<std::string>();
-			bool active = entityJson["active"].get<bool>();
+			UUID uuid = UUID(entityNode.GetValue<std::string>("uuid").Result);
+			std::string name = entityNode.GetValue<std::string>("name").Result;
+			bool active = entityNode.GetValue<bool>("active", false).Result;
 
 			std::shared_ptr<Entity> entity = CreateEntity(uuid, name);
-			entity->SetIsActive(active);		}
+			entity->SetIsActive(active);		
+		}
 
 		// Second iteration: Link relationships and components
-		for (size_t i = 0; i < entitiesArray.size(); ++i)
+		for (size_t i = 0; i < rootNode.Size(); ++i)
 		{
-			json& entityJson = entitiesArray[i];
+			JsonResult<json> entityJson = rootNode.GetArrayElement<json>(i);
+			JsonNode entityNode = JsonNode(&entityJson.Result);
 
-			if (!entityJson.contains("uuid"))
+			if (!entityNode.IsValid() || !entityNode.Contains("uuid"))
 				continue;
 
-			UUID uuid = UUID(entityJson["uuid"].get<std::string>());
+			UUID uuid = UUID(entityNode.GetValue<std::string>("uuid").Result);
 			std::shared_ptr<Entity> entity = m_entities[uuid];
 
 			// Set parent if it exists
-			if (entityJson.contains("parent_uuid") && !entityJson["parent_uuid"].is_null())
+			if (entityNode.Contains("parent_uuid"))
 			{
-				UUID parentUUID = UUID(entityJson["parent_uuid"].get<std::string>());
+				UUID parentUUID = UUID(entityNode.GetValue<std::string>("parent_uuid").Result);
 				if (m_entities.find(parentUUID) != m_entities.end())
 				{
 					entity->SetParent(m_entities[parentUUID]);
 				}
 			}
 
-			if (entityJson.contains("components") && entityJson["components"].is_array())
+			JsonNode componentsObj = entityNode.Child("components");
+			if (componentsObj.IsValid() && componentsObj.IsArray())
 			{
-				json& componentsArray = entityJson["components"];
 
-				for (size_t j = 0; j < componentsArray.size(); ++j)
+				for (size_t j = 0; j < componentsObj.Size(); ++j)
 				{
-					json& componentJson = componentsArray[j];
+					JsonResult<json> componentJson = componentsObj.GetArrayElement<json>(j);
+					JsonNode componentNode = JsonNode(&componentJson.Result);
 
 					// Check which component type it is - I don't know if we can do this more clean?
-					if (componentJson.contains("transform"))
+					
+					if (componentNode.Contains("transform"))
 					{
-						entity->GetTransform()->Deserialize(componentJson["transform"]);
+						JsonNode node = componentNode.Child("transform");
+						entity->GetTransform()->Deserialize(node);
 					}
-					else if (componentJson.contains("camera"))
+					else if (componentNode.Contains("camera"))
 					{
+						JsonNode node = componentNode.Child("camera");
 						auto camera = entity->AddComponent<Camera>();
 						if (camera)
 						{
-							camera->Deserialize(componentJson["camera"]);
+							camera->Deserialize(node);
 						}
 					}
-					else if (componentJson.contains("meshrenderer"))
+					else if (componentNode.Contains("meshrenderer"))
 					{
+						JsonNode node = componentNode.Child("meshrenderer");
 						auto meshRenderer = entity->AddComponent<MeshRenderer>();
 						if (meshRenderer)
 						{
-							meshRenderer->Deserialize(componentJson["meshrenderer"]);
+							meshRenderer->Deserialize(node);
 						}
 					}
 				}
@@ -320,25 +329,13 @@ namespace Loopie {
 		if (!parentEntity)
 			return desiredName;
 
-		std::unordered_set<std::string> existingNames;
+		std::vector<std::string> existingNames;
 		for (const auto& sibling : GetAllSiblings(parentEntity))
 		{
-			existingNames.insert(sibling->GetName());
+			existingNames.emplace_back(sibling->GetName());
 		}
 
-		if (existingNames.find(desiredName) == existingNames.end())
-			return desiredName;
-
-		int counter = 1;
-		std::string uniqueName;
-
-		do
-		{
-			uniqueName = desiredName + " (" + std::to_string(counter) + ")";
-			counter++;
-		} while (existingNames.find(uniqueName) != existingNames.end());
-
-		return uniqueName;
+		return Helper::MakeUniqueName(desiredName, existingNames);
 	}
 
 	void Scene::CollectEntitiesRecursive(std::shared_ptr<Entity> entity,

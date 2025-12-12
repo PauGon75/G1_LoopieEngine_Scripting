@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Loopie/Core/UUID.h"
+#include "Loopie/Resources/Resource.h"
+#include "Loopie/Importers/ImportSettings.h"
 
 #include <filesystem>
 #include <string>
@@ -14,6 +16,7 @@ namespace Loopie {
 
     struct Metadata {
         UUID UUID;
+        ResourceType Type = ResourceType::UNKNOWN;
         std::vector<std::string> CachesPath;
 
         bool HasCache = false;

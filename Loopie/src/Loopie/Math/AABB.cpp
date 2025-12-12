@@ -49,6 +49,21 @@ namespace Loopie {
         return true;
     }
 
+    bool AABB::IntersectsSphere(const vec3& center, float radius) const {
+        // Find the closest point on the AABB to the sphere center
+        vec3 closestPoint;
+        closestPoint.x = glm::clamp(center.x, MinPoint.x, MaxPoint.x);
+        closestPoint.y = glm::clamp(center.y, MinPoint.y, MaxPoint.y);
+        closestPoint.z = glm::clamp(center.z, MinPoint.z, MaxPoint.z);
+
+        // Calculate distance from sphere center to closest point
+        vec3 diff = closestPoint - center;
+        float distanceSquared = glm::dot(diff, diff);
+
+        // Check if distance is within radius
+        return distanceSquared <= (radius * radius);
+    }
+
     bool AABB::IntersectsRay(const vec3& rayStart, const vec3& rayEnd) const
     {
         vec3 dir = rayEnd - rayStart;

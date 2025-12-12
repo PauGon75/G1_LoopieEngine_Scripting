@@ -5,8 +5,8 @@ namespace Loopie{
     struct OBB;
 
     struct AABB {
-        vec3 MinPoint;
-        vec3 MaxPoint;
+        vec3 MinPoint = vec3(0);
+        vec3 MaxPoint = vec3(0);
 
         void SetNegativeInfinity();
         void Enclose(const AABB& other);
@@ -17,6 +17,7 @@ namespace Loopie{
         bool ContainsRay(const vec3& rayStart, const vec3& rayEnd) const;
 
         bool Intersects(const AABB& other) const;
+        bool IntersectsSphere(const vec3& center, float radius) const;
         bool IntersectsRay(const vec3& rayStart, const vec3& rayEnd) const;
         bool IntersectsRay(const vec3& rayOrigin, const vec3& rayDirection, vec3& hitPoint) const;
 

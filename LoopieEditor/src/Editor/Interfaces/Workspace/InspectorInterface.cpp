@@ -5,6 +5,7 @@
 #include "Loopie/Math/MathTypes.h"
 #include "Loopie/Components/Camera.h"
 #include "Loopie/Components/MeshRenderer.h"
+#include "Loopie/Resources/AssetRegistry.h"
 
 #include <imgui.h>
 
@@ -139,11 +140,13 @@ namespace Loopie {
 			ImGui::Text("Material");
 
 			std::shared_ptr<Material> material = meshRenderer->GetMaterial();
+			bool editable = material->IsEditable();
 			const std::unordered_map<std::string, UniformValue> properties = material->GetUniforms();
 
 			std::shared_ptr<Texture> texture = material->GetTexture();
 			if (texture) {
-				ImGui::Text("Path: %s", material->GetTexture()->GetPath().c_str());
+				Metadata* metadata = AssetRegistry::GetMetadata(material->GetTexture()->GetUUID());
+				ImGui::Text("Path: %s", metadata->CachesPath[0].c_str());
 				ivec2 texSize = material->GetTexture()->GetSize();
 				ImGui::Text("Size: %d x %d", texSize.x, texSize.y);		
 				ImGui::Separator();
@@ -279,7 +282,9 @@ namespace Loopie {
 						break;
 				}
 			}
-
+			if (ImGui::Button("Apply")) {
+				material->Save();
+			}
 		}
 	}
 

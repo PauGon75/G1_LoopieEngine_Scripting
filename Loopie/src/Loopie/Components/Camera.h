@@ -47,8 +47,8 @@ namespace Loopie
 		void SetIfBeMainCamera(bool canBe) { m_canBeMainCamera = canBe; }
 		bool IsMainCamera() { return m_isMainCamera; }
 
-		json Serialize() const override;
-		void Deserialize(const json& data);
+		JsonNode Serialize(JsonNode& parent) const override;
+		void Deserialize(const JsonNode& data) override;
 
 	private:
 		void CalculateMatrices() const;

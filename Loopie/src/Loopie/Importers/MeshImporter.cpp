@@ -17,6 +17,8 @@ namespace Loopie {
 	void MeshImporter::ImportModel(const std::string& filepath, Metadata& metadata) {
 		if (metadata.HasCache && !metadata.IsOutdated)
 			return;
+
+
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenBoundingBoxes);
 
@@ -25,9 +27,11 @@ namespace Loopie {
 			return;
 		}
 
+		metadata.CachesPath.clear();
+		metadata.HasCache = true;
+		metadata.Type = ResourceType::MESH;
 		ProcessNode(scene->mRootNode, scene, metadata.CachesPath);
 
-		metadata.HasCache = true;
 		MetadataRegistry::SaveMetadata(filepath, metadata);
 
 		Log::Trace("Mesh Imported -> {0}", filepath);
@@ -67,7 +71,9 @@ namespace Loopie {
 		file.read(reinterpret_cast<char*>(&data.BoundingBox.MinPoint), sizeof(data.BoundingBox.MinPoint));
 		file.read(reinterpret_cast<char*>(&data.BoundingBox.MaxPoint), sizeof(data.BoundingBox.MaxPoint));
 
-		file.read(reinterpret_cast<char*>(&data.Matrix), sizeof(data.Matrix)); /// Still NotWorking
+		file.read(reinterpret_cast<char*>(&data.Position), sizeof(data.Position)); /// Still NotWorking
+		file.read(reinterpret_cast<char*>(&data.Rotation), sizeof(data.Rotation)); /// Still NotWorking
+		file.read(reinterpret_cast<char*>(&data.Scale), sizeof(data.Scale)); /// Still NotWorking
 
 		file.read(reinterpret_cast<char*>(&data.VerticesAmount), sizeof data.VerticesAmount);
 		file.read(reinterpret_cast<char*>(&data.VertexElements), sizeof data.VertexElements);
@@ -154,13 +160,19 @@ namespace Loopie {
 		data.Name = node->mName.C_Str();
 		unsigned int nameLength = (unsigned int)data.Name.size();
 
-		aiMatrix4x4 transform = node->mTransformation;
-		matrix4 matrix = matrix4(
-			transform.a1, transform.b1, transform.c1, transform.d1,
-			transform.a2, transform.b2, transform.c2, transform.d2,
-			transform.a3, transform.b3, transform.c3, transform.d3,
-			transform.a4, transform.b4, transform.c4, transform.d4
-		);
+
+		// Extract translation from matrix
+		const aiMatrix4x4& transformMatrix = node->mTransformation;
+		
+		aiVector3D aiScaling, aiPosition;
+		aiQuaternion aiRotation;
+		node->mTransformation.Decompose(aiScaling, aiRotation, aiPosition);
+
+		data.Position = vec3(aiPosition.x, aiPosition.y, aiPosition.z);
+		data.Scale = vec3(aiScaling.x, aiScaling.y, aiScaling.z);
+		data.Rotation = quaternion(aiRotation.w, aiRotation.x, aiRotation.y, aiRotation.z);
+
+		// Extract translation from matrix
 
 		data.BoundingBox.MaxPoint = { mesh->mAABB.mMax.x,mesh->mAABB.mMax.y,mesh->mAABB.mMax.z };
 		data.BoundingBox.MinPoint = { mesh->mAABB.mMin.x,mesh->mAABB.mMin.y,mesh->mAABB.mMin.z };
@@ -197,7 +209,9 @@ namespace Loopie {
 		fs.write(reinterpret_cast<const char*>(&data.BoundingBox.MinPoint), sizeof(data.BoundingBox.MinPoint));
 		fs.write(reinterpret_cast<const char*>(&data.BoundingBox.MaxPoint), sizeof(data.BoundingBox.MaxPoint));
 
-		fs.write(reinterpret_cast<const char*>(&matrix), sizeof(matrix));
+		fs.write(reinterpret_cast<const char*>(&data.Position), sizeof(data.Position));
+		fs.write(reinterpret_cast<const char*>(&data.Rotation), sizeof(data.Rotation));
+		fs.write(reinterpret_cast<const char*>(&data.Scale), sizeof(data.Scale));
 
 		fs.write(reinterpret_cast<const char*>(&data.VerticesAmount), sizeof data.VerticesAmount);
 		fs.write(reinterpret_cast<const char*>(&data.VertexElements), sizeof data.VertexElements);

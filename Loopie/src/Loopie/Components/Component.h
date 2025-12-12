@@ -1,7 +1,8 @@
 #pragma once
 #include <memory>
 
-#include "Loopie/Core/Identificable.h"
+#include "Loopie/Core/IIdentificable.h"
+#include "Loopie/Core/ISerializable.h"
 #include "Loopie/Core/UUID.h"
 #include "Loopie/Events/IObserver.h"
 #include "Loopie/Files/Json.h"
@@ -12,7 +13,7 @@ namespace Loopie {
 	class Entity;
 	class Transform;
 
-	class Component : public Identificable
+	class Component : public IIdentificable, public ISerializable
 	{
 		friend class Entity;
 	public:
@@ -30,8 +31,8 @@ namespace Loopie {
 		void SetUUID(const std::string uuid);
 
 		// Serialize & Deserialize
-		virtual json Serialize() const;
-		virtual void Deserialize(const json& data);
+		virtual JsonNode Serialize(JsonNode& parent) const =0;
+		virtual void Deserialize(const JsonNode& data) =0;
 
 		virtual void Init() = 0;
 

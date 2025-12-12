@@ -32,7 +32,7 @@ namespace Loopie
 
 		JsonData data = Json::ReadFromFile("recentProjects.json");
 
-		JsonNode recentArray = data.Root().Child("recent");
+		JsonNode recentArray = data.Child("recent");
 		recentArray.ClearArray();
 
 		for (size_t i = 0; i < m_recentProjects.size(); i++)
@@ -54,7 +54,7 @@ namespace Loopie
 		JsonData data = Json::ReadFromFile("recentProjects.json");
 		if (data.IsEmpty())
 			return;
-		JsonNode recentArray = data.Root().Child("recent");
+		JsonNode recentArray = data.Child("recent");
 		if (recentArray.IsArray()) {
 			JsonResult<std::string> result;
 			for (unsigned int i = 0; i < recentArray.Size(); ++i) {
