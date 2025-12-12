@@ -46,7 +46,7 @@ namespace Loopie {
 		const std::unordered_map<UUID, std::shared_ptr<Entity>>& GetAllEntities() const;
 		std::vector<std::shared_ptr<Entity>> GetAllEntitiesHierarchical(std::shared_ptr<Entity> parentEntity = nullptr) const;
 		std::vector<std::shared_ptr<Entity>> GetAllSiblings(std::shared_ptr<Entity> parentEntity = nullptr) const;
-		void ReadAndLoadSceneFile(std::string filePath);
+		void ReadAndLoadSceneFile(std::string filePath, bool safeSceneAsLastLoaded = true);
 
 	public:
 

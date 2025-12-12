@@ -231,7 +231,7 @@ namespace Loopie {
 		return siblingEntities;
 	}
 
-	void Scene::ReadAndLoadSceneFile(std::string filePath)
+	void Scene::ReadAndLoadSceneFile(std::string filePath, bool safeSceneAsLastLoaded)
 	{
 		m_entities.clear();
 		m_octree->Clear();
@@ -338,22 +338,26 @@ namespace Loopie {
 			}
 		}
 		Log::Info("Scene loaded successfully");
-		m_filePath = filePath;
-		std::filesystem::path config = Application::GetInstance().m_activeProject.GetConfigPath();
-		if (!config.empty())
-		{
-			JsonData configData = Json::ReadFromFile(config.string());
-			JsonResult<std::string> result = configData.Child("last_scene").GetValue<std::string>();
-			if (!result.Found) {
-				configData.CreateField<std::string>("last_scene", "");
-			}
-			configData.SetValue<std::string>("last_scene", filePath);
-			configData.ToFile(config.string());
 
-			/*Metadata* metadata = AssetRegistry::GetMetadata(filePath); /// Swap to UUID
-			if (metadata)
-				configData.SetValue<std::string>("last_scene", metadata->UUID.Get());*/
+		if (safeSceneAsLastLoaded) {
+			std::filesystem::path config = Application::GetInstance().m_activeProject.GetConfigPath();
+			if (!config.empty())
+			{
+				JsonData configData = Json::ReadFromFile(config.string());
+				JsonResult<std::string> result = configData.Child("last_scene").GetValue<std::string>();
+				if (!result.Found) {
+					configData.CreateField<std::string>("last_scene", "");
+				}
+				configData.SetValue<std::string>("last_scene", filePath);
+				configData.ToFile(config.string());
+
+				/*Metadata* metadata = AssetRegistry::GetMetadata(filePath); /// Swap to UUID
+				if (metadata)
+					configData.SetValue<std::string>("last_scene", metadata->UUID.Get());*/
+			}
 		}
+
+		
 	}
 
 	std::string Scene::GetUniqueName(std::shared_ptr<Entity> parentEntity, const std::string& desiredName)
