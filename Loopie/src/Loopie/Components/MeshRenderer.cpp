@@ -48,9 +48,9 @@ namespace Loopie {
 
 			if (m_drawAABB || m_drawOBB) {
 				if(m_drawAABB)
-					Gizmo::DrawCube(m_worldAABB.MinPoint, m_worldAABB.MaxPoint);
+					Gizmo::DrawCube(GetWorldAABB().MinPoint, GetWorldAABB().MaxPoint);
 				if(m_drawOBB)
-					Gizmo::DrawCube(m_worldOBB.GetCorners());
+					Gizmo::DrawCube(GetWorldOBB().GetCorners());
 			}
 			///
 		}
