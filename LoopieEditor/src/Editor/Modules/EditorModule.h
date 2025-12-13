@@ -11,6 +11,7 @@
 #include "Editor/Interfaces/Workspace/GameInterface.h"
 #include "Editor/Interfaces/Workspace/EditorMenuInterface.h"
 #include "Editor/Interfaces/Workspace/AssetsExplorerInterface.h"
+#include "Editor/Interfaces/Workspace/TopBarInterface.h"
 
 namespace Loopie {
 
@@ -45,6 +46,7 @@ namespace Loopie {
 		GameInterface m_game;
 		EditorMenuInterface m_mainMenu;
 		AssetsExplorerInterface m_assetsExplorer;
+		TopBarInterface m_topBar;
 
 		Scene* scene = nullptr;
 		std::shared_ptr<Material> selectedObjectMaterial;

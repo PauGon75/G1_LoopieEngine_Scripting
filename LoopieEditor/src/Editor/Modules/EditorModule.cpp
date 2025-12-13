@@ -11,9 +11,8 @@
 
 #include "Loopie/Resources/ResourceManager.h"
 #include "Loopie/Importers/TextureImporter.h"
-#include "Loopie/Importers/MaterialImporter.h"
-
 #include "Loopie/Math/Ray.h"
+#include "Loopie/Importers/MaterialImporter.h"
 
 #include "Loopie/Components/MeshRenderer.h"
 #include "Loopie/Components/Transform.h"
@@ -54,6 +53,7 @@ namespace Loopie
 		////
 
 		m_assetsExplorer.Init();
+		m_topBar.Init();
 		m_hierarchy.Init();
 		m_inspector.Init();
 		m_console.Init();
@@ -82,6 +82,7 @@ namespace Loopie
 		m_hierarchy.Update(inputEvent);
 		m_assetsExplorer.Update(inputEvent);
 		m_scene.Update(inputEvent);
+		m_topBar.Update(inputEvent);
 
 		const std::vector<Camera*>& cameras = Renderer::GetRendererCameras();
 		for (const auto cam : cameras)
@@ -147,6 +148,7 @@ namespace Loopie
 		m_console.Render();
 		m_hierarchy.Render();
 		m_assetsExplorer.Render();
+		m_topBar.Render();
 		m_game.Render();
 		m_scene.Render();
 	}
