@@ -6,6 +6,7 @@
 #include "Loopie/Core/Log.h"
 #include "Loopie/Render/Renderer.h"
 #include "Loopie/Render/Gizmo.h"
+#include "Loopie/Render/Colors.h"
 
 #include "Loopie/Math/MathTypes.h"
 
@@ -250,7 +251,7 @@ namespace Loopie
 				if(cam)
 					cam->RenderGizmo();
 			}
-			scene->GetOctree().DebugDraw(vec4{0, 255, 0, 255});
+			scene->GetOctree().DebugDraw(GREEN_COLOR);
 		}
 	}
 

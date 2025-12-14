@@ -3,6 +3,7 @@
 #include "Loopie/Math/Frustum.h"
 #include "Loopie/Math/AABB.h"
 #include "Loopie/Math/OBB.h"
+#include "Loopie/Render/Colors.h"
 
 #include <memory>
 
@@ -19,12 +20,12 @@ namespace Loopie {
 		static void Init();
 		static void Shutdown();
 
-		static void DrawLine(const vec3& p0, const vec3& p1, const vec4& color = {1,1,1,1});
-		static void DrawCube(const vec3& p0, const vec3& p1, const vec4& color = {1,1,1,1});
-		static void DrawCube(const std::array<vec3, 8>& corners, const vec4& color = {1,1,1,1});
-		static void DrawCube(const OBB& obb, const vec4& color = {1,1,1,1});
-		static void DrawCube(const AABB& aabb, const vec4& color = {1,1,1,1});
-		static void DrawFrustum(const Frustum& frustum, const vec4& color = { 1,1,1,1 });
+		static void DrawLine(const vec3& p0, const vec3& p1, const vec4& color = WHITE_COLOR);
+		static void DrawCube(const vec3& p0, const vec3& p1, const vec4& color = WHITE_COLOR);
+		static void DrawCube(const std::array<vec3, 8>& corners, const vec4& color = WHITE_COLOR);
+		static void DrawCube(const OBB& obb, const vec4& color = WHITE_COLOR);
+		static void DrawCube(const AABB& aabb, const vec4& color = WHITE_COLOR);
+		static void DrawFrustum(const Frustum& frustum, const vec4& color = WHITE_COLOR);
 
 		static void SetGridSize(int size);
 		static void SetGridSpacing(float spacing);
@@ -72,7 +73,7 @@ namespace Loopie {
 			int GridHalfSize=50;
 			float GridSpacing = 10;
 			bool DrawGrid = true;
-			vec4 GridColor = { 0.6f, 0.6f, 0.6f, 1.0f };
+			vec4 GridColor = GREY_COLOR;
 			///
 		};
 

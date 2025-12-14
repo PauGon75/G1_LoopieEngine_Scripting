@@ -5,6 +5,7 @@
 #include "Loopie/Components/Transform.h"
 #include "Loopie/Scene/Entity.h"
 #include "Loopie/Core/Log.h"
+#include "Loopie/Render/Colors.h"
 #include "Loopie/Render/Gizmo.h"
 
 
@@ -401,9 +402,9 @@ namespace Loopie
 		// If is Leaf and depth is greater than 3, then color is YELLOW
 		if (node->m_isLeaf && depth > 3)
 		{
-			Gizmo::DrawCube(node->m_aabb.MinPoint, node->m_aabb.MaxPoint, vec4{ 255,255,0,255 });
+			Gizmo::DrawCube(node->m_aabb.MinPoint, node->m_aabb.MaxPoint, YELLOW_COLOR);
 		}
-		// The rest's color is WHATEVER var color is (normally GREEN)
+		// The rest's is WHATEVER color contained within var color (normally GREEN)
 		else
 		{
 			Gizmo::DrawCube(node->m_aabb.MinPoint, node->m_aabb.MaxPoint, color);
