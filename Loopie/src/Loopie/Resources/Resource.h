@@ -25,6 +25,7 @@ namespace Loopie {
 	
 		void IncrementReferenceCount() { m_referenceCount++; }
 		void DecrementReferenceCount();
+		unsigned int GetReferenceCount() const { return m_referenceCount; }	
 
 	protected:
 		UUID m_uuid;

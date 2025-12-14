@@ -155,6 +155,7 @@ namespace Loopie {
 			ImGui::Text("Mesh: %s", mesh ? "Assigned" : "None");
 			if (!mesh)
 				return;
+			ImGui::Text("Mesh Resource Count: %u", mesh->GetReferenceCount());
 			ImGui::Text("Mesh Vertices: %d", mesh->GetData().VerticesAmount);
 
 			ImGui::Separator();
@@ -178,8 +179,8 @@ namespace Loopie {
 			ImGui::Separator();
 			ImGui::Separator();
 			ImGui::Text("Material");
-
 			std::shared_ptr<Material> material = meshRenderer->GetMaterial();
+			ImGui::Text("Material Resource Count: %u", material->GetReferenceCount());
 			bool editable = material->IsEditable();
 			const std::unordered_map<std::string, UniformValue> properties = material->GetUniforms();
 
@@ -187,6 +188,7 @@ namespace Loopie {
 			if (texture) {
 				Metadata* metadata = AssetRegistry::GetMetadata(material->GetTexture()->GetUUID());
 				ImGui::Text("Path: %s", metadata->CachesPath[0].c_str());
+				ImGui::Text("Texture Resource Count: %u", material->GetTexture()->GetReferenceCount());
 				ivec2 texSize = material->GetTexture()->GetSize();
 				ImGui::Text("Size: %d x %d", texSize.x, texSize.y);		
 				ImGui::Separator();

@@ -204,6 +204,9 @@ namespace Loopie {
 		if (ImGui::ImageButton("all", (ImTextureID)m_trsIcon->GetRendererId(), ImVec2(15, 15)))
 			m_gizmoOperation = (int)ImGuizmo::UNIVERSAL;
 
+		if(!m_usingGuizmo)
+			m_usingGuizmo = ImGui::IsAnyItemHovered();
+
 		ImGui::PopStyleVar(2);
 	}
 
