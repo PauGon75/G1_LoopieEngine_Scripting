@@ -1,4 +1,4 @@
-#include "Loopie/Core/Application.h"
+/*#include "Loopie/Core/Application.h"
 #include "Loopie/Scene/Scene.h"
 #include "Loopie/Components/Transform.h"
 #include <mono/jit/jit.h>
@@ -30,4 +30,4 @@ namespace Loopie {
         mono_add_internal_call("Loopie.InternalCalls::Native_SetTranslation", (void*)Native_SetTranslation);
         mono_add_internal_call("Loopie.InternalCalls::Native_CreateEntity", (void*)Native_CreateEntity);
     }
-}
+}*/
