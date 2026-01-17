@@ -2,7 +2,6 @@
 
 project ("Loopie" VERSION 0.1.0 LANGUAGES C CXX)
 
-
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(VENDOR_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor")
 file(GLOB_RECURSE SOURCES "${SRC_DIR}/*.cpp" "${SRC_DIR}/*.h" "${VENDOR_DIR}/*.cpp" "${VENDOR_DIR}/*.h" )
@@ -42,6 +41,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	imgui::imgui
 	DevIL::IL
 	DevIL::ILU
+	Mono::Runtime
 )
 
 

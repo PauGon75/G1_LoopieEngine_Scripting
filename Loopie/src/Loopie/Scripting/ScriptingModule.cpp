@@ -1,6 +1,7 @@
 #include "ScriptingModule.h"
 #include "Loopie/Core/Log.h"
 #include <mono/metadata/mono-config.h>
+#include <mono/metadata/assembly.h>
 
 namespace Loopie {
 
