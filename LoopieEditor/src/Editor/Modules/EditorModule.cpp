@@ -31,22 +31,22 @@ namespace Loopie
 
 		/////SCENE
 		Application::GetInstance().CreateScene(""); /// Maybe default One
-		scene = &Application::GetInstance().GetScene();
+		m_currentScene = &Application::GetInstance().GetScene();
 
 		JsonData data = Json::ReadFromFile(Application::GetInstance().m_activeProject.GetConfigPath());
 		JsonResult<std::string> result = data.Child("last_scene").GetValue<std::string>();
-		if (!result.Found || !scene->ReadAndLoadSceneFile(result.Result))
+		if (!result.Found || !m_currentScene->ReadAndLoadSceneFile(result.Result))
 		{
 			CreateCity();
-			scene->CreateEntity({ 0,1,-10 }, { 1,0,0,0 }, { 1,1,1 }, nullptr, "MainCamera")->AddComponent<Camera>();
+			m_currentScene->CreateEntity({ 0,1,-10 }, { 1,0,0,0 }, { 1,1,1 }, nullptr, "MainCamera")->AddComponent<Camera>();
 		}
 		
 
 		Metadata& metadata = AssetRegistry::GetOrCreateMetadata("assets/materials/outlineMaterial.mat");
-		selectedObjectMaterial = ResourceManager::GetMaterial(metadata);
-		selectedObjectMaterial->SetIfEditable(false);
-		selectedObjectShader = new Shader("assets/shaders/SelectionOutline.shader");
-		selectedObjectMaterial->SetShader(*selectedObjectShader);
+		m_selectedObjectMaterial = ResourceManager::GetMaterial(metadata);
+		m_selectedObjectMaterial->SetIfEditable(false);
+		m_selectedObjectShader = new Shader("assets/shaders/SelectionOutline.shader");
+		m_selectedObjectMaterial->SetShader(*m_selectedObjectShader);
 
 		////
 
@@ -59,7 +59,7 @@ namespace Loopie
 		m_scene.Init();
 		m_mainMenu.Init();
 
-		m_hierarchy.SetScene(scene);
+		m_hierarchy.SetScene(m_currentScene);
 
 		Application::GetInstance().m_notifier.AddObserver(this);
 
@@ -186,7 +186,7 @@ namespace Loopie
 
 		// POST
 		std::unordered_set<std::shared_ptr<Entity>> entities;
-		scene->GetOctree().CollectVisibleEntitiesFrustum(camera->GetFrustum(), entities);
+		m_currentScene->GetOctree().CollectVisibleEntitiesFrustum(camera->GetFrustum(), entities);
 
 		std::vector<MeshRenderer*> renderers;
 		renderers.reserve(1);
@@ -233,7 +233,7 @@ namespace Loopie
 					Renderer::SetStencilFunc(Renderer::StencilFunc::NOTEQUAL, 1, 0xFF);
 					Renderer::SetStencilMask(0x00);
 
-					Renderer::FlushRenderItem(renderer->GetMesh()->GetVAO(), selectedObjectMaterial, entity->GetTransform());
+					Renderer::FlushRenderItem(renderer->GetMesh()->GetVAO(), m_selectedObjectMaterial, entity->GetTransform());
 
 					Renderer::SetStencilMask(0xFF);
 					Renderer::EnableDepth();
@@ -249,7 +249,7 @@ namespace Loopie
 				if(cam)
 					cam->RenderGizmo();
 			}
-			scene->GetOctree().DebugDraw(Color::GREEN);
+			m_currentScene->GetOctree().DebugDraw(Color::GREEN);
 		}
 	}
 

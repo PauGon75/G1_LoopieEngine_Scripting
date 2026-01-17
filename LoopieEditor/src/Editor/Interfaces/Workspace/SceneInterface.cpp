@@ -108,6 +108,7 @@ namespace Loopie {
 				ImGuizmo::SetDrawlist();
 				if (ImGuizmo::Manipulate(&m_camera->GetCamera()->GetViewMatrix()[0][0], &m_camera->GetCamera()->GetProjectionMatrix()[0][0], (ImGuizmo::OPERATION)m_gizmoOperation, (ImGuizmo::MODE)m_gizmoMode, &worldMatrix[0][0])) {
 					transform->SetWorldMatrix(worldMatrix);
+					Application::GetInstance().GetScene().GetOctree().Rebuild();				
 				}
 				Renderer::EnableDepth();
 			}

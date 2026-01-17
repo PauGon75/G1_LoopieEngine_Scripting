@@ -49,8 +49,8 @@ namespace Loopie {
 		AssetsExplorerInterface m_assetsExplorer;
 		TopBarInterface m_topBar;
 
-		Scene* scene = nullptr;
-		std::shared_ptr<Material> selectedObjectMaterial;
-		Shader* selectedObjectShader;
+		Scene* m_currentScene = nullptr;
+		std::shared_ptr<Material> m_selectedObjectMaterial;
+		Shader* m_selectedObjectShader;
 	};
 }

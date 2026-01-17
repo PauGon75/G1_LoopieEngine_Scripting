@@ -107,26 +107,46 @@ namespace Loopie {
 
 	void InspectorInterface::DrawTransform(Transform* transform)
 	{
-		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+		ImGui::PushID(transform);
+
+		bool open = ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen);
+		bool modified = false;
+		if (open) {
 			vec3 position = transform->GetLocalPosition();
 			vec3 rotation = transform->GetLocalEulerAngles();
 			vec3 scale = transform->GetLocalScale();
 
 			if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
+				modified = true;
 				transform->SetLocalPosition(position);
 			}
 			if (ImGui::DragFloat3("Rotation", &rotation.x, 0.5f)) {
+				modified = true;
 				transform->SetLocalEulerAngles(rotation);
 			}
 			if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
+				modified = true;
 				transform->SetLocalScale(scale);
 			}
 		}
+		ImGui::PopID();
+
+		if(modified)
+			Application::GetInstance().GetScene().GetOctree().Rebuild();
 	}
 
 	void InspectorInterface::DrawCamera(Camera* camera)
 	{
-		if (ImGui::CollapsingHeader("Camera")) {
+		ImGui::PushID(camera);
+
+		bool open = ImGui::CollapsingHeader("Camera");
+
+		if (RemoveComponent(camera)) {
+			ImGui::PopID();
+			return;
+		}
+
+		if (open) {
 			float fov = camera->GetFov();
 			float nearPlane = camera->GetNearPlane();
 			float farPlane = camera->GetFarPlane();
@@ -146,15 +166,27 @@ namespace Loopie {
 					camera->SetAsMainCamera();
 			}
 		}
+		ImGui::PopID();
 	}
 
 	void InspectorInterface::DrawMeshRenderer(MeshRenderer* meshRenderer)
 	{
-		if (ImGui::CollapsingHeader("Mesh Renderer")) {
+		ImGui::PushID(meshRenderer);
+
+		bool open = ImGui::CollapsingHeader("Mesh Renderer");
+
+		if (RemoveComponent(meshRenderer)) {
+			ImGui::PopID();
+			return;
+		}
+
+		if (open) {
 			auto mesh = meshRenderer->GetMesh();
 			ImGui::Text("Mesh: %s", mesh ? "Assigned" : "None");
-			if (!mesh)
+			if (!mesh) {
+				ImGui::PopID();
 				return;
+			}
 			ImGui::Text("Mesh Resource Count: %u", mesh->GetReferenceCount());
 			ImGui::Text("Mesh Vertices: %d", mesh->GetData().VerticesAmount);
 
@@ -175,13 +207,19 @@ namespace Loopie {
 			//ImGui::Text("Shader: %s", meshRenderer->GetShader().GetName().c_str()); ????
 
 
+
+
 			/// Draw Material Props
+
 			ImGui::Separator();
 			ImGui::Separator();
-			ImGui::Text("Material");
 			std::shared_ptr<Material> material = meshRenderer->GetMaterial();
+			bool isEditable = material->IsEditable();
+			std::string materialName = "Material"; ///GetNameLater
+			if(!isEditable)
+				materialName += " (Read-Only -> EngineDefault)";
+			ImGui::Text(materialName.c_str());
 			ImGui::Text("Material Resource Count: %u", material->GetReferenceCount());
-			bool editable = material->IsEditable();
 			const std::unordered_map<std::string, UniformValue> properties = material->GetUniforms();
 
 			std::shared_ptr<Texture> texture = material->GetTexture();
@@ -194,6 +232,11 @@ namespace Loopie {
 				ImGui::Separator();
 			}
 			
+			
+			
+			if (!isEditable)
+				ImGui::BeginDisabled();
+
 			for (auto& [name, uniform] : properties)
 			{
 
@@ -324,15 +367,81 @@ namespace Loopie {
 						break;
 				}
 			}
-			if (ImGui::Button("Apply")) {
-				material->Save();
+
+			if (!isEditable)
+				ImGui::EndDisabled();
+			else {
+				if (ImGui::Button("Apply")) {
+					material->Save();
+				}
 			}
+			
 		}
+
+		RemoveComponent(meshRenderer);	
+		ImGui::PopID();
 	}
 
 	void InspectorInterface::AddComponent(const std::shared_ptr<Entity>& entity)
 	{
-		
+		if (!entity)
+			return;
+
+		ImGui::Separator();
+
+		static const char* previewLabel = "Add Component...";
+		static int selectedIndex = -1;
+
+		if (ImGui::BeginCombo("##AddComponentCombo", previewLabel))
+		{
+			if (!entity->HasComponent<Camera>())
+			{
+				if (ImGui::Selectable("Camera"))
+				{
+					entity->AddComponent<Camera>();
+					ImGui::EndCombo();
+					return;
+				}
+			}
+
+			if (ImGui::Selectable("Mesh Renderer"))
+			{
+				entity->AddComponent<MeshRenderer>();
+				ImGui::EndCombo();
+				return;
+			}
+
+
+			///// How To Add More Components
+			// 
+			//if (ImGui::Selectable(""))
+			//{
+			//    entity->AddComponent<>();
+			//    ImGui::EndCombo();
+			//    return;
+			//}
+
+			
+
+			ImGui::EndCombo();
+		}
+	}
+
+	bool InspectorInterface::RemoveComponent(Component* component)
+	{
+		if (!component)
+			return false;
+
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Remove Component"))
+			{
+				component->GetOwner()->RemoveComponent(component);
+				ImGui::EndPopup();
+				return true;
+			}
+			ImGui::EndPopup();
+		}
 	}
 
 	void InspectorInterface::DrawMaterialImportSettings(const std::filesystem::path& path)

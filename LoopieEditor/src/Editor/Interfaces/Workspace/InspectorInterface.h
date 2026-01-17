@@ -34,6 +34,7 @@ namespace Loopie {
 		void DrawCamera(Camera* camera);
 		void DrawMeshRenderer(MeshRenderer* meshRenderer);
 		void AddComponent(const std::shared_ptr<Entity>& entity);
+		bool RemoveComponent(Component* component);
 
 		///FilesRelated
 		void DrawMaterialImportSettings(const std::filesystem::path& path);
