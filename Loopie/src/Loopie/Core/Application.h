@@ -8,6 +8,7 @@
 #include "Loopie/Project/Project.h"
 #include "Loopie/ImGui/ImGuiManager.h"
 #include "Loopie/Scene/Scene.h"
+#include "Loopie/Scripting/ScriptingModule.h"
 
 #include <vector>
 

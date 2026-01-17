@@ -5,6 +5,7 @@
 #include "Loopie/Core/Time.h"
 #include "Loopie/Render/Renderer.h"
 
+
 namespace Loopie {
 	Application* Application::s_Instance = nullptr;
 
@@ -17,7 +18,7 @@ namespace Loopie {
 		s_Instance = this;
 
 		Log::Info("Application Started");
-
+		AddModule(new ScriptingModule());
 		// Window Creation
 		m_window = new Window();
 		Log::Info("Window created successfully.");
