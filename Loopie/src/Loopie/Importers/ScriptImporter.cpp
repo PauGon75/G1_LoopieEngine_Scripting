@@ -1,33 +1,46 @@
 #include "ScriptImporter.h"
 #include "ScriptResource.h"
+#include "Loopie/Resources/AssetRegistry.h"
+#include "Loopie/Resources/ResourceManager.h"
 #include "Loopie/Core/Log.h"
+#include <cstdlib>
 #include <filesystem>
 
 namespace Loopie {
 
     std::shared_ptr<ScriptResource> ScriptImporter::Import(const std::string& path) {
-        std::filesystem::path filePath(path);
-        std::string extension = filePath.extension().string();
+        Metadata* metadata = AssetRegistry::GetMetadata(path);
+        UUID id = metadata ? metadata->UUID : UUID();
 
-        if (extension != ".cs" && extension != ".dll") {
-            Log::Error("ScriptImporter: Formato no soportado: {0}", extension);
-            return nullptr;
-        }
+        auto script = std::make_shared<ScriptResource>(id, path);
+        script->SetClassName(std::filesystem::path(path).stem().string());
+        script->SetLibraryPath("Library/Scripts/" + script->GetClassName() + ".dll");
 
-        auto script = std::make_shared<ScriptResource>(path);
-        script->SetClassName(filePath.stem().string());
+        ResourceManager::AddResource(path, script);
 
-        std::string libPath = "Library/Scripts/" + script->GetClassName() + ".dll";
-        script->SetLibraryPath(libPath);
-
-        Log::Info("ScriptImporter: Importado '{0}' correctamente.", filePath.filename().string());
-
+        Compile(script);
         return script;
     }
 
     bool ScriptImporter::Compile(std::shared_ptr<ScriptResource> script) {
-        Log::Info("ScriptImporter: Preparando compilacion para {0}...", script->GetClassName());
-        return true;
-    }
+        if (!std::filesystem::exists("Library/Scripts")) {
+            std::filesystem::create_directories("Library/Scripts");
+        }
 
+        std::string command = "csc -target:library -out:" + script->GetLibraryPath() + " " + script->GetSourcePath();
+
+        int result = std::system(command.c_str());
+        bool success = (result == 0);
+
+        script->SetCompiled(success);
+
+        if (!success) {
+            Log::Error("Scripting: Error al compilar {0}", script->GetClassName());
+        }
+        else {
+            Log::Info("Scripting: {0} compilado con exito", script->GetClassName());
+        }
+
+        return success;
+    }
 }
