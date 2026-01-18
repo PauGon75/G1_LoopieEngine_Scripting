@@ -7,6 +7,7 @@
 #include "Loopie/Components/MeshRenderer.h"
 #include "Loopie/Helpers/LoopieHelpers.h"
 #include "Loopie/Resources/AssetRegistry.h"
+#include "Loopie/Components/ScriptComponent.h"
 
 #include <unordered_set>
 
@@ -333,6 +334,16 @@ namespace Loopie {
 						if (camera)
 						{
 							camera->Deserialize(node);
+						}
+					}
+					else if (componentNode.Contains("ScriptComponent"))
+					{
+						JsonNode node = componentNode.Child("ScriptComponent");
+					
+						auto scriptComp = entity->AddComponent<ScriptComponent>();
+						if (scriptComp)
+						{
+							scriptComp->Deserialize(node);
 						}
 					}
 					else if (componentNode.Contains("meshrenderer"))
