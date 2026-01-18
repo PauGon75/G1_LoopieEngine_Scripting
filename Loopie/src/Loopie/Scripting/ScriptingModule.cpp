@@ -7,7 +7,7 @@
 namespace Loopie {
     extern void RegisterGlue();
 
-    void ScriptingModule::OnLoad() {
+    /*void ScriptingModule::OnLoad() {
         mono_set_dirs("vendor/mono/lib", "vendor/mono/etc");
         mono_config_parse(NULL);
         m_RootDomain = mono_jit_init("LoopieRootDomain");
@@ -17,7 +17,7 @@ namespace Loopie {
         RegisterGlue();
 
         LoadAssembly("Assets/Scripts/Scripts.dll");
-    }
+    }*/
 
     MonoAssembly* ScriptingModule::LoadAssembly(const std::string& filePath) {
         MonoAssembly* assembly = mono_domain_assembly_open(m_AppDomain, filePath.c_str());

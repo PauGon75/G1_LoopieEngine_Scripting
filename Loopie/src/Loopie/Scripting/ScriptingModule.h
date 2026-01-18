@@ -9,7 +9,7 @@ namespace Loopie {
     class ScriptingModule : public Module {
     public:
         ScriptingModule() : Module("Scripting") {}
-        void OnLoad() override;
+        //void OnLoad() override;
         void OnUpdate() override;
         void OnUnload() override;
         MonoAssembly* LoadAssembly(const std::string& filePath);
