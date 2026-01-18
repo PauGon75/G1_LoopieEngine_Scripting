@@ -1,33 +1,35 @@
 #include "ScriptImporter.h"
 #include "ScriptResource.h"
+#include "ScriptCompiler.h"
 #include "Loopie/Core/Log.h"
-#include <filesystem>
 
 namespace Loopie {
 
     std::shared_ptr<ScriptResource> ScriptImporter::Import(const std::string& path) {
         std::filesystem::path filePath(path);
-        std::string extension = filePath.extension().string();
 
-        if (extension != ".cs" && extension != ".dll") {
-            Log::Error("ScriptImporter: Formato no soportado: {0}", extension);
-            return nullptr;
-        }
+        UUID scriptID;
 
-        auto script = std::make_shared<ScriptResource>(path);
+        auto script = std::make_shared<ScriptResource>(scriptID, path);
         script->SetClassName(filePath.stem().string());
+        script->SetLibraryPath("Library/Scripts/" + script->GetClassName() + ".dll");
 
-        std::string libPath = "Library/Scripts/" + script->GetClassName() + ".dll";
-        script->SetLibraryPath(libPath);
-
-        Log::Info("ScriptImporter: Importado '{0}' correctamente.", filePath.filename().string());
-
+        Compile(script);
         return script;
     }
 
     bool ScriptImporter::Compile(std::shared_ptr<ScriptResource> script) {
-        Log::Info("ScriptImporter: Preparando compilacion para {0}...", script->GetClassName());
-        return true;
-    }
+        CompileResult result = ScriptCompiler::Compile(script->GetSourcePath(), script->GetLibraryPath());
 
+        if (result.Success) {
+            script->SetCompiled(true);
+            Log::Info("Compilacion exitosa: {0}", script->GetClassName());
+            return true;
+        }
+        else {
+            script->SetCompiled(false);
+            Log::Error("Error en script {0}: {1}", script->GetClassName(), result.ErrorMessage);
+            return false;
+        }
+    }
 }

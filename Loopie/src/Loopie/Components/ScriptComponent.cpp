@@ -1,14 +1,13 @@
 #include "ScriptComponent.h"
 #include "Loopie/Core/Log.h"
-#include "Loopie/Scene/Entity.h" 
+#include "Loopie/Scene/Entity.h"
+#include "Loopie/Resources/ScriptResource.h"
 
 extern MonoImage* g_GameAssemblyImage;
 
 namespace Loopie {
 
-    ScriptComponent::ScriptComponent(Entity* owner)
-    {
-   
+    ScriptComponent::ScriptComponent(Entity* owner) : Component(owner) {
     }
 
     ScriptComponent::~ScriptComponent() {
@@ -22,20 +21,28 @@ namespace Loopie {
     }
 
     void ScriptComponent::SetScript(const std::string& name) {
-        if (!g_GameAssemblyImage) return;
+        auto scriptRes = ResourceManager::GetResource<ScriptResource>(name);
 
-        m_scriptName = name;
-        MonoClass* monoClass = mono_class_from_name(g_GameAssemblyImage, "", name.c_str());
-
-        if (!monoClass) {
-           
+        if (!scriptRes || !scriptRes->IsCompiled() || !g_GameAssemblyImage) {
+            Log::Error("ScriptComponent: Error al cargar el recurso de script o ensamblado no listo.");
             return;
         }
+
+        m_scriptName = name;
+        MonoClass* monoClass = mono_class_from_name(g_GameAssemblyImage, "", scriptRes->GetClassName().c_str());
+
+        if (!monoClass) return;
 
         m_instance = mono_object_new(mono_domain_get(), monoClass);
         if (!m_instance) return;
 
         mono_runtime_object_init(m_instance);
+
+        MonoClassField* idField = mono_class_get_field_from_name(monoClass, "ID");
+        if (idField) {
+            uint32_t uuid = m_owner->GetUUID();
+            mono_field_set_value(m_instance, idField, &uuid);
+        }
 
         m_startMethod = mono_class_get_method_from_name(monoClass, "Start", 0);
         m_updateMethod = mono_class_get_method_from_name(monoClass, "Update", 1);
@@ -51,7 +58,6 @@ namespace Loopie {
             m_startCalled = true;
         }
 
-
         float dt = 0.016f;
         void* args[1];
         args[0] = &dt;
@@ -63,22 +69,14 @@ namespace Loopie {
     }
 
     JsonNode ScriptComponent::Serialize(JsonNode& parent) const {
-      
         JsonNode node = parent.CreateObjectField("ScriptComponent");
-
-
         node.CreateField("ScriptName", m_scriptName);
-
         return node;
     }
 
     void ScriptComponent::Deserialize(const JsonNode& data) {
-      
         if (data.Contains("ScriptName")) {
-
-          
             auto result = data.GetValue<std::string>("ScriptName");
-
             if (result.Found) {
                 m_scriptName = result.Result;
             }
