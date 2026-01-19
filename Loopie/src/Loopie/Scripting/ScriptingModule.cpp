@@ -27,7 +27,8 @@ namespace Loopie {
     }
 
     void ScriptingModule::CheckForScriptChanges() {
-        // Usamos R"(...)" para que C++ ignore los caracteres de escape en la ruta
+
+        //TO CHANGE this hardcoded path later
         std::string scriptsPath = R"(C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Projects\Scripting Project\Assets\Scenes\a\Assets\Scripts)";
 
         if (!std::filesystem::exists(scriptsPath)) {
@@ -53,10 +54,10 @@ namespace Loopie {
                 if (it == m_FileWatchMap.end()) {
                     Log::Info("Estado: [NUEVO] - Procediendo a importar {0}", fileName);
 
-                    /*auto newScript = ScriptImporter::Import(pathStr);
+                    auto newScript = TextureImporter::Import(pathStr);
                     if (newScript) {
                         m_FileWatchMap[pathStr] = currentWriteTime;
-                    }*/
+                    }
                 }
                 else if (currentWriteTime > it->second) {
                     Log::Info("Estado: [MODIFICADO] - Procediendo a recompilar {0}", fileName);
@@ -68,11 +69,11 @@ namespace Loopie {
                             resource->SetLastWriteTime(currentWriteTime);
                         }
                     }
-                    /*else {
+                    else {
                         Log::Error("Recurso no encontrado en Manager para {0}. Re-importando...", fileName);
-                        ScriptImporter::Import(pathStr);
+                        TextureImporter::Import(pathStr);
                         m_FileWatchMap[pathStr] = currentWriteTime;
-                    }*/
+                    }
                 }
                 else {
                     Log::Info("Estado: [SIN CAMBIOS] - {0}", fileName);

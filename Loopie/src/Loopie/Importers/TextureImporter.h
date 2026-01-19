@@ -48,7 +48,7 @@ namespace Loopie {
         static void ImportImage(const std::string& filepath, Metadata& metadata);
         static void LoadImage(const std::string& filepath, Texture& texture);
         static bool CheckIfIsImage(const char* path);
-
+		static bool CompileManual(const std::string& sourcePath, const std::string& outputPath);
 		static std::shared_ptr<ScriptResource> Import(const std::string& path);
 		static bool Compile(std::shared_ptr<ScriptResource> script);
 		static void Test();

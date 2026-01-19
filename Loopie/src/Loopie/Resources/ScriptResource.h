@@ -4,8 +4,10 @@
 #include <filesystem>
 
 namespace Loopie {
+
     class ScriptResource : public Resource {
     public:
+        // Constructor: Pasa el UUID y el Tipo al padre
         ScriptResource(UUID uuid, const std::string& path)
             : Resource(uuid, ResourceType::SCRIPT), m_path(path) {
             if (std::filesystem::exists(path)) {
@@ -13,18 +15,26 @@ namespace Loopie {
             }
         }
 
+        // Destructor virtual: Muy importante para evitar fugas y errores de vtable
         virtual ~ScriptResource() override = default;
 
-        // Implementación obligatoria para evitar C2259
-        bool Load() override { return true; }
+        // ESTA LINEA ES LA QUE ARREGLA std::make_shared
+        // Debe ser EXACTAMENTE "bool Load() override"
+        bool Load() override {
+            return true;
+        }
 
+        // Getters y Setters
         const std::string& GetSourcePath() const { return m_path; }
         const std::string& GetClassName() const { return m_className; }
         void SetClassName(const std::string& name) { m_className = name; }
+
         bool IsCompiled() const { return m_isCompiled; }
         void SetCompiled(bool compiled) { m_isCompiled = compiled; }
+
         const std::string& GetLibraryPath() const { return m_libraryPath; }
         void SetLibraryPath(const std::string& path) { m_libraryPath = path; }
+
         std::filesystem::file_time_type GetLastWriteTime() const { return m_lastWriteTime; }
         void SetLastWriteTime(std::filesystem::file_time_type time) { m_lastWriteTime = time; }
 

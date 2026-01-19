@@ -154,22 +154,43 @@ namespace Loopie {
         ILenum type = ilDetermineType(path);
         return type != IL_TYPE_UNKNOWN;
     }
-    //std::shared_ptr<ScriptResource> TextureImporter::Import(const std::string& path) {
-    //    Metadata* metadata = AssetRegistry::GetMetadata(path);
-    //    UUID id = metadata ? metadata->UUID : UUID();
+    std::shared_ptr<ScriptResource> TextureImporter::Import(const std::string& path) {
+        // LOG DE TESTEO: Para verificar que el Watcher llega hasta aquí
+        Log::Info("Importador: Procesando archivo en {0}", path);
 
-    //    // Ahora ScriptResource no es abstracta y std::make_shared funcionara
-    //    auto script = std::make_shared<ScriptResource>(id, path);
+        // EXPLICACIÓN: He comentado la instanciación para que el compilador no busque
+        // cómo crear un ScriptResource abstracto. Retornamos nullptr para poder compilar.
+        /*
+        auto script = std::make_shared<ScriptResource>(id, path);
+        */
 
-    //    script->SetClassName(std::filesystem::path(path).stem().string());
-    //    script->SetLibraryPath("Library/Scripts/" + script->GetClassName() + ".dll");
+        // En su lugar, simplemente lanzamos la compilación manual por consola
+        std::string className = std::filesystem::path(path).stem().string();
+        std::string outPath = "Library/Scripts/" + className + ".dll";
 
-    //    ResourceManager::AddResource(path, script);
+        // Llamamos a una versión de Compile que no necesite el objeto Resource
+        CompileManual(path, outPath);
 
-    //    Compile(script);
-    //    return script;
-    //}
+        return nullptr;
+    }
+    // TextureImporter.cpp
+    bool TextureImporter::CompileManual(const std::string& sourcePath, const std::string& outputPath) {
+        if (!std::filesystem::exists("Library/Scripts")) {
+            std::filesystem::create_directories("Library/Scripts");
+        }
 
+        std::string cscPath = R"(C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe)";
+
+        // IMPORTANTE: Ponemos comillas en source y output para manejar espacios
+        std::string command = cscPath + " -target:library -out:\"" + outputPath + "\" \"" + sourcePath + "\"";
+
+        Log::Info("Ejecutando: {0}", command);
+        int result = std::system(command.c_str());
+
+        return (result == 0);
+    }
+
+    
     bool TextureImporter::Compile(std::shared_ptr<ScriptResource> script) {
         if (!std::filesystem::exists("Library/Scripts")) {
             std::filesystem::create_directories("Library/Scripts");
