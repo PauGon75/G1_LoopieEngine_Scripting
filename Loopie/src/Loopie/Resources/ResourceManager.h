@@ -38,8 +38,6 @@ namespace Loopie {
         static std::shared_ptr<T> GetResource(const std::string& path) {
             Metadata* metadata = AssetRegistry::GetMetadata(path);
 
-            if (!metadata) return nullptr;
-
             ResourceKey key{ *metadata, 0 };
             auto it = m_Resources.find(key);
 

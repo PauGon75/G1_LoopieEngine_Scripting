@@ -340,11 +340,11 @@ namespace Loopie {
 					{
 						JsonNode node = componentNode.Child("ScriptComponent");
 					
-						auto scriptComp = entity->AddComponent<ScriptComponent>();
+						/*auto scriptComp = entity->AddComponent<ScriptComponent>();
 						if (scriptComp)
 						{
 							scriptComp->Deserialize(node);
-						}
+						}*/
 					}
 					else if (componentNode.Contains("meshrenderer"))
 					{

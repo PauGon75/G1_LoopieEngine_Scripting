@@ -13,6 +13,9 @@ namespace Loopie {
             }
         }
 
+        virtual ~ScriptResource() override = default;
+
+        // Implementación obligatoria para evitar C2259
         bool Load() override { return true; }
 
         const std::string& GetSourcePath() const { return m_path; }

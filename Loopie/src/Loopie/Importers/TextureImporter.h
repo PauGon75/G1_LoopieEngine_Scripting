@@ -2,12 +2,18 @@
 #include "Loopie/Resources/Types/Texture.h"
 #include "Loopie/Resources/MetadataRegistry.h"
 #include "Loopie/Importers/ImportSettings.h"
-
+#include "Loopie/Resources/AssetRegistry.h"
+#include "Loopie/Resources/ResourceManager.h"
+#include "loopie/Core/Log.h"
 #include <memory>
 #include <vector>
 #include <string>
+#include <Loopie/Resources/ScriptResource.h>
+#include <iostream>
 
 namespace Loopie {
+
+	class ScriptResource;
 
 	struct TextureImportSettigns : public ImportSettings {
 
@@ -37,10 +43,14 @@ namespace Loopie {
 		bool ReadAndWrite;
 	};
 
-	class TextureImporter {
-	public:
-		static void ImportImage(const std::string& filepath, Metadata& metadata);
-		static void LoadImage(const std::string& filepath, Texture& texture);
-		static bool CheckIfIsImage(const char* path);
-	};
+    class TextureImporter {
+    public:
+        static void ImportImage(const std::string& filepath, Metadata& metadata);
+        static void LoadImage(const std::string& filepath, Texture& texture);
+        static bool CheckIfIsImage(const char* path);
+
+		static std::shared_ptr<ScriptResource> Import(const std::string& path);
+		static bool Compile(std::shared_ptr<ScriptResource> script);
+		static void Test();
+    };
 }

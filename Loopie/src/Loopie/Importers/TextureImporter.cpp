@@ -154,4 +154,46 @@ namespace Loopie {
         ILenum type = ilDetermineType(path);
         return type != IL_TYPE_UNKNOWN;
     }
+    //std::shared_ptr<ScriptResource> TextureImporter::Import(const std::string& path) {
+    //    Metadata* metadata = AssetRegistry::GetMetadata(path);
+    //    UUID id = metadata ? metadata->UUID : UUID();
+
+    //    // Ahora ScriptResource no es abstracta y std::make_shared funcionara
+    //    auto script = std::make_shared<ScriptResource>(id, path);
+
+    //    script->SetClassName(std::filesystem::path(path).stem().string());
+    //    script->SetLibraryPath("Library/Scripts/" + script->GetClassName() + ".dll");
+
+    //    ResourceManager::AddResource(path, script);
+
+    //    Compile(script);
+    //    return script;
+    //}
+
+    bool TextureImporter::Compile(std::shared_ptr<ScriptResource> script) {
+        if (!std::filesystem::exists("Library/Scripts")) {
+            std::filesystem::create_directories("Library/Scripts");
+        }
+
+        std::string command = "csc -target:library -out:" + script->GetLibraryPath() + " " + script->GetSourcePath();
+
+        int result = std::system(command.c_str());
+        bool success = (result == 0);
+
+        script->SetCompiled(success);
+
+        if (!success) {
+            Log::Error("Scripting: Error al compilar {0}.", script->GetClassName());
+        }
+        else {
+            Log::Info("Scripting: {0} generado correctamente en Library/.", script->GetClassName());
+        }
+
+        return success;
+        return true;
+    }
+
+    void TextureImporter::Test() {
+        std::cout << "TextureImporter: Enlace verificado. Test ejecutado." << std::endl;
+    }
 }
