@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required (VERSION 3.10)
-project ("LoopieEngine" VERSION 0.1.0 LANGUAGES C CXX)
+project ("LoopieEngine" VERSION 0.1.0 LANGUAGES C CXX CSharp)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -57,3 +57,11 @@ add_subdirectory("LoopieEditor")
 #add_subdirectory("LoopieSandbox")
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT LoopieEditor)    
+
+add_subdirectory(src/LoopieScriptCore)
+
+
+add_dependencies(${PROJECT_NAME} LoopieScriptCore)
+
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
