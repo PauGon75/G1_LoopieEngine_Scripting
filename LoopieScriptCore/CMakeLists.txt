@@ -1,18 +1,26 @@
-# Configurar versión de .NET Framework
-set(CMAKE_DOTNET_TARGET_FRAMEWORK_VERSION "v4.7.2")
+cmake_minimum_required(VERSION 3.10)
+project("LoopieScripting" NONE)
 
-# Definir los archivos del proyecto
-set(SOURCES
-    "Entity.cs"
+find_program(DOTNET_EXECUTABLE dotnet REQUIRED)
+
+set(LOOPIE_SCRIPT
+    ${CMAKE_CURRENT_SOURCE_DIR}/LoopieScriptProject.csproj
 )
 
-# Crear la librería (DLL)
-add_library(LoopieScriptCore SHARED ${SOURCES})
+set(LOOPIE_SCRIPTING_OUTPUT
+    ${CMAKE_BINARY_DIR}/Loopie.Core.dll
+)
 
-# Configurar dónde guardar la DLL compilada
-set_target_properties(LoopieScriptCore PROPERTIES
-    VS_DOTNET_REFERENCES "System"
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Assets/Scripts/Bin"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Assets/Scripts/Bin"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Assets/Scripts/Bin"
+add_custom_command(
+    OUTPUT ${LOOPIE_SCRIPTING_OUTPUT}
+    COMMAND ${DOTNET_EXECUTABLE} build
+            ${LOOPIE_SCRIPT}
+            -c $<CONFIG>
+            -o ${CMAKE_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Building LoopieScripting (C#)"
+)
+
+add_custom_target(LoopieScriptingBuild ALL
+    DEPENDS ${LOOPIE_SCRIPTING_OUTPUT}
 )

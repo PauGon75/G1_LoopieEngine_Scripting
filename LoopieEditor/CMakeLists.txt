@@ -14,6 +14,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${SRC_DIR}")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC loopie-core)
 
+add_dependencies(${PROJECT_NAME} LoopieScriptingBuild)
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${PROJECT_NAME}>/Scripting
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_BINARY_DIR}/Loopie.Core.dll
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/Scripting/Loopie.Core.dll
+)
 file(COPY ${PROJECT_SOURCE_DIR}/assets DESTINATION ${OUTPUT_PATH})
-##file(COPY ${PROJECT_SOURCE_DIR}/imgui.ini DESTINATION ${OUTPUT_PATH})

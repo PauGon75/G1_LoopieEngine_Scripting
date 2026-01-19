@@ -8,13 +8,42 @@
 
 namespace Loopie {
 
+#include <filesystem>
+    namespace fs = std::filesystem;
     void ScriptingModule::OnLoad() {
-        mono_set_dirs("vendor/mono/lib", "vendor/mono/etc");
+        fs::path rootPath = fs::current_path();
+
+        fs::path libPath = (rootPath / "vendor" / "mono" / "lib").make_preferred();
+        fs::path etcPath = (rootPath / "vendor" / "mono" / "etc").make_preferred();
+
+        std::string libStr = libPath.string();
+        std::string etcStr = etcPath.string();
+
+        Log::Info("Configurando rutas de Mono:");
+        Log::Info("  Lib: {0}", libStr);
+        Log::Info("  Etc: {0}", etcStr);
+
+        mono_set_dirs(libStr.c_str(), etcStr.c_str());
         mono_config_parse(NULL);
 
         m_RootDomain = mono_jit_init("LoopieRootDomain");
+        if (!m_RootDomain) {
+            Log::Error("Fallo crítico: No se pudo inicializar LoopieRootDomain");
+            return;
+        }
+
         m_AppDomain = mono_domain_create_appdomain((char*)"LoopieAppDomain", NULL);
         mono_domain_set(m_AppDomain, true);
+
+        fs::path scriptDllPath = (rootPath / "Library" / "Scripts" / "LoopieScriptCore.dll").make_preferred();
+
+        if (fs::exists(scriptDllPath)) {
+            LoadAssembly(scriptDllPath.string());
+            Log::Info("Scripting Core cargado exitosamente: {0}", scriptDllPath.string());
+        }
+        else {
+            Log::Error("No se encontró la DLL de scripts en: {0}", scriptDllPath.string());
+        }
     }
 
     void ScriptingModule::OnUpdate() {
