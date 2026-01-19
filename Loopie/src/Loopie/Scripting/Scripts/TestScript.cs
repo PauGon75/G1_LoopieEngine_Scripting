@@ -28,7 +28,6 @@ namespace Loopie
                 InternalCalls.NativeLog("HelloWorld desde C#");
                 _timer = 0;
             }
-
             InternalCalls.Native_SetTranslation(ID, 2.0f, 0.0f, 0.0f);
         }
     }

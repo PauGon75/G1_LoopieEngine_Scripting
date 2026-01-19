@@ -155,25 +155,15 @@ namespace Loopie {
         return type != IL_TYPE_UNKNOWN;
     }
     std::shared_ptr<ScriptResource> TextureImporter::Import(const std::string& path) {
-        // LOG DE TESTEO: Para verificar que el Watcher llega hasta aquí
         Log::Info("Importador: Procesando archivo en {0}", path);
 
-        // EXPLICACIÓN: He comentado la instanciación para que el compilador no busque
-        // cómo crear un ScriptResource abstracto. Retornamos nullptr para poder compilar.
-        /*
-        auto script = std::make_shared<ScriptResource>(id, path);
-        */
-
-        // En su lugar, simplemente lanzamos la compilación manual por consola
         std::string className = std::filesystem::path(path).stem().string();
         std::string outPath = "Library/Scripts/" + className + ".dll";
 
-        // Llamamos a una versión de Compile que no necesite el objeto Resource
         CompileManual(path, outPath);
 
         return nullptr;
     }
-    // TextureImporter.cpp
     bool TextureImporter::CompileManual(const std::string& sourcePath, const std::string& outputPath) {
         if (!std::filesystem::exists("Library/Scripts")) {
             std::filesystem::create_directories("Library/Scripts");
@@ -181,7 +171,6 @@ namespace Loopie {
 
         std::string cscPath = R"(C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe)";
 
-        // IMPORTANTE: Ponemos comillas en source y output para manejar espacios
         std::string command = cscPath + " -target:library -out:\"" + outputPath + "\" \"" + sourcePath + "\"";
 
         Log::Info("Ejecutando: {0}", command);

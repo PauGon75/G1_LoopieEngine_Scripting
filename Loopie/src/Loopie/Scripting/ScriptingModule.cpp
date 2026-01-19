@@ -27,62 +27,42 @@ namespace Loopie {
     }
 
     void ScriptingModule::CheckForScriptChanges() {
-
-        //TO CHANGE this hardcoded path later
         std::string scriptsPath = R"(C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Projects\Scripting Project\Assets\Scenes\a\Assets\Scripts)";
 
         if (!std::filesystem::exists(scriptsPath)) {
-            Log::Error("Watcher: La ruta no existe: {0}", scriptsPath);
+            Log::Error("ERROR: La ruta no existe. Revisa si has movido la carpeta: {0}", scriptsPath);
             return;
         }
 
-        Log::Info("--- Escaneando Scripts en: {0} ---", scriptsPath);
+        Log::Info("--- Escaneando Scripts ---");
 
-        bool foundAny = false;
+        if (std::filesystem::is_empty(scriptsPath)) {
+            Log::Error("AVISO: La carpeta existe pero está totalmente vacía.");
+        }
+
         for (auto& entry : std::filesystem::recursive_directory_iterator(scriptsPath)) {
-            if (entry.path().extension() == ".cs") {
-                foundAny = true;
+            std::string fileName = entry.path().filename().string();
+            std::string extension = entry.path().extension().string();
+
+            Log::Info("Archivo visto en disco: {0} (Ext: {1})", fileName, extension);
+
+            if (extension == ".cs" || extension == ".CS") {
                 std::string pathStr = entry.path().string();
-                std::string fileName = entry.path().filename().string();
                 auto currentWriteTime = std::filesystem::last_write_time(entry.path());
 
-                // DEBUG: Imprime cada archivo encontrado
-                Log::Info("Encontrado: {0} | Ruta completa: {1}", fileName, pathStr);
-				TextureImporter::Test();
                 auto it = m_FileWatchMap.find(pathStr);
 
                 if (it == m_FileWatchMap.end()) {
-                    Log::Info("Estado: [NUEVO] - Procediendo a importar {0}", fileName);
-
-                    auto newScript = TextureImporter::Import(pathStr);
-                    if (newScript) {
-                        m_FileWatchMap[pathStr] = currentWriteTime;
-                    }
+                    Log::Info("-> Detectado como [NUEVO]: {0}", fileName);
+                    TextureImporter::Import(pathStr);
+                    m_FileWatchMap[pathStr] = currentWriteTime;
                 }
                 else if (currentWriteTime > it->second) {
-                    Log::Info("Estado: [MODIFICADO] - Procediendo a recompilar {0}", fileName);
-
-                    auto resource = ResourceManager::GetResource<ScriptResource>(pathStr);
-                    if (resource) {
-                        if (TextureImporter::Compile(resource)) {
-                            m_FileWatchMap[pathStr] = currentWriteTime;
-                            resource->SetLastWriteTime(currentWriteTime);
-                        }
-                    }
-                    else {
-                        Log::Error("Recurso no encontrado en Manager para {0}. Re-importando...", fileName);
-                        TextureImporter::Import(pathStr);
-                        m_FileWatchMap[pathStr] = currentWriteTime;
-                    }
-                }
-                else {
-                    Log::Info("Estado: [SIN CAMBIOS] - {0}", fileName);
+                    Log::Info("-> Detectado como [MODIFICADO]: {0}", fileName);
+                    TextureImporter::Import(pathStr);
+                    m_FileWatchMap[pathStr] = currentWriteTime;
                 }
             }
-        }
-
-        if (!foundAny) {
-            Log::Error("No se encontraron archivos .cs en la carpeta.");
         }
 
         Log::Info("--- Fin del Escaneo ---");
