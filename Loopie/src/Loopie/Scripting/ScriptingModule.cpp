@@ -6,11 +6,14 @@
 #include <mono/metadata/mono-config.h>
 #include "Loopie/Importers/TextureImporter.h"
 
+MonoImage* g_GameAssemblyImage = nullptr;
+
 namespace Loopie {
 
 #include <filesystem>
     namespace fs = std::filesystem;
     void ScriptingModule::OnLoad() {
+
         fs::path rootPath = fs::current_path();
 
         fs::path libPath = (rootPath / "vendor" / "mono" / "lib").make_preferred();
@@ -35,14 +38,32 @@ namespace Loopie {
         m_AppDomain = mono_domain_create_appdomain((char*)"LoopieAppDomain", NULL);
         mono_domain_set(m_AppDomain, true);
 
-        fs::path scriptDllPath = (rootPath / "Library" / "Scripts" / "LoopieScriptCore.dll").make_preferred();
+     
+
+        fs::path scriptDllPath = (rootPath / "Assets" / "Scripts" / "LoopieScriptCore.dll").make_preferred();
 
         if (fs::exists(scriptDllPath)) {
-            LoadAssembly(scriptDllPath.string());
-            Log::Info("Scripting Core cargado exitosamente: {0}", scriptDllPath.string());
+        
+            MonoAssembly* coreAssembly = LoadAssembly(scriptDllPath.string());
+
+            if (coreAssembly) {
+               
+                m_AssemblyImage = mono_assembly_get_image(coreAssembly);
+
+          
+                g_GameAssemblyImage = m_AssemblyImage;
+
+               
+                ScriptGlue::RegisterGlue();
+
+                Log::Info("Scripting Core cargado exitosamente y JIT enlazado: {0}", scriptDllPath.string());
+            }
+            else {
+                Log::Error("Se encontró el archivo pero Mono falló al cargar el Assembly.");
+            }
         }
         else {
-            Log::Error("No se encontró la DLL de scripts en: {0}", scriptDllPath.string());
+            Log::Error("No se encontró la DLL de scripts en: {0}. (¿Has compilado el proyecto C#?)", scriptDllPath.string());
         }
     }
 
