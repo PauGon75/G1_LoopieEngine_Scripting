@@ -5,6 +5,8 @@
 #include "Loopie/Core/Log.h"
 #include <mono/metadata/mono-config.h>
 #include "Loopie/Importers/TextureImporter.h"
+#include "ScriptGlue.h"
+
 
 MonoImage* g_GameAssemblyImage = nullptr;
 

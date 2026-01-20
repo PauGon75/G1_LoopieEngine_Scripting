@@ -9,7 +9,6 @@
 
 namespace Loopie {
 
-  ----------------------------------------------------------------
 
     static void NativeLog(MonoString* string) {
       
@@ -25,7 +24,7 @@ namespace Loopie {
         Scene& scene = Application::GetInstance().GetScene();
 
        
-        std::shared_ptr<Entity> entity = scene.GetEntity(UUID(entityID));
+        /*std::shared_ptr<Entity> entity = scene.GetEntity(UUID(entityID));
 
         if (entity) {
           
@@ -34,7 +33,7 @@ namespace Loopie {
       
               
             }
-        }
+        }*/
     }
 
     static void Native_CreateEntity(MonoString* name) {
