@@ -79,7 +79,7 @@ namespace Loopie {
     }
 
     void ScriptingModule::CheckForScriptChanges() {
-        std::string scriptsPath = R"(C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Projects\Scripting Project\Assets\Scenes\a\Assets\Scripts)";
+        std::string scriptsPath = R"(C:\Users\noapo\Desktop\G1_LoopieEngine_Scripting\Projects\Scripting Project\Assets\Scenes\a\Assets\Scripts)";
 
         if (!std::filesystem::exists(scriptsPath)) {
             Log::Error("ERROR: La ruta no existe. Revisa si has movido la carpeta: {0}", scriptsPath);

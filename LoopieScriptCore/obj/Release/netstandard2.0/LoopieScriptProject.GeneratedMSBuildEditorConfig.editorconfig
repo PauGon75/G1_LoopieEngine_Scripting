@@ -1,8 +1,5 @@
 is_global = true
 build_property.RootNamespace = LoopieScriptProject
-build_property.ProjectDir = C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\LoopieScriptCore\
+build_property.ProjectDir = C:\Users\noapo\Desktop\G1_LoopieEngine_Scripting\LoopieScriptCore\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.CsWinRTUseWindowsUIXamlProjections = false
-build_property.EffectiveAnalysisLevelStyle = 
-build_property.EnableCodeStyleSeverity = 
