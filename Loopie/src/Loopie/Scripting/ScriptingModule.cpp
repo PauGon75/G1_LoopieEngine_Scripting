@@ -133,5 +133,4 @@ namespace Loopie {
             mono_jit_cleanup(m_RootDomain);
         }
     }
-
 }

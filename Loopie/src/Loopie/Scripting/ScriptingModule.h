@@ -21,7 +21,9 @@ namespace Loopie {
         void CheckForScriptChanges();
         MonoAssembly* LoadAssembly(const std::string& filePath);
         std::unordered_map<std::string, std::filesystem::file_time_type> m_FileWatchMap;
-    private:
+        
+        MonoDomain* GetAppDomain() { return m_AppDomain; }
+
         MonoDomain* m_RootDomain = nullptr;
         MonoDomain* m_AppDomain = nullptr;
         MonoImage* m_AssemblyImage = nullptr;

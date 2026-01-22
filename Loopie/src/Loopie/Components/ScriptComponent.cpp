@@ -1,5 +1,6 @@
 #include "ScriptComponent.h"
 #include "Loopie/Core/Log.h"
+#include "Loopie/Scripting/ScriptingModule.h"
 #include <mono/metadata/reflection.h>
 #include <mono/metadata/attrdefs.h>
 

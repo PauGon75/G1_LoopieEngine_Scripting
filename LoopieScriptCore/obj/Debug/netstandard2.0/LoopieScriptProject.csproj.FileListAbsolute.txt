@@ -20,3 +20,14 @@ C:\Users\noapo\Desktop\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\nets
 C:\Users\noapo\Desktop\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\LoopieScriptProject.sourcelink.json
 C:\Users\noapo\Desktop\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\Loopie.Core.dll
 C:\Users\noapo\Desktop\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\Loopie.Core.pdb
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\build\Debug\Loopie.Core.deps.json
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\build\Debug\Loopie.Core.dll
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\build\Debug\Loopie.Core.pdb
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\LoopieScriptProject.csproj.AssemblyReference.cache
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\LoopieScriptProject.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\LoopieScriptProject.AssemblyInfoInputs.cache
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\LoopieScriptProject.AssemblyInfo.cs
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\LoopieScriptProject.csproj.CoreCompileInputs.cache
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\LoopieScriptProject.sourcelink.json
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\Loopie.Core.dll
+C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\Loopie.Core.pdb
