@@ -1,17 +1,18 @@
 #include "ScriptComponent.h"
 #include "Loopie/Core/Log.h"
 #include <mono/metadata/reflection.h>
+#include "Loopie/Scripting/ScriptingModule.h"
 
 extern MonoImage* g_GameAssemblyImage;
 
 namespace Loopie {
 
     // Arregla el error de herencia pasando el owner a la base
-    ScriptComponent::ScriptComponent(Entity* owner) : Component()
-    {
-        // Nota: Si tu clase base Component requiere owner en el constructor, usalo aqui
-        m_owner = owner;
-    }
+    //ScriptComponent::ScriptComponent(Entity* owner) : Component()
+    //{
+    //    // Nota: Si tu clase base Component requiere owner en el constructor, usalo aqui
+    //    m_owner = owner;
+    //}
 
     ScriptComponent::~ScriptComponent() {
         m_instance = nullptr;
