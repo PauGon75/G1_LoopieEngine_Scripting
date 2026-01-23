@@ -4,6 +4,8 @@
 #include <string>
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
+#include <mono/metadata/debug-helpers.h>
+#include <Loopie/Scene/Entity.h>
 
 namespace Loopie {
 
@@ -15,7 +17,7 @@ namespace Loopie {
             ScriptComponent() = default;
         ~ScriptComponent() override;
 
-        // Implementación obligatoria de Component.h
+        // Implementaciï¿½n obligatoria de Component.h
         void Init() override;
         void Update() override;
         JsonNode Serialize(JsonNode& parent) const override;
@@ -24,11 +26,14 @@ namespace Loopie {
         void SetScript(const std::string& name);
         const std::string& GetScriptName() const { return m_scriptName; }
         bool IsBound() const { return m_isBound; } // Para que el Inspector lo sepa
+        void SetEntityReference(Entity* cppEntity);
     private:
         std::string m_scriptName;
+        MonoClass* m_scriptClass;
         MonoObject* m_instance = nullptr;
         MonoMethod* m_startMethod = nullptr;
         MonoMethod* m_updateMethod = nullptr;
+        Entity* m_owner = nullptr;
         bool m_startCalled = false;
         bool m_isBound = false; // <--- Nuevo flag
     };
