@@ -41,8 +41,10 @@ namespace Loopie {
         mono_domain_set(m_AppDomain, true);
 
      
+        //TODO changed hardcoded path
+        rootPath = "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting";
+        fs::path scriptDllPath = (rootPath / "Assets" / "Scripts" / "Loopie.Core.dll").make_preferred();
 
-        fs::path scriptDllPath = (rootPath / "Assets" / "Scripts" / "LoopieScriptCore.dll").make_preferred();
 
         if (fs::exists(scriptDllPath)) {
         
@@ -79,7 +81,9 @@ namespace Loopie {
     }
 
     void ScriptingModule::CheckForScriptChanges() {
-        std::string scriptsPath = R"(C:\Users\noapo\Desktop\G1_LoopieEngine_Scripting\Projects\Scripting Project\Assets\Scenes\a\Assets\Scripts)";
+
+        //TODO changed hardcoded path
+        std::string scriptsPath = R"(C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Projects\Scripting Project\Assets\Scenes\a\Assets\Scripts)";
 
         if (!std::filesystem::exists(scriptsPath)) {
             Log::Error("ERROR: La ruta no existe. Revisa si has movido la carpeta: {0}", scriptsPath);

@@ -31,3 +31,6 @@ C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScr
 C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\LoopieScriptProject.sourcelink.json
 C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\Loopie.Core.dll
 C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\netstandard2.0\Loopie.Core.pdb
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Assets\Scripts\Loopie.Core.deps.json
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Assets\Scripts\Loopie.Core.dll
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Assets\Scripts\Loopie.Core.pdb
