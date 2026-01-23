@@ -1,15 +1,14 @@
 using System;
 using Loopie;
 
-// SIN NAMESPACE
-public class TestScript
+namespace Scripts
 {
-    void Start()
+    public class TestScript
     {
+        void Start()
+        {
         }
 
-    void Update()
-    {
-    
+        void Update(float dt) { }
     }
 }
