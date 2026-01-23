@@ -6,6 +6,13 @@ extern MonoImage* g_GameAssemblyImage;
 
 namespace Loopie {
 
+    // Arregla el error de herencia pasando el owner a la base
+    ScriptComponent::ScriptComponent(Entity* owner) : Component()
+    {
+        // Nota: Si tu clase base Component requiere owner en el constructor, usalo aqui
+        m_owner = owner;
+    }
+
     ScriptComponent::~ScriptComponent() {
         m_instance = nullptr;
     }
@@ -21,24 +28,24 @@ namespace Loopie {
         m_scriptName = name;
 
         if (!g_GameAssemblyImage) {
-            Log::Error("Scripting: g_GameAssemblyImage es NULL. ¿Cargaste la DLL?");
+            Log::Error("Scripting: g_GameAssemblyImage es NULL. ï¿½Cargaste la DLL?");
             return;
         }
 
-        // Intento 1: Namespace vacío (como lo tienes ahora)
-        MonoClass* monoClass = mono_class_from_name(g_GameAssemblyImage, "", name.c_str());
+        // Intento 1: Namespace vacï¿½o (como lo tienes ahora)
+        m_scriptClass = mono_class_from_name(g_GameAssemblyImage, "", name.c_str());
 
         // Intento 2: Namespace "Loopie" (por si acaso)
-        if (!monoClass) {
-            monoClass = mono_class_from_name(g_GameAssemblyImage, "Loopie", name.c_str());
+        if (!m_scriptClass) {
+            m_scriptClass = mono_class_from_name(g_GameAssemblyImage, "Loopie", name.c_str());
         }
 
-        if (!monoClass) {
+        if (!m_scriptClass) {
             Log::Error("Scripting: No se encontro la clase '{0}' en la DLL.", name);
             return;
         }
 
-        m_instance = mono_object_new(mono_domain_get(), monoClass);
+        m_instance = mono_object_new(mono_domain_get(), m_scriptClass);
         if (m_instance) {
             mono_runtime_object_init(m_instance);
             m_isBound = true; // ESTO ES LO QUE LO PONE VERDE
@@ -72,6 +79,53 @@ namespace Loopie {
             if (result.Found) {
                 SetScript(result.Result);
             }
+        }
+    }
+
+    void ScriptComponent::SetEntityReference(Entity* cppEntity) {
+        
+        MonoImage* image = mono_assembly_get_image(ScriptingModule::GetAssembly());
+        MonoClass* entityClass = mono_class_from_name(image, "Loopie", "Entity");
+
+        if (!entityClass)
+        {
+            Log::Error("Entity class in C# not found");
+            return;
+        }
+
+        MonoObject* entityInstance = mono_object_new(ScriptingModule::GetAppDomain(), entityClass);
+
+        MonoMethod* constructor = mono_class_get_method_from_name(entityClass, ".ctor", 1);
+
+        if (constructor)
+        {
+            void* args[1];
+            UUID entityID = cppEntity->GetUUID();
+            args[0] = &entityID;
+
+            mono_runtime_invoke(constructor, entityInstance, args, nullptr);
+        }
+        else
+        {
+            mono_runtime_object_init(entityInstance);
+
+            MonoClassField* idField = mono_class_get_field_from_name(entityClass, "entityID");
+            if (idField)
+            {
+                UUID entityID = cppEntity->GetUUID();
+                mono_field_set_value(entityInstance, idField, &entityID);
+            }
+        }
+
+        MonoClassField* entityField = mono_class_get_field_from_name(m_scriptClass, "entity");
+
+        if (entityField)
+        {
+            mono_field_set_value(m_instance, entityField, entityInstance);
+        }
+        else
+        {
+            Log::Error("No se encontrï¿½ el campo 'entity' en LoopieScript");
         }
     }
 }

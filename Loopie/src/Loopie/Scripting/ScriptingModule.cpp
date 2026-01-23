@@ -12,6 +12,18 @@ namespace fs = std::filesystem;
 
 namespace Loopie {
 
+#include <filesystem>
+    namespace fs = std::filesystem;
+
+    ScriptingModule* ScriptingModule::s_Instance = nullptr;
+
+    MonoDomain* ScriptingModule::m_RootDomain = nullptr;
+    MonoDomain* ScriptingModule::m_AppDomain = nullptr;
+    MonoImage* ScriptingModule::m_AssemblyImage = nullptr;
+    MonoAssembly* ScriptingModule::m_CoreAssembly = nullptr;
+
+    std::unordered_map<std::string, std::filesystem::file_time_type>ScriptingModule::m_FileWatchMap{};
+
     void ScriptingModule::OnLoad() {
         if (!m_RootDomain) {
             fs::path rootPath = fs::current_path();
@@ -38,9 +50,12 @@ namespace Loopie {
         std::string scriptDllPath = "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/Assets/Scripts/Loopie.Core.dll";
 
         if (fs::exists(scriptDllPath)) {
-            MonoAssembly* coreAssembly = LoadAssembly(scriptDllPath);
-            if (coreAssembly) {
-                m_AssemblyImage = mono_assembly_get_image(coreAssembly);
+        
+            m_CoreAssembly = LoadAssembly(scriptDllPath);
+            if (m_CoreAssembly) {
+                m_AssemblyImage = mono_assembly_get_image(m_CoreAssembly);
+
+          
                 g_GameAssemblyImage = m_AssemblyImage;
                 ScriptGlue::RegisterGlue();
                 Log::Info("Scripting Core cargado: {0}", scriptDllPath);

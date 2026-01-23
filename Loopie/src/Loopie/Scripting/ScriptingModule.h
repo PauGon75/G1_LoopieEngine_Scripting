@@ -12,26 +12,32 @@ namespace Loopie {
 
     class ScriptingModule : public Module {
     public:
-        ScriptingModule() : Module("Scripting") {}
+        ScriptingModule() : Module("Scripting") { s_Instance = this; }
 
         void OnLoad() override;
         void OnUpdate() override;
         void OnUnload() override;
 
-        void LoadCoreAssembly();
-        void ReloadAssembly();
-        void CheckForScriptChanges();
+        static void CheckForScriptChanges();
+        static void ReloadAssembly();
+        static void LoadCoreAssembly();
+        
+        static MonoAssembly* LoadAssembly(const std::string& filePath);
+        static MonoDomain* GetAppDomain() { return m_AppDomain; }
+        static MonoAssembly* GetAssembly() { return m_CoreAssembly; }
+        static MonoImage* GetAssemblyImage() { return m_AssemblyImage; }
 
-        MonoAssembly* LoadAssembly(const std::string& filePath);
-        MonoDomain* GetAppDomain() { return m_AppDomain; }
+        static MonoDomain* m_RootDomain;
+        static MonoDomain* m_AppDomain;
+        static MonoImage* m_AssemblyImage;
+        static MonoAssembly* m_CoreAssembly;
 
-        MonoDomain* m_RootDomain = nullptr;
-        MonoDomain* m_AppDomain = nullptr;
-        MonoImage* m_AssemblyImage = nullptr;
-
-        std::unordered_map<std::string, std::filesystem::file_time_type> m_FileWatchMap;
+        static std::unordered_map<std::string, std::filesystem::file_time_type> m_FileWatchMap;
         float m_WatcherTimer = 0.0f;
         const float m_WatcherInterval = 2.0f;
+
+    private:
+        static ScriptingModule* s_Instance;
     };
 
 }
