@@ -18,16 +18,18 @@ namespace Loopie {
         void OnUpdate() override;
         void OnUnload() override;
 
+        void LoadCoreAssembly();
+        void ReloadAssembly();
         void CheckForScriptChanges();
+
         MonoAssembly* LoadAssembly(const std::string& filePath);
-        std::unordered_map<std::string, std::filesystem::file_time_type> m_FileWatchMap;
-        
         MonoDomain* GetAppDomain() { return m_AppDomain; }
 
         MonoDomain* m_RootDomain = nullptr;
         MonoDomain* m_AppDomain = nullptr;
         MonoImage* m_AssemblyImage = nullptr;
 
+        std::unordered_map<std::string, std::filesystem::file_time_type> m_FileWatchMap;
         float m_WatcherTimer = 0.0f;
         const float m_WatcherInterval = 2.0f;
     };

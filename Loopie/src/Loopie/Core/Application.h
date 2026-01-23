@@ -41,9 +41,10 @@ namespace Loopie {
 	public:
 		Project m_activeProject;
 		Event<EngineNotification> m_notifier;
+		Scene* m_scene = nullptr;
+
 	private:
 		static Application* s_Instance;
-		Scene* m_scene = nullptr;
 
 		std::vector<Module*> m_modules;
 		Window* m_window = nullptr;

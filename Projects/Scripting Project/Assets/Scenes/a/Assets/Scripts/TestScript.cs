@@ -1,35 +1,21 @@
 using System;
-using System.Runtime.CompilerServices;
+using Loopie;
 
-namespace Loopie
+public class TestScript
 {
-    public static class InternalCalls
+    // Se ejecuta la primera vez que ScriptComponent::Update detecta la instancia
+    void Start()
     {
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void NativeLog(string message);
+        // Enviamos un mensaje a la consola de C++ a través de nuestro Glue
+        InternalCalls.Log("¡TestScript iniciado desde C#!");
 
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Native_SetTranslation(uint entityID, float x, float y, float z);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void Native_CreateEntity(string name);
+        // Creamos una entidad en la escena de C++
+        Entity.Create("Entidad_Desde_CSharp");
     }
 
-    public class Entity
+    // Se ejecuta cada frame desde ScriptComponent::Update
+    void Update(float dt)
     {
-        public uint ID;
-        private float _timer = 0;
-
-        public void OnUpdate()
-        {
-            _timer += 0.01f;
-            if (_timer > 5.0f)
-            {
-                InternalCalls.NativeLog("Hello World desde C#");
-                _timer = 0;
-            }
-
-            InternalCalls.Native_SetTranslation(ID, 2.0f, 0.0f, 0.0f);
-        }
+        // Aquí puedes añadir lógica de movimiento o respuesta a input
     }
 }

@@ -1,15 +1,29 @@
-using System;
 using System.Runtime.CompilerServices;
 
 namespace Loopie
 {
+    internal static class InternalCalls
+    {
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern string CreateEntity_Internal(string name);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void DestroyEntity_Internal(string uuid);
+    }
+
     public class Entity
     {
-        public readonly ulong ID;
-        protected Entity() { ID = 0; }
-        internal Entity(ulong id) { ID = id; }
+        public string UUID; // Almacenamos el ID generado en C++
 
-        public virtual void Init() { }
-        public virtual void Update(float dt) { }
+        public static Entity Create(string name)
+        {
+            string id = InternalCalls.CreateEntity_Internal(name);
+            return new Entity { UUID = id };
+        }
+
+        public void Destroy()
+        {
+            InternalCalls.DestroyEntity_Internal(this.UUID);
+        }
     }
 }

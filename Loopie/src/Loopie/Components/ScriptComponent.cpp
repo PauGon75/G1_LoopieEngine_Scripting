@@ -1,18 +1,10 @@
 #include "ScriptComponent.h"
 #include "Loopie/Core/Log.h"
-#include "Loopie/Scripting/ScriptingModule.h"
 #include <mono/metadata/reflection.h>
-#include <mono/metadata/attrdefs.h>
 
 extern MonoImage* g_GameAssemblyImage;
 
 namespace Loopie {
-
-    // Arregla el error de herencia pasando el owner a la base
-    ScriptComponent::ScriptComponent(Entity* owner) : Component()
-    {
-        // Nota: Si tu clase base Component requiere owner en el constructor, usalo aqui
-    }
 
     ScriptComponent::~ScriptComponent() {
         m_instance = nullptr;
@@ -25,42 +17,43 @@ namespace Loopie {
     }
 
     void ScriptComponent::SetScript(const std::string& name) {
-        if (!g_GameAssemblyImage) return;
-
+        m_isBound = false; // Resetear siempre al empezar
         m_scriptName = name;
-        MonoClass* monoClass = mono_class_from_name(g_GameAssemblyImage, "", name.c_str());
 
-        if (!monoClass) return;
+        if (!g_GameAssemblyImage || name.empty()) return;
+
+        MonoClass* monoClass = mono_class_from_name(g_GameAssemblyImage, "", name.c_str());
+        if (!monoClass) {
+            Log::Error("Scripting: Clase '{0}' no encontrada.", name);
+            return;
+        }
 
         m_instance = mono_object_new(mono_domain_get(), monoClass);
-        if (!m_instance) return;
+        if (m_instance) {
+            mono_runtime_object_init(m_instance);
+            m_startMethod = mono_class_get_method_from_name(monoClass, "Start", 0);
+            m_updateMethod = mono_class_get_method_from_name(monoClass, "Update", 1);
 
-        mono_runtime_object_init(m_instance);
-
-        m_startMethod = mono_class_get_method_from_name(monoClass, "Start", 0);
-        m_updateMethod = mono_class_get_method_from_name(monoClass, "Update", 1);
+            m_isBound = true; // ¡Éxito!
+            Log::Info("Scripting: '{0}' vinculado correctamente.", name);
+        }
     }
 
     void ScriptComponent::Update() {
         if (!m_instance || !m_updateMethod) return;
 
         if (!m_startCalled && m_startMethod) {
-            MonoObject* exc = nullptr;
-            mono_runtime_invoke(m_startMethod, m_instance, nullptr, &exc);
-            if (exc) mono_print_unhandled_exception(exc);
+            mono_runtime_invoke(m_startMethod, m_instance, nullptr, nullptr);
             m_startCalled = true;
         }
 
         float dt = 0.016f;
-        void* args[1];
-        args[0] = &dt;
-
-        MonoObject* exception = nullptr;
-        mono_runtime_invoke(m_updateMethod, m_instance, args, &exception);
-        if (exception) mono_print_unhandled_exception(exception);
+        void* args[1] = { &dt };
+        mono_runtime_invoke(m_updateMethod, m_instance, args, nullptr);
     }
 
     JsonNode ScriptComponent::Serialize(JsonNode& parent) const {
+        // Creamos el objeto exactamente como en MeshRenderer
         JsonNode node = parent.CreateObjectField("ScriptComponent");
         node.CreateField("ScriptName", m_scriptName);
         return node;
@@ -69,7 +62,7 @@ namespace Loopie {
     void ScriptComponent::Deserialize(const JsonNode& data) {
         if (data.Contains("ScriptName")) {
             auto result = data.GetValue<std::string>("ScriptName");
-            if (result.Found && !result.Result.empty()) {
+            if (result.Found) {
                 SetScript(result.Result);
             }
         }

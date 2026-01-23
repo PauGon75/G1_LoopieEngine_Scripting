@@ -6,6 +6,7 @@
 #include "Loopie/Core/Log.h"
 #include "Loopie/Math/MathTypes.h"
 #include "Loopie/Components/Camera.h"
+#include "Loopie/Components/ScriptComponent.h"
 #include "Loopie/Components/MeshRenderer.h"
 #include "Loopie/Resources/AssetRegistry.h"
 
@@ -63,6 +64,9 @@ namespace Loopie {
 			}
 			else if (component->GetTypeID() == MeshRenderer::GetTypeIDStatic()) {
 				DrawMeshRenderer(static_cast<MeshRenderer*>(component));
+			}
+			else if (component->GetTypeID() == ScriptComponent::GetTypeIDStatic()) {
+				DrawScriptComponent(static_cast<ScriptComponent*>(component));
 			}
 		}
 		AddComponent(entity);
@@ -412,6 +416,14 @@ namespace Loopie {
 			}
 
 
+			if (ImGui::Selectable("Scripting Component"))
+			{
+				entity->AddComponent<ScriptComponent>();
+				ImGui::EndCombo();
+				return;
+			}
+
+
 			///// How To Add More Components
 			// 
 			//if (ImGui::Selectable(""))
@@ -459,5 +471,29 @@ namespace Loopie {
 		else if (id == OnEntityOrFileNotification::OnFileSelect) {
 			m_mode = InspectorMode::ImportMode;
 		}
+	}
+	void InspectorInterface::DrawScriptComponent(ScriptComponent* script) {
+		ImGui::PushID(script);
+		if (ImGui::CollapsingHeader("Scripting Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+
+			char buffer[256];
+			strncpy_s(buffer, script->GetScriptName().c_str(), sizeof(buffer) - 1);
+
+			if (ImGui::InputText("Class Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
+				script->SetScript(std::string(buffer)); // Solo se activa al pulsar ENTER
+			}
+
+			// --- COMPROBACIÓN VISUAL ---
+			if (script->GetScriptName().empty()) {
+				ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Status: Empty");
+			}
+			else if (script->IsBound()) {
+				ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: SCRIPT BOUND"); // Verde
+			}
+			else {
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Status: INVALID CLASS (Check DLL)"); // Rojo
+			}
+		}
+		ImGui::PopID();
 	}
 }
