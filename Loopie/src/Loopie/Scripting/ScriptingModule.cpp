@@ -46,6 +46,24 @@ namespace Loopie {
                 Log::Info("Scripting Core cargado: {0}", scriptDllPath);
             }
         }
+
+        // Reemplaza el bucle que da error por este
+        const MonoTableInfo* typeTable = mono_image_get_table_info(g_GameAssemblyImage, MONO_TABLE_TYPEDEF);
+        int numTypes = mono_table_info_get_rows(typeTable);
+
+        Log::Info("--- Clases detectadas en la DLL ---");
+        for (int i = 0; i < numTypes; i++) {
+            // mono_class_get requiere la imagen Y el token
+            // Usamos el desplazamiento manual del token que es mas seguro
+            uint32_t cols[MONO_TYPEDEF_SIZE];
+            mono_metadata_decode_row(typeTable, i, cols, MONO_TYPEDEF_SIZE);
+
+            const char* name = mono_metadata_string_heap(g_GameAssemblyImage, cols[MONO_TYPEDEF_NAME]);
+            const char* ns = mono_metadata_string_heap(g_GameAssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
+
+            Log::Info("Found: {0}.{1}", ns, name);
+        }
+        Log::Info("----------------------------------");
     }
 
     void ScriptingModule::ReloadAssembly() {

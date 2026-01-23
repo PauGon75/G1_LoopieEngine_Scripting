@@ -17,25 +17,32 @@ namespace Loopie {
     }
 
     void ScriptComponent::SetScript(const std::string& name) {
-        m_isBound = false; // Resetear siempre al empezar
+        m_isBound = false;
         m_scriptName = name;
 
-        if (!g_GameAssemblyImage || name.empty()) return;
+        if (!g_GameAssemblyImage) {
+            Log::Error("Scripting: g_GameAssemblyImage es NULL. ¿Cargaste la DLL?");
+            return;
+        }
 
+        // Intento 1: Namespace vacío (como lo tienes ahora)
         MonoClass* monoClass = mono_class_from_name(g_GameAssemblyImage, "", name.c_str());
+
+        // Intento 2: Namespace "Loopie" (por si acaso)
         if (!monoClass) {
-            Log::Error("Scripting: Clase '{0}' no encontrada.", name);
+            monoClass = mono_class_from_name(g_GameAssemblyImage, "Loopie", name.c_str());
+        }
+
+        if (!monoClass) {
+            Log::Error("Scripting: No se encontro la clase '{0}' en la DLL.", name);
             return;
         }
 
         m_instance = mono_object_new(mono_domain_get(), monoClass);
         if (m_instance) {
             mono_runtime_object_init(m_instance);
-            m_startMethod = mono_class_get_method_from_name(monoClass, "Start", 0);
-            m_updateMethod = mono_class_get_method_from_name(monoClass, "Update", 1);
-
-            m_isBound = true; // ¡Éxito!
-            Log::Info("Scripting: '{0}' vinculado correctamente.", name);
+            m_isBound = true; // ESTO ES LO QUE LO PONE VERDE
+            Log::Debug("Scripting: Clase '{0}' vinculada y marcada como Bound.", name);
         }
     }
 
