@@ -47,7 +47,7 @@ namespace Loopie {
         m_AppDomain = mono_domain_create_appdomain((char*)"LoopieAppDomain", NULL);
         mono_domain_set(m_AppDomain, true);
 
-        std::string scriptDllPath = "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/Assets/Scripts/Loopie.Core.dll";
+        std::string scriptDllPath = "C:/Users/Judit/Documents/GitHub_Repositories/G1_LoopieEngine_Scripting/Assets/Scripts/Loopie.Core.dll";
 
         if (fs::exists(scriptDllPath)) {
         
