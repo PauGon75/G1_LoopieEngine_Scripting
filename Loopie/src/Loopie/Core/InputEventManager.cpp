@@ -51,6 +51,8 @@ namespace Loopie {
 		{
 			ImGui_ImplSDL3_ProcessEvent(&event);
 
+			ImGuiIO& io = ImGui::GetIO();
+
 			if (!m_events[event.type]) {
 				m_events.set(event.type, true);
 				m_touchedEvents.push_back(event.type);
@@ -59,7 +61,7 @@ namespace Loopie {
 			switch (event.type) {
 				case SDL_EVENT_KEY_DOWN:
 
-					if (!event.key.repeat) {
+					if (!io.WantCaptureKeyboard && !event.key.repeat) {
 						m_keyboard[event.key.scancode] = KeyState::DOWN;
 						any = true;
 						anyKey = true;
@@ -67,7 +69,9 @@ namespace Loopie {
 					break;
 
 				case SDL_EVENT_KEY_UP:
-					m_keyboard[event.key.scancode] = KeyState::UP;
+					if (!io.WantCaptureKeyboard) {
+						m_keyboard[event.key.scancode] = KeyState::UP;
+					}
 					break;
 
 				case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
@@ -81,14 +85,14 @@ namespace Loopie {
 					break;
 
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
-					if (event.button.button <= m_mouse.size()) {
+					if (!io.WantCaptureMouse && event.button.button <= m_mouse.size()) {
 						m_mouse[event.button.button - 1] = KeyState::DOWN;
 						any = true;
 						anyMouseButton = true;
 					}
 					break;
 				case SDL_EVENT_MOUSE_BUTTON_UP:
-					if (event.button.button <= m_mouse.size())
+					if (!io.WantCaptureMouse && event.button.button <= m_mouse.size())
 						m_mouse[event.button.button - 1] = KeyState::UP;
 					break;
 
@@ -98,7 +102,9 @@ namespace Loopie {
 					break;
 
 				case SDL_EVENT_MOUSE_WHEEL:
-					m_scrollDelta = { event.wheel.x, event.wheel.y };
+					if (!io.WantCaptureMouse) {
+						m_scrollDelta = { event.wheel.x, event.wheel.y };
+					}
 					break;
 
 				case SDL_EVENT_GAMEPAD_AXIS_MOTION:

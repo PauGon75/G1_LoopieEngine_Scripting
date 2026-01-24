@@ -753,7 +753,32 @@ namespace Loopie {
 		if (filePath.extension().string() == ".scene") {
 			Application::GetInstance().GetScene().ReadAndLoadSceneFile(filePath.string());
 		}
+		if (IsTextFile(filePath)) {
+			if (m_textEditor) {
+				m_textEditor->OpenFile(filePath.string());
+			}
+			else {
+				Log::Error("TextEditor not available");
+			}
+			return;
+		}
+	}
 
+	bool AssetsExplorerInterface::IsTextFile(const std::filesystem::path& filePath) const
+	{
+		std::string ext = filePath.extension().string();
+
+		//Convertion to lower-case letters
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+		static const std::vector<std::string> textExtensions = {
+			".cs",
+			".cpp",
+			".h",
+			".txt",
+		};
+
+		return std::find(textExtensions.begin(), textExtensions.end(), ext) != textExtensions.end();
 	}
 
 	std::string AssetsExplorerInterface::CreateFolder(const std::filesystem::path& directory, const std::string& name) {

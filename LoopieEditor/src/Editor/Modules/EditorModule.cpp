@@ -59,8 +59,11 @@ namespace Loopie
 		m_game.Init();
 		m_scene.Init();
 		m_mainMenu.Init();
+		m_textEditor.Init();
 
 		m_hierarchy.SetScene(m_currentScene);
+
+		m_assetsExplorer.SetTextEditor(&m_textEditor);
 
 		Application::GetInstance().m_notifier.AddObserver(this);
 
@@ -78,10 +81,16 @@ namespace Loopie
 		Application& app = Application::GetInstance();
 		InputEventManager& inputEvent = app.GetInputEvent();
 
-		m_hierarchy.Update(inputEvent);
-		m_assetsExplorer.Update(inputEvent);
-		m_scene.Update(inputEvent);
+		ImGuiIO& io = ImGui::GetIO();
+
+		if (!io.WantCaptureKeyboard) {
+			m_hierarchy.Update(inputEvent);
+			m_assetsExplorer.Update(inputEvent);
+			m_scene.Update(inputEvent);
+		}
+
 		m_topBar.Update(inputEvent);
+		m_textEditor.Update();
 
 		const std::vector<Camera*>& cameras = Renderer::GetRendererCameras();
 		for (const auto cam : cameras)
@@ -174,6 +183,7 @@ namespace Loopie
 		m_inspector.Render();
 		m_console.Render();
 		m_hierarchy.Render();
+		m_textEditor.Render();
 		m_assetsExplorer.Render();
 		m_game.Render();
 		m_scene.Render();
