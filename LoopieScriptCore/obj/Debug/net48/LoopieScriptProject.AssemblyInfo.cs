@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Loopie.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7477c140287d1e386d7c329155f1d908772ae0f9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d41c5204634a2a00a6a902ca9be16c6e4bc39a19")]
 [assembly: System.Reflection.AssemblyProductAttribute("Loopie.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Loopie.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -38,8 +38,6 @@ namespace Loopie
         {
             return new Vector3(a.X * scalar, a.Y * scalar, a.Z * scalar);
         }
-
-        
     }
 
     public struct Quaternion
@@ -71,10 +69,31 @@ namespace Loopie
             ID = id;
         }
 
+        // --- FIX: Added Transform Property ---
+        private Transform _transform;
+        public Transform Transform
+        {
+            get
+            {
+                if (_transform == null)
+                    _transform = new Transform(ID);
+                return _transform;
+            }
+        }
+        // -------------------------------------
+
         public string Name
         {
             get => InternalCalls.Entity_GetName(ID);
             set => InternalCalls.Entity_SetName(ID, value);
+        }
+
+        public static Entity Find(string name)
+        {
+            // Ensure InternalCalls.Entity_Find is defined in InternalCalls.cs
+            string id = InternalCalls.Entity_Find(name);
+            if (string.IsNullOrEmpty(id)) return null;
+            return new Entity(id);
         }
 
         public bool IsActive

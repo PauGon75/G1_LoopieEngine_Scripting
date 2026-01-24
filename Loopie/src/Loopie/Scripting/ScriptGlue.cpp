@@ -201,7 +201,24 @@ namespace Loopie {
         //return Application::GetInstance().GetInputEvent().IsMouseButtonPressed(button);
         return true;
     }
+    static MonoString* Entity_Find_Native(MonoString* name) {
+        if (!name) return nullptr;
 
+        char* nameCStr = mono_string_to_utf8(name);
+        std::string targetName(nameCStr);
+        mono_free(nameCStr);
+
+        Scene* scene = Application::GetInstance().m_scene;
+        if (!scene) return nullptr;
+
+        // Recorremos todas las entidades buscando el nombre
+        for (auto& [uuid, entity] : scene->GetAllEntities()) {
+            if (entity->GetName() == targetName) {
+                return mono_string_new(ScriptingModule::GetAppDomain(), uuid.Get().c_str());
+            }
+        }
+        return nullptr;
+    }
     void ScriptGlue::RegisterGlue() {
         mono_add_internal_call("Loopie.InternalCalls::Log", (void*)Log_Native);
         mono_add_internal_call("Loopie.InternalCalls::LogWarning", (void*)LogWarning_Native);
@@ -227,5 +244,6 @@ namespace Loopie {
         mono_add_internal_call("Loopie.InternalCalls::Input_GetMousePosition", (void*)Input_GetMousePosition_Native);
         mono_add_internal_call("Loopie.InternalCalls::Input_GetMouseDelta", (void*)Input_GetMouseDelta_Native);
         mono_add_internal_call("Loopie.InternalCalls::Input_IsMouseButtonPressed", (void*)Input_IsMouseButtonPressed_Native);
+        mono_add_internal_call("Loopie.InternalCalls::Entity_Find", (void*)Entity_Find_Native);
     }
 }
