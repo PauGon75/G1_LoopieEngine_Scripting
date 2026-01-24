@@ -42,7 +42,7 @@ namespace Loopie {
         //TODO CHANGE PATH
 
         static std::string GetScriptsPath() {
-            return "../../../Projects/Scripting Project/Assets/Scenes/a/Assets/Scripts";
+            return "assets/scripts/";
         }
         static void CreateScriptAsset(const std::filesystem::path& directory, const std::string& name);
     private:
