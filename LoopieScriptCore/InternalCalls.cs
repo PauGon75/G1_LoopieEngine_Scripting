@@ -15,7 +15,7 @@ namespace Loopie
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void LogError(string message);
 
-        // === ENTITY MANAGEMENT ===
+        // === ENTITY MANAGEMENT === (CAMBIO: string en lugar de ulong)
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern string Entity_Create(string name);
 
@@ -62,5 +62,24 @@ namespace Loopie
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_SetScale(string entityID, float x, float y, float z);
+
+        // === INPUT ===
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Input_IsKeyPressed(int keyCode);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Input_IsKeyDown(int keyCode);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Input_IsKeyReleased(int keyCode);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Input_GetMousePosition(out float x, out float y);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Input_GetMouseDelta(out float x, out float y);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool Input_IsMouseButtonPressed(int button);
     }
 }

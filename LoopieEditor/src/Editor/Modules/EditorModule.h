@@ -37,6 +37,7 @@ namespace Loopie {
 		/// Test
 		void CreateBakerHouse();
 		void CreateCity();
+		void CreateTank();
 		//void MousePick(Camera* camera);
 		///
 	private:

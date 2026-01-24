@@ -11,8 +11,9 @@
 namespace Loopie {
 
     static std::shared_ptr<Entity> GetEntityByUUID(MonoString* uuidStr) {
+        if (!uuidStr) return nullptr;
         Scene* scene = Application::GetInstance().m_scene;
-        if (!scene || !uuidStr) return nullptr;
+        if (!scene) return nullptr;
 
         char* cStr = mono_string_to_utf8(uuidStr);
         UUID uuid(cStr);
@@ -22,18 +23,21 @@ namespace Loopie {
     }
 
     static void Log_Native(MonoString* message) {
+        if (!message) return;
         char* cStr = mono_string_to_utf8(message);
         Log::Info("[C#] {0}", cStr);
         mono_free(cStr);
     }
 
     static void LogWarning_Native(MonoString* message) {
+        if (!message) return;
         char* cStr = mono_string_to_utf8(message);
         Log::Warn("[C#] {0}", cStr);
         mono_free(cStr);
     }
 
     static void LogError_Native(MonoString* message) {
+        if (!message) return;
         char* cStr = mono_string_to_utf8(message);
         Log::Error("[C#] {0}", cStr);
         mono_free(cStr);
@@ -52,32 +56,22 @@ namespace Loopie {
     }
 
     static void Entity_Destroy_Native(MonoString* uuidStr) {
-        Scene* scene = Application::GetInstance().m_scene;
-        if (!scene || !uuidStr) return;
-
-        char* cStr = mono_string_to_utf8(uuidStr);
-        UUID uuid(cStr);
-        scene->RemoveEntity(uuid);
-        mono_free(cStr);
+        auto entity = GetEntityByUUID(uuidStr);
+        if (entity) Application::GetInstance().m_scene->RemoveEntity(entity->GetUUID());
     }
 
     static MonoString* Entity_GetName_Native(MonoString* uuidStr) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (entity) {
-            return mono_string_new(mono_domain_get(), entity->GetName().c_str());
-        }
-        return mono_string_new(mono_domain_get(), "");
+        return entity ? mono_string_new(mono_domain_get(), entity->GetName().c_str()) : mono_string_new(mono_domain_get(), "");
     }
 
     static void Entity_SetName_Native(MonoString* uuidStr, MonoString* name) {
+        if (!name) return;
         char* cStr = mono_string_to_utf8(name);
         std::string newName(cStr);
         mono_free(cStr);
-
         auto entity = GetEntityByUUID(uuidStr);
-        if (entity) {
-            entity->SetName(newName);
-        }
+        if (entity) entity->SetName(newName);
     }
 
     static bool Entity_GetActive_Native(MonoString* uuidStr) {
@@ -87,12 +81,11 @@ namespace Loopie {
 
     static void Entity_SetActive_Native(MonoString* uuidStr, bool active) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (entity) {
-            entity->SetIsActive(active);
-        }
+        if (entity) entity->SetIsActive(active);
     }
 
     static bool Entity_HasComponent_Native(MonoString* uuidStr, MonoString* componentType) {
+        if (!componentType) return false;
         char* cStr = mono_string_to_utf8(componentType);
         std::string type(cStr);
         mono_free(cStr);
@@ -102,12 +95,11 @@ namespace Loopie {
 
         if (type == "Transform") return entity->HasComponent<Transform>();
         if (type == "MeshRenderer") return entity->HasComponent<MeshRenderer>();
-        if (type == "Camera") return entity->HasComponent<Camera>();
-
         return false;
     }
 
     static bool Entity_AddComponent_Native(MonoString* uuidStr, MonoString* componentType) {
+        if (!componentType) return false;
         char* cStr = mono_string_to_utf8(componentType);
         std::string type(cStr);
         mono_free(cStr);
@@ -119,103 +111,109 @@ namespace Loopie {
             entity->AddComponent<MeshRenderer>();
             return true;
         }
-        if (type == "Camera" && !entity->HasComponent<Camera>()) {
-            entity->AddComponent<Camera>();
-            return true;
-        }
-
         return false;
     }
 
     static void Entity_RemoveComponent_Native(MonoString* uuidStr, MonoString* componentType) {
+        if (!componentType) return;
         char* cStr = mono_string_to_utf8(componentType);
         std::string type(cStr);
         mono_free(cStr);
 
         auto entity = GetEntityByUUID(uuidStr);
-        if (!entity) return;
-
-        if (type == "MeshRenderer") {
-            entity->RemoveComponent<MeshRenderer>();
-        }
-        else if (type == "Camera") {
-            entity->RemoveComponent<Camera>();
-        }
+        if (entity && type == "MeshRenderer") entity->RemoveComponent<MeshRenderer>();
     }
 
     static void Transform_GetPosition_Native(MonoString* uuidStr, float* x, float* y, float* z) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (!entity || !entity->HasComponent<Transform>()) return;
-
-        Transform* transform = entity->GetTransform();
-        glm::vec3 pos = transform->GetPosition();
-        *x = pos.x;
-        *y = pos.y;
-        *z = pos.z;
+        if (entity) {
+            glm::vec3 pos = entity->GetTransform()->GetPosition();
+            *x = pos.x; *y = pos.y; *z = pos.z;
+        }
     }
 
     static void Transform_SetPosition_Native(MonoString* uuidStr, float x, float y, float z) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (!entity || !entity->HasComponent<Transform>()) return;
-
-        Transform* transform = entity->GetTransform();
-        transform->SetPosition(glm::vec3(x, y, z));
+        if (entity) entity->GetTransform()->SetPosition({ x, y, z });
     }
 
     static void Transform_GetRotation_Native(MonoString* uuidStr, float* x, float* y, float* z, float* w) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (!entity || !entity->HasComponent<Transform>()) return;
-
-        Transform* transform = entity->GetTransform();
-        glm::quat rot = transform->GetRotation();
-        *x = rot.x;
-        *y = rot.y;
-        *z = rot.z;
-        *w = rot.w;
+        if (entity) {
+            glm::quat rot = entity->GetTransform()->GetRotation();
+            *x = rot.x; *y = rot.y; *z = rot.z; *w = rot.w;
+        }
     }
 
     static void Transform_SetRotation_Native(MonoString* uuidStr, float x, float y, float z, float w) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (!entity || !entity->HasComponent<Transform>()) return;
-
-        Transform* transform = entity->GetTransform();
-        transform->SetRotation(glm::quat(w, x, y, z));
+        if (entity) entity->GetTransform()->SetRotation(glm::quat(w, x, y, z));
     }
 
     static void Transform_GetScale_Native(MonoString* uuidStr, float* x, float* y, float* z) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (!entity || !entity->HasComponent<Transform>()) return;
-        *x = 1.0f; *y = 1.0f; *z = 1.0f;
+        if (entity) {
+            glm::vec3 scale = entity->GetTransform()->GetLocalScale();
+            *x = scale.x; *y = scale.y; *z = scale.z;
+        }
     }
 
     static void Transform_SetScale_Native(MonoString* uuidStr, float x, float y, float z) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (!entity || !entity->HasComponent<Transform>()) return;
+        if (entity) entity->GetTransform()->SetLocalScale({ x, y, z });
+    }
+
+    static bool Input_IsKeyPressed_Native(int keyCode) {
+        return Application::GetInstance().GetInputEvent().GetKeyStatus((SDL_Scancode)keyCode) == KeyState::DOWN;
+    }
+
+    static bool Input_IsKeyDown_Native(int keyCode) {
+        return Application::GetInstance().GetInputEvent().GetKeyStatus((SDL_Scancode)keyCode) == KeyState::DOWN;
+    }
+
+    static bool Input_IsKeyReleased_Native(int keyCode) {
+        return Application::GetInstance().GetInputEvent().GetKeyStatus((SDL_Scancode)keyCode) == KeyState::UP;
+    }
+
+    static void Input_GetMousePosition_Native(float* x, float* y) {
+        auto pos = Application::GetInstance().GetInputEvent().GetMousePosition();
+        *x = pos.x; *y = pos.y;
+    }
+
+    static void Input_GetMouseDelta_Native(float* x, float* y) {
+        *x = (float)Application::GetInstance().GetInputEvent().GetMouseDelta().x;
+        *y = (float)Application::GetInstance().GetInputEvent().GetMouseDelta().y;
+    }
+
+    static bool Input_IsMouseButtonPressed_Native(int button) {
+        //return Application::GetInstance().GetInputEvent().IsMouseButtonPressed(button);
+        return true;
     }
 
     void ScriptGlue::RegisterGlue() {
         mono_add_internal_call("Loopie.InternalCalls::Log", (void*)Log_Native);
         mono_add_internal_call("Loopie.InternalCalls::LogWarning", (void*)LogWarning_Native);
         mono_add_internal_call("Loopie.InternalCalls::LogError", (void*)LogError_Native);
-
         mono_add_internal_call("Loopie.InternalCalls::Entity_Create", (void*)Entity_Create_Native);
         mono_add_internal_call("Loopie.InternalCalls::Entity_Destroy", (void*)Entity_Destroy_Native);
         mono_add_internal_call("Loopie.InternalCalls::Entity_GetName", (void*)Entity_GetName_Native);
         mono_add_internal_call("Loopie.InternalCalls::Entity_SetName", (void*)Entity_SetName_Native);
         mono_add_internal_call("Loopie.InternalCalls::Entity_GetActive", (void*)Entity_GetActive_Native);
         mono_add_internal_call("Loopie.InternalCalls::Entity_SetActive", (void*)Entity_SetActive_Native);
-
         mono_add_internal_call("Loopie.InternalCalls::Entity_HasComponent", (void*)Entity_HasComponent_Native);
         mono_add_internal_call("Loopie.InternalCalls::Entity_AddComponent", (void*)Entity_AddComponent_Native);
         mono_add_internal_call("Loopie.InternalCalls::Entity_RemoveComponent", (void*)Entity_RemoveComponent_Native);
-
         mono_add_internal_call("Loopie.InternalCalls::Transform_GetPosition", (void*)Transform_GetPosition_Native);
         mono_add_internal_call("Loopie.InternalCalls::Transform_SetPosition", (void*)Transform_SetPosition_Native);
         mono_add_internal_call("Loopie.InternalCalls::Transform_GetRotation", (void*)Transform_GetRotation_Native);
         mono_add_internal_call("Loopie.InternalCalls::Transform_SetRotation", (void*)Transform_SetRotation_Native);
         mono_add_internal_call("Loopie.InternalCalls::Transform_GetScale", (void*)Transform_GetScale_Native);
         mono_add_internal_call("Loopie.InternalCalls::Transform_SetScale", (void*)Transform_SetScale_Native);
-
-        Log::Debug("Scripting: Glue registrado con soporte de UUID string.");
+        mono_add_internal_call("Loopie.InternalCalls::Input_IsKeyPressed", (void*)Input_IsKeyPressed_Native);
+        mono_add_internal_call("Loopie.InternalCalls::Input_IsKeyDown", (void*)Input_IsKeyDown_Native);
+        mono_add_internal_call("Loopie.InternalCalls::Input_IsKeyReleased", (void*)Input_IsKeyReleased_Native);
+        mono_add_internal_call("Loopie.InternalCalls::Input_GetMousePosition", (void*)Input_GetMousePosition_Native);
+        mono_add_internal_call("Loopie.InternalCalls::Input_GetMouseDelta", (void*)Input_GetMouseDelta_Native);
+        mono_add_internal_call("Loopie.InternalCalls::Input_IsMouseButtonPressed", (void*)Input_IsMouseButtonPressed_Native);
     }
 }

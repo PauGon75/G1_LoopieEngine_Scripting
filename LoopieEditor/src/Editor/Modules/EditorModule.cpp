@@ -39,6 +39,7 @@ namespace Loopie
 		{
 			CreateCity();
 			m_currentScene->CreateEntity({ 0,1,-10 }, { 1,0,0,0 }, { 1,1,1 }, nullptr, "MainCamera")->AddComponent<Camera>();
+			CreateTank();
 		}
 		
 
@@ -263,6 +264,11 @@ namespace Loopie
 	{
 		m_scene.ChargeModel("assets/models/Street environment_V01.fbx");
 		//m_scene.ChargeTexture("assets/textures/Baker_house.png");
+	}
+
+	void EditorModule::CreateTank()
+	{
+		m_scene.ChargeModel("assets/models/Primitives/Sphere.fbx");
 	}
 
 	/*void EditorModule::MousePick(Camera* camera)
