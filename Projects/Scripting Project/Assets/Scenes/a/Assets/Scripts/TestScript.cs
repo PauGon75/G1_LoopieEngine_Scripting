@@ -17,8 +17,9 @@ public class TestScript
     void Update(float dt)
     {
         // Aquí puedes añadir lógica de movimiento o respuesta a input
-        //TEST EDITOR WORKS!!!!!
+        //TEST EDITOR WORKS!!!!!YEY =D
     }
 }
+
 
 
