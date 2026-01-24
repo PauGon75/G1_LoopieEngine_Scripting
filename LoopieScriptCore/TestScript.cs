@@ -1,14 +1,14 @@
 using System;
 using Loopie;
 
-namespace Scripts
+public class TestScript
 {
-    public class TestScript
+    public void Start()
     {
-        void Start()
-        {
-        }
+    }
 
-        void Update(float dt) { }
+    public void Update(float dt)
+    {
+        // Update code
     }
 }

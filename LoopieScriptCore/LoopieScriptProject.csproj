@@ -1,14 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFramework>net48</TargetFramework>
 		<AssemblyName>Loopie.Core</AssemblyName>
 		<OutputPath>../Assets/Scripts/</OutputPath>
-
 		<LangVersion>7.3</LangVersion>
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<NuGetAudit>false</NuGetAudit>
 	</PropertyGroup>
-
 </Project>

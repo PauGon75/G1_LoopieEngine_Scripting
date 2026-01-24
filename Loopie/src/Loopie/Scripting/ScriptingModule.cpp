@@ -12,9 +12,6 @@ namespace fs = std::filesystem;
 
 namespace Loopie {
 
-#include <filesystem>
-    namespace fs = std::filesystem;
-
     ScriptingModule* ScriptingModule::s_Instance = nullptr;
 
     MonoDomain* ScriptingModule::m_RootDomain = nullptr;
@@ -22,7 +19,7 @@ namespace Loopie {
     MonoImage* ScriptingModule::m_AssemblyImage = nullptr;
     MonoAssembly* ScriptingModule::m_CoreAssembly = nullptr;
 
-    std::unordered_map<std::string, std::filesystem::file_time_type>ScriptingModule::m_FileWatchMap{};
+    std::unordered_map<std::string, std::filesystem::file_time_type> ScriptingModule::m_FileWatchMap{};
 
     void ScriptingModule::OnLoad() {
         if (!m_RootDomain) {
@@ -34,49 +31,88 @@ namespace Loopie {
             mono_config_parse(NULL);
 
             m_RootDomain = mono_jit_init("LoopieRootDomain");
+
+            if (!m_RootDomain) {
+                Log::Error("No se pudo inicializar Mono JIT!");
+                return;
+            }
+
+            Log::Info("Mono Root Domain inicializado correctamente.");
         }
 
         LoadCoreAssembly();
     }
 
     void ScriptingModule::LoadCoreAssembly() {
+        // Descargar dominio anterior si existe
         if (m_AppDomain) {
-            mono_domain_set(mono_get_root_domain(), false);
+            Log::Debug("Descargando AppDomain anterior...");
+            mono_domain_set(m_RootDomain, false);
+            mono_domain_unload(m_AppDomain);
+            m_AppDomain = nullptr;
+            m_AssemblyImage = nullptr;
+            m_CoreAssembly = nullptr;
+            g_GameAssemblyImage = nullptr;
         }
 
+        // Crear nuevo AppDomain
+        Log::Debug("Creando nuevo AppDomain...");
         m_AppDomain = mono_domain_create_appdomain((char*)"LoopieAppDomain", NULL);
-        mono_domain_set(m_AppDomain, true);
 
-        std::string scriptDllPath = "C:/Users/Judit/Documents/GitHub_Repositories/G1_LoopieEngine_Scripting/Assets/Scripts/Loopie.Core.dll";
+        if (!m_AppDomain) {
+            Log::Error("No se pudo crear AppDomain!");
+            return;
+        }
+
+        // Establecer el AppDomain como activo
+        if (!mono_domain_set(m_AppDomain, true)) {
+            Log::Error("No se pudo establecer el AppDomain como activo!");
+            return;
+        }
+
+        Log::Debug("AppDomain creado y establecido: {0}", (void*)m_AppDomain);
+
+        std::string scriptDllPath = "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/Assets/Scripts/Loopie.Core.dll";
 
         if (fs::exists(scriptDllPath)) {
-        
+            Log::Debug("Cargando assembly desde: {0}", scriptDllPath);
+
             m_CoreAssembly = LoadAssembly(scriptDllPath);
+
             if (m_CoreAssembly) {
                 m_AssemblyImage = mono_assembly_get_image(m_CoreAssembly);
-
-          
                 g_GameAssemblyImage = m_AssemblyImage;
+
+                Log::Debug("Assembly cargado. Image: {0}", (void*)g_GameAssemblyImage);
+
                 ScriptGlue::RegisterGlue();
                 Log::Info("Scripting Core cargado: {0}", scriptDllPath);
             }
+            else {
+                Log::Error("No se pudo cargar el assembly!");
+                return;
+            }
+        }
+        else {
+            Log::Error("No se encontro el archivo DLL: {0}", scriptDllPath);
+            return;
         }
 
-        // Reemplaza el bucle que da error por este
+        // Listar clases detectadas
         const MonoTableInfo* typeTable = mono_image_get_table_info(g_GameAssemblyImage, MONO_TABLE_TYPEDEF);
         int numTypes = mono_table_info_get_rows(typeTable);
 
         Log::Info("--- Clases detectadas en la DLL ---");
         for (int i = 0; i < numTypes; i++) {
-            // mono_class_get requiere la imagen Y el token
-            // Usamos el desplazamiento manual del token que es mas seguro
             uint32_t cols[MONO_TYPEDEF_SIZE];
             mono_metadata_decode_row(typeTable, i, cols, MONO_TYPEDEF_SIZE);
 
             const char* name = mono_metadata_string_heap(g_GameAssemblyImage, cols[MONO_TYPEDEF_NAME]);
             const char* ns = mono_metadata_string_heap(g_GameAssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
 
-            Log::Info("Found: {0}.{1}", ns, name);
+            if (std::string(name) != "<Module>") {
+                Log::Info("Found: {0}.{1}", ns, name);
+            }
         }
         Log::Info("----------------------------------");
     }
@@ -134,12 +170,22 @@ namespace Loopie {
 
     MonoAssembly* ScriptingModule::LoadAssembly(const std::string& filePath) {
         MonoAssembly* assembly = mono_domain_assembly_open(m_AppDomain, filePath.c_str());
+        if (!assembly) {
+            Log::Error("mono_domain_assembly_open fallo para: {0}", filePath);
+        }
         return assembly;
     }
 
     void ScriptingModule::OnUnload() {
+        if (m_AppDomain) {
+            mono_domain_set(m_RootDomain, false);
+            mono_domain_unload(m_AppDomain);
+            m_AppDomain = nullptr;
+        }
+
         if (m_RootDomain) {
             mono_jit_cleanup(m_RootDomain);
+            m_RootDomain = nullptr;
         }
     }
 }

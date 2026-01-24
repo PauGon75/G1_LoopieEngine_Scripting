@@ -1,11 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "A1ByDgD7nZw=",
+  "dgSpecHash": "cCQpa2Gs/L8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Judit\\Documents\\Github_Repositories\\G1_LoopieEngine_Scripting\\LoopieScriptCore\\LoopieScriptProject.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\Judit\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
-    "C:\\Users\\Judit\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
-  ],
+  "projectFilePath": "C:\\Users\\paugo\\Documents\\GitHub\\Engine\\G1_LoopieEngine_Scripting\\LoopieScriptCore\\LoopieScriptProject.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }
