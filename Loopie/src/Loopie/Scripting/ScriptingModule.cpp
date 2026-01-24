@@ -72,7 +72,7 @@ namespace Loopie {
 
         Log::Debug("AppDomain creado y establecido: {0}", (void*)m_AppDomain);
 
-        std::string scriptDllPath = "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/Assets/Scripts/Loopie.Core.dll";
+        std::string scriptDllPath = "../../../Assets/Scripts/Loopie.Core.dll";
 
         if (fs::exists(scriptDllPath)) {
             Log::Debug("Cargando assembly desde: {0}", scriptDllPath);
@@ -134,7 +134,7 @@ namespace Loopie {
     }
 
     void ScriptingModule::CheckForScriptChanges() {
-        std::string scriptsPath = R"(C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Projects\Scripting Project\Assets\Scenes\a\Assets\Scripts)";
+        std::string scriptsPath = R"(../../../Projects/Scripting Project/Assets/Scenes/a/Assets/Scripts)";
 
         if (!fs::exists(scriptsPath)) return;
 
@@ -195,7 +195,7 @@ namespace Loopie {
         // 2. Tu ruta del Proyecto C# (donde se compila la DLL)
 
         //TODO CHANGE PATH
-        std::filesystem::path coreProjectPath = "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/LoopieScriptCore/";
+        std::filesystem::path coreProjectPath = "../../../LoopieScriptCore/";
         std::filesystem::path corePath = coreProjectPath / (name + ".cs");
 
         // Plantilla básica del script

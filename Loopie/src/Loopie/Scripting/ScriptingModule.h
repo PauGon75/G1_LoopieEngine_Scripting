@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Loopie/Core/Module.h"
+#include "Loopie/Core/Application.h"
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <string>
@@ -41,7 +42,7 @@ namespace Loopie {
         //TODO CHANGE PATH
 
         static std::string GetScriptsPath() {
-            return "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/Projects/Scripting Project/Assets/Scenes/a/Assets/Scripts";
+            return "../../../Projects/Scripting Project/Assets/Scenes/a/Assets/Scripts";
         }
         static void CreateScriptAsset(const std::filesystem::path& directory, const std::string& name);
     private:

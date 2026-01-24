@@ -1,6 +1,7 @@
 #include "ScriptEditorInterface.h"
-#include "ScriptingModule.h"
+#include "Loopie/Scripting/ScriptingModule.h"
 #include "Loopie/Core/Log.h"
+#include "Loopie/Core/Application.h"
 #include <imgui.h>
 #include <fstream>
 #include <sstream>
@@ -59,7 +60,7 @@ namespace Loopie {
         std::string fileName = m_currentAssetPath.filename().string();
 
         //TODO CHANGE PATH
-        std::filesystem::path corePath = "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/LoopieScriptCore/" + fileName;
+        std::filesystem::path corePath ="../../../LoopieScriptCore/" + fileName;
 
         std::ofstream coreOut(corePath);
         coreOut << m_textBuffer;
