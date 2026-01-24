@@ -3,17 +3,20 @@
 #include "Loopie/Resources/Types/Texture.h"
 #include "Editor/Interfaces/Interface.h"
 #include "Editor/ImGuiHelpers/ImGuiHelpers.h"
+#include "TextEditorWindow.h"
 
 #include "Loopie/Events/Event.h"
 #include "Loopie/Events/EventTypes.h"
 #include "Editor/Events/EditorEventTypes.h"
 #include "Loopie/Scripting/ScriptingModule.h"
+#include "Loopie/Core/Log.h"
 #include <filesystem>
 #include <vector>
 #include <memory>
 #include <string>
 
 namespace Loopie {
+
 	class AssetsExplorerInterface : public Interface , public IObserver<EngineNotification>{
 	public:
 		AssetsExplorerInterface();
@@ -25,6 +28,9 @@ namespace Loopie {
 
 		void Reload();
 		std::string CreateScript(const std::filesystem::path& directory, const std::string& name);
+
+		void SetTextEditor(TextEditorWindow* textEditor) { m_textEditor = textEditor; }
+
 	private:
 		struct CachedDirectoryTreeNode
 		{
@@ -75,6 +81,8 @@ namespace Loopie {
 		std::string CreateMaterial(const std::filesystem::path& directory, const std::string& name);
 		std::string CreateScene(const std::filesystem::path& directory, const std::string& name);
 
+		bool IsTextFile(const std::filesystem::path& filePath) const;
+
 	
 	public:
 		static Event<OnEntityOrFileNotification> s_OnFileSelected;
@@ -115,6 +123,8 @@ namespace Loopie {
 
 		std::filesystem::path m_renamingFile;
 		char m_renameBuffer[256] = { 0 };
+
+		TextEditorWindow* m_textEditor = nullptr;
 		
 	};
 }

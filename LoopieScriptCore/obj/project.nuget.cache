@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "cCQpa2Gs/L8=",
+  "dgSpecHash": "SnjrnpqtW0g=",
   "success": true,
-  "projectFilePath": "C:\\Users\\paugo\\Documents\\GitHub\\Engine\\G1_LoopieEngine_Scripting\\LoopieScriptCore\\LoopieScriptProject.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\Judit\\Documents\\Github_Repositories\\G1_LoopieEngine_Scripting\\LoopieScriptCore\\LoopieScriptProject.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Judit\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.3\\microsoft.netframework.referenceassemblies.1.0.3.nupkg.sha512",
+    "C:\\Users\\Judit\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net48\\1.0.3\\microsoft.netframework.referenceassemblies.net48.1.0.3.nupkg.sha512"
+  ],
   "logs": []
 }
