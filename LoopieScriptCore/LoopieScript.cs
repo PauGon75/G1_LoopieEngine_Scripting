@@ -5,7 +5,7 @@ namespace Loopie
     public abstract class LoopieScript
     {
         // Reference to the Entity that contains the script
-        public Entity entity { get; internal set; }
+        //public Entity entity { get; internal set; }
 
         public virtual void Awake() { }
 

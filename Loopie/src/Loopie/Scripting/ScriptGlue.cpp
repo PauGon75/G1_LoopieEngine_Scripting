@@ -1,40 +1,34 @@
 #include "ScriptGlue.h"
-#include "Loopie/Core/Application.h"
-#include "Loopie/Scene/Scene.h"
 #include "Loopie/Core/Log.h"
-#include <mono/metadata/reflection.h>
+#include <mono/metadata/object.h>
 
 namespace Loopie {
 
-    static void Log_Internal(MonoString* message) {
-        char* msg = mono_string_to_utf8(message);
-        Log::Info("[C#]: {0}", msg);
-        mono_free(msg);
+    // Funciones nativas que C# puede llamar
+    static void Log_Native(MonoString* message) {
+        char* cStr = mono_string_to_utf8(message);
+        Log::Info("[C#] {0}", cStr);
+        mono_free(cStr);
     }
 
-    static void DestroyEntity_Internal(MonoString* uuidStr) {
-        char* uuidCStr = mono_string_to_utf8(uuidStr);
-        Scene* scene = Application::GetInstance().m_scene;
-        if (scene) {
-            scene->RemoveEntity(UUID(uuidCStr));
-        }
-        mono_free(uuidCStr);
+    static void LogWarning_Native(MonoString* message) {
+        char* cStr = mono_string_to_utf8(message);
+        Log::Warn("[C#] {0}", cStr);
+        mono_free(cStr);
     }
 
-    static MonoString* CreateEntity_Internal(MonoString* name) {
-        char* nameStr = mono_string_to_utf8(name);
-        Scene* scene = Application::GetInstance().m_scene;
-        if (!scene) return nullptr;
-
-        auto entity = scene->CreateEntity(nameStr);
-        mono_free(nameStr);
-
-        return mono_string_new(mono_domain_get(), entity->GetUUID().Get().c_str());
+    static void LogError_Native(MonoString* message) {
+        char* cStr = mono_string_to_utf8(message);
+        Log::Error("[C#] {0}", cStr);
+        mono_free(cStr);
     }
 
     void ScriptGlue::RegisterGlue() {
-        mono_add_internal_call("Loopie.InternalCalls::Log", (void*)Log_Internal);
-        mono_add_internal_call("Loopie.InternalCalls::CreateEntity_Internal", (void*)CreateEntity_Internal);
-        mono_add_internal_call("Loopie.InternalCalls.DestroyEntity_Internal", (void*)DestroyEntity_Internal);
+        // Registrar las funciones para que C# pueda llamarlas
+        mono_add_internal_call("Loopie.InternalCalls::Log", (void*)Log_Native);
+        mono_add_internal_call("Loopie.InternalCalls::LogWarning", (void*)LogWarning_Native);
+        mono_add_internal_call("Loopie.InternalCalls::LogError", (void*)LogError_Native);
+
+        Log::Info("ScriptGlue: Funciones de logging registradas.");
     }
 }
