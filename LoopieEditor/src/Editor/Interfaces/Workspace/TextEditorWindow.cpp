@@ -125,6 +125,7 @@ namespace Loopie
         m_hasUnsavedChanges = false;
         m_isVisible = true;
         m_shouldFocus = true;
+        SDL_StartTextInput(Application::GetInstance().GetWindow().GetSDLWindow());
     }
 
     void TextEditorWindow::SaveFile()
@@ -180,6 +181,7 @@ namespace Loopie
         }
 
         m_isVisible = false;
+        SDL_StopTextInput(Application::GetInstance().GetWindow().GetSDLWindow());
     }
 
     void TextEditorWindow::SetLanguage(const std::string& extension)

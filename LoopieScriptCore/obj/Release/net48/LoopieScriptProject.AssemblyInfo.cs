@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Loopie.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0bb9d9b4db70393f5d1c713ded14401bcdf43555")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+73ff235768ad0fdd73cdc654939c2e6241034b27")]
 [assembly: System.Reflection.AssemblyProductAttribute("Loopie.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Loopie.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

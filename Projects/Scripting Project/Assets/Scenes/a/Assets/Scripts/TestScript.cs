@@ -16,7 +16,9 @@ public class TestScript
     // Se ejecuta cada frame desde ScriptComponent::Update
     void Update(float dt)
     {
-        // Aquí puedes añadir lógica de movimiento o respuesta a i
+        // Aquí puedes añadir lógica de movimiento o respuesta a input
+        //TEST EDITOR WORKS!!!!!
     }
 }
+
 

@@ -85,14 +85,14 @@ namespace Loopie {
 					break;
 
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
-					if (!io.WantCaptureMouse && event.button.button <= m_mouse.size()) {
+					if (event.button.button <= m_mouse.size()) {
 						m_mouse[event.button.button - 1] = KeyState::DOWN;
 						any = true;
 						anyMouseButton = true;
 					}
 					break;
 				case SDL_EVENT_MOUSE_BUTTON_UP:
-					if (!io.WantCaptureMouse && event.button.button <= m_mouse.size())
+					if (event.button.button <= m_mouse.size())
 						m_mouse[event.button.button - 1] = KeyState::UP;
 					break;
 

@@ -1,7 +1,9 @@
 #pragma once
 #include "TextEditor/TextEditor.h"
+#include "Loopie/Core/Application.h"
 #include <string>
 #include <memory>
+#include <SDL3/SDL.h>
 
 namespace Loopie
 {
