@@ -188,4 +188,51 @@ namespace Loopie {
             m_RootDomain = nullptr;
         }
     }
+    void ScriptingModule::CreateScriptAsset(const std::filesystem::path& directory, const std::string& name) {
+        // 1. Ruta en la carpeta de Assets (para el Assets Explorer)
+        std::filesystem::path assetPath = directory / (name + ".cs");
+
+        // 2. Tu ruta del Proyecto C# (donde se compila la DLL)
+        std::filesystem::path coreProjectPath = "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/LoopieScriptCore/";
+        std::filesystem::path corePath = coreProjectPath / (name + ".cs");
+
+        // Plantilla básica del script
+        std::string content =
+            "using System;\n"
+            "using Loopie;\n\n"
+            "public class " + name + " : LoopieScript\n"
+            "{\n"
+            "    public override void Start()\n"
+            "    {\n"
+            "        InternalCalls.Log(\"Script " + name + " iniciado en: \" + Entity.Name);\n"
+            "    }\n\n"
+            "    public override void Update(float dt)\n"
+            "    {\n"
+            "    }\n"
+            "}\n";
+
+        // Escribimos en ambas carpetas
+        std::ofstream assetFile(assetPath);
+        assetFile << content;
+        assetFile.close();
+
+        std::ofstream coreFile(corePath);
+        coreFile << content;
+        coreFile.close();
+
+        Log::Info("Scripting: Script '{0}' creado y sincronizado con el Core.", name);
+    }
+    std::vector<std::string> ScriptingModule::GetAvailableScripts() {
+        std::vector<std::string> scripts;
+        std::string path = GetScriptsPath();
+
+        if (!fs::exists(path)) return scripts;
+
+        for (auto& entry : fs::directory_iterator(path)) {
+            if (entry.path().extension() == ".cs") {
+                scripts.push_back(entry.path().stem().string());
+            }
+        }
+        return scripts;
+    }
 }

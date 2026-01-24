@@ -725,6 +725,9 @@ namespace Loopie {
 		{
 			CreateScene(m_currentDirectory, "NewScene");
 		}
+		if (ImGui::MenuItem("Create C# Script")) {
+			CreateScript(m_currentDirectory, "NewScript");
+		}
 
 		ImGui::Separator();
 
@@ -734,7 +737,17 @@ namespace Loopie {
 		}
 
 	}
+	std::string AssetsExplorerInterface::CreateScript(const std::filesystem::path& directory, const std::string& name) {
+		std::vector<std::string> names;
+		Helper::GetPathExistingNames(directory, names);
 
+		std::string uniqueName = Helper::MakeUniqueName(name, names);
+
+		ScriptingModule::CreateScriptAsset(directory, uniqueName);
+
+		Refresh();
+		return uniqueName;
+	}
 	void AssetsExplorerInterface::OpenFile(const std::filesystem::path& filePath)
 	{
 		if (filePath.extension().string() == ".scene") {

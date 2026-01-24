@@ -36,6 +36,11 @@ namespace Loopie {
         float m_WatcherTimer = 0.0f;
         const float m_WatcherInterval = 2.0f;
 
+        static std::vector<std::string> GetAvailableScripts();
+        static std::string GetScriptsPath() {
+            return "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/Projects/Scripting Project/Assets/Scenes/a/Assets/Scripts";
+        }
+        static void CreateScriptAsset(const std::filesystem::path& directory, const std::string& name);
     private:
         static ScriptingModule* s_Instance;
     };

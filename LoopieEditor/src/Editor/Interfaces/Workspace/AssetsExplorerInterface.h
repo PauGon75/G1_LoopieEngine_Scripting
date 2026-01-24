@@ -7,7 +7,7 @@
 #include "Loopie/Events/Event.h"
 #include "Loopie/Events/EventTypes.h"
 #include "Editor/Events/EditorEventTypes.h"
-
+#include "Loopie/Scripting/ScriptingModule.h"
 #include <filesystem>
 #include <vector>
 #include <memory>
@@ -24,7 +24,7 @@ namespace Loopie {
 		void Render() override;
 
 		void Reload();
-
+		std::string CreateScript(const std::filesystem::path& directory, const std::string& name);
 	private:
 		struct CachedDirectoryTreeNode
 		{
