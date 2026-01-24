@@ -134,7 +134,7 @@ namespace Loopie {
     }
 
     void ScriptingModule::CheckForScriptChanges() {
-        std::string scriptsPath = R"(../../../Projects/Scripting Project/Assets/Scenes/a/Assets/Scripts)";
+        std::string scriptsPath = R"(../../../LoopieScriptCore)";
 
         if (!fs::exists(scriptsPath)) return;
 
