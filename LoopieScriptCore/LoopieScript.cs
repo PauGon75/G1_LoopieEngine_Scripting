@@ -4,15 +4,15 @@ namespace Loopie
 {
     public class LoopieScript
     {
-        public string EntityID { get; internal set; }
+        // Campo simple para que C++ lo rellene facil
+        public string EntityID;
 
         private Entity _entity;
         public Entity Entity
         {
             get
             {
-                if (_entity == null)
-                    _entity = new Entity(EntityID);
+                if (_entity == null) _entity = new Entity(EntityID);
                 return _entity;
             }
         }
@@ -22,8 +22,7 @@ namespace Loopie
         {
             get
             {
-                if (_transform == null)
-                    _transform = new Transform(EntityID);
+                if (_transform == null) _transform = new Transform(EntityID);
                 return _transform;
             }
         }

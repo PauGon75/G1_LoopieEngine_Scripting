@@ -19,7 +19,7 @@ namespace Loopie {
 	public:
 		Entity(const std::string& name);
 		~Entity();
-
+		
 		template<typename T, typename... Args, typename = std::enable_if_t<std::is_base_of_v<Component, T>>>
 		T* AddComponent(Args&&... args)
 		{

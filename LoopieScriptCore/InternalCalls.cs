@@ -81,5 +81,8 @@ namespace Loopie
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool Input_IsMouseButtonPressed(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Transform_GetForward(string entityID, out float x, out float y, out float z);
     }
 }

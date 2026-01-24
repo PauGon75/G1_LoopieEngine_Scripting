@@ -5,7 +5,9 @@
 #include "Loopie/Components/ScriptComponent.h"
 #include "ScriptGlue.h"
 #include <mono/metadata/mono-config.h>
+#include <mono/metadata/debug-helpers.h>
 #include <filesystem>
+#include <fstream>
 
 MonoImage* g_GameAssemblyImage = nullptr;
 namespace fs = std::filesystem;
@@ -13,7 +15,6 @@ namespace fs = std::filesystem;
 namespace Loopie {
 
     ScriptingModule* ScriptingModule::s_Instance = nullptr;
-
     MonoDomain* ScriptingModule::m_RootDomain = nullptr;
     MonoDomain* ScriptingModule::m_AppDomain = nullptr;
     MonoImage* ScriptingModule::m_AssemblyImage = nullptr;
@@ -26,102 +27,64 @@ namespace Loopie {
             fs::path rootPath = fs::current_path();
             fs::path libPath = (rootPath / "vendor" / "mono" / "lib").make_preferred();
             fs::path etcPath = (rootPath / "vendor" / "mono" / "etc").make_preferred();
-
             mono_set_dirs(libPath.string().c_str(), etcPath.string().c_str());
             mono_config_parse(NULL);
-
             m_RootDomain = mono_jit_init("LoopieRootDomain");
-
-            if (!m_RootDomain) {
-                Log::Error("No se pudo inicializar Mono JIT!");
-                return;
-            }
-
-            Log::Info("Mono Root Domain inicializado correctamente.");
         }
-
         LoadCoreAssembly();
     }
 
     void ScriptingModule::LoadCoreAssembly() {
-        // Descargar dominio anterior si existe
         if (m_AppDomain) {
-            Log::Debug("Descargando AppDomain anterior...");
             mono_domain_set(m_RootDomain, false);
             mono_domain_unload(m_AppDomain);
-            m_AppDomain = nullptr;
-            m_AssemblyImage = nullptr;
-            m_CoreAssembly = nullptr;
-            g_GameAssemblyImage = nullptr;
         }
-
-        // Crear nuevo AppDomain
-        Log::Debug("Creando nuevo AppDomain...");
         m_AppDomain = mono_domain_create_appdomain((char*)"LoopieAppDomain", NULL);
-
-        if (!m_AppDomain) {
-            Log::Error("No se pudo crear AppDomain!");
-            return;
-        }
-
-        // Establecer el AppDomain como activo
-        if (!mono_domain_set(m_AppDomain, true)) {
-            Log::Error("No se pudo establecer el AppDomain como activo!");
-            return;
-        }
-
-        Log::Debug("AppDomain creado y establecido: {0}", (void*)m_AppDomain);
+        mono_domain_set(m_AppDomain, true);
 
         std::string scriptDllPath = "../../../Assets/Scripts/Loopie.Core.dll";
-
         if (fs::exists(scriptDllPath)) {
-            Log::Debug("Cargando assembly desde: {0}", scriptDllPath);
-
-            m_CoreAssembly = LoadAssembly(scriptDllPath);
-
+            m_CoreAssembly = mono_domain_assembly_open(m_AppDomain, scriptDllPath.c_str());
             if (m_CoreAssembly) {
                 m_AssemblyImage = mono_assembly_get_image(m_CoreAssembly);
                 g_GameAssemblyImage = m_AssemblyImage;
-
-                Log::Debug("Assembly cargado. Image: {0}", (void*)g_GameAssemblyImage);
-
                 ScriptGlue::RegisterGlue();
-                Log::Info("Scripting Core cargado: {0}", scriptDllPath);
-            }
-            else {
-                Log::Error("No se pudo cargar el assembly!");
-                return;
             }
         }
-        else {
-            Log::Error("No se encontro el archivo DLL: {0}", scriptDllPath);
+    }
+
+    void ScriptingModule::InitializeScriptInstance(MonoObject* instance, const std::string& uuid) {
+        if (!instance) {
+            Log::Error("InitializeScriptInstance: Instancia nula!");
             return;
         }
 
-        // Listar clases detectadas
-        const MonoTableInfo* typeTable = mono_image_get_table_info(g_GameAssemblyImage, MONO_TABLE_TYPEDEF);
-        int numTypes = mono_table_info_get_rows(typeTable);
+        MonoClass* monoClass = mono_object_get_class(instance);
 
-        Log::Info("--- Clases detectadas en la DLL ---");
-        for (int i = 0; i < numTypes; i++) {
-            uint32_t cols[MONO_TYPEDEF_SIZE];
-            mono_metadata_decode_row(typeTable, i, cols, MONO_TYPEDEF_SIZE);
+        // 1. Buscamos el campo en la clase base LoopieScript
+        // Importante: No usamos propiedades, buscamos el FIELD "EntityID"
+        MonoClassField* field = mono_class_get_field_from_name(monoClass, "EntityID");
 
-            const char* name = mono_metadata_string_heap(g_GameAssemblyImage, cols[MONO_TYPEDEF_NAME]);
-            const char* ns = mono_metadata_string_heap(g_GameAssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
-
-            if (std::string(name) != "<Module>") {
-                Log::Info("Found: {0}.{1}", ns, name);
+        if (!field) {
+            // Si el script hereda de LoopieScript, el campo esta en el padre
+            MonoClass* parentClass = mono_class_get_parent(monoClass);
+            if (parentClass) {
+                field = mono_class_get_field_from_name(parentClass, "EntityID");
             }
         }
-        Log::Info("----------------------------------");
+
+        if (field) {
+            MonoString* monoStr = mono_string_new(m_AppDomain, uuid.c_str());
+            mono_field_set_value(instance, field, monoStr);
+            Log::Info("UUID '{0}' inyectado correctamente en C#", uuid);
+        }
+        else {
+            Log::Error("ERROR CRITICO: No se encontro el campo 'EntityID' en C#. ¿Has compilado el paso 1?");
+        }
     }
 
     void ScriptingModule::ReloadAssembly() {
-        Log::Debug("Recargando scripts...");
-
         LoadCoreAssembly();
-
         Scene* activeScene = Application::GetInstance().m_scene;
         if (activeScene) {
             for (auto& [uuid, entity] : activeScene->GetAllEntities()) {
@@ -130,110 +93,45 @@ namespace Loopie {
                 }
             }
         }
-        Log::Debug("Sincronizacion de scripts completada.");
     }
 
     void ScriptingModule::CheckForScriptChanges() {
         std::string scriptsPath = R"(../../../LoopieScriptCore)";
-
         if (!fs::exists(scriptsPath)) return;
-
         bool needsReload = false;
         for (auto& entry : fs::recursive_directory_iterator(scriptsPath)) {
-            if (entry.path().extension() == ".cs" || entry.path().extension() == ".CS") {
-                std::string pathStr = entry.path().string();
+            if (entry.path().extension() == ".cs") {
                 auto currentWriteTime = fs::last_write_time(entry.path());
-
-                if (m_FileWatchMap.find(pathStr) == m_FileWatchMap.end()) {
-                    m_FileWatchMap[pathStr] = currentWriteTime;
-                    needsReload = true;
-                }
-                else if (currentWriteTime > m_FileWatchMap[pathStr]) {
-                    m_FileWatchMap[pathStr] = currentWriteTime;
+                if (m_FileWatchMap[entry.path().string()] < currentWriteTime) {
+                    m_FileWatchMap[entry.path().string()] = currentWriteTime;
                     needsReload = true;
                 }
             }
         }
-
-        if (needsReload) {
-            ReloadAssembly();
-        }
+        if (needsReload) ReloadAssembly();
     }
 
     void ScriptingModule::OnUpdate() {
-        m_WatcherTimer += 0.016f;
-        if (m_WatcherTimer >= m_WatcherInterval) {
-            CheckForScriptChanges();
-            m_WatcherTimer = 0.0f;
-        }
-    }
-
-    MonoAssembly* ScriptingModule::LoadAssembly(const std::string& filePath) {
-        MonoAssembly* assembly = mono_domain_assembly_open(m_AppDomain, filePath.c_str());
-        if (!assembly) {
-            Log::Error("mono_domain_assembly_open fallo para: {0}", filePath);
-        }
-        return assembly;
+        static float timer = 0;
+        timer += 0.016f;
+        if (timer >= 1.0f) { CheckForScriptChanges(); timer = 0; }
     }
 
     void ScriptingModule::OnUnload() {
-        if (m_AppDomain) {
-            mono_domain_set(m_RootDomain, false);
-            mono_domain_unload(m_AppDomain);
-            m_AppDomain = nullptr;
-        }
-
-        if (m_RootDomain) {
-            mono_jit_cleanup(m_RootDomain);
-            m_RootDomain = nullptr;
-        }
+        if (m_AppDomain) { mono_domain_set(m_RootDomain, false); mono_domain_unload(m_AppDomain); }
+        if (m_RootDomain) { mono_jit_cleanup(m_RootDomain); }
     }
+
     void ScriptingModule::CreateScriptAsset(const std::filesystem::path& directory, const std::string& name) {
-        // 1. Ruta en la carpeta de Assets (para el Assets Explorer)
-        std::filesystem::path assetPath = directory / (name + ".cs");
-
-        // 2. Tu ruta del Proyecto C# (donde se compila la DLL)
-
-        //TODO CHANGE PATH
-        std::filesystem::path coreProjectPath = "../../../LoopieScriptCore/";
-        std::filesystem::path corePath = coreProjectPath / (name + ".cs");
-
-        // Plantilla básica del script
-        std::string content =
-            "using System;\n"
-            "using Loopie;\n\n"
-            "public class " + name + " : LoopieScript\n"
-            "{\n"
-            "    public override void Start()\n"
-            "    {\n"
-            "        InternalCalls.Log(\"Script " + name + " iniciado en: \" + Entity.Name);\n"
-            "    }\n\n"
-            "    public override void Update(float dt)\n"
-            "    {\n"
-            "    }\n"
-            "}\n";
-
-        // Escribimos en ambas carpetas
-        std::ofstream assetFile(assetPath);
-        assetFile << content;
-        assetFile.close();
-
-        std::ofstream coreFile(corePath);
-        coreFile << content;
-        coreFile.close();
-
-        Log::Info("Scripting: Script '{0}' creado y sincronizado con el Core.", name);
+        std::string content = "using System;\nusing Loopie;\n\npublic class " + name + " : LoopieScript\n{\n    public override void Start() { }\n    public override void Update(float dt) { }\n}\n";
+        std::ofstream f1(directory / (name + ".cs")); f1 << content; f1.close();
+        std::ofstream f2(fs::path("../../../LoopieScriptCore/") / (name + ".cs")); f2 << content; f2.close();
     }
+
     std::vector<std::string> ScriptingModule::GetAvailableScripts() {
         std::vector<std::string> scripts;
-        std::string path = GetScriptsPath();
-
-        if (!fs::exists(path)) return scripts;
-
-        for (auto& entry : fs::directory_iterator(path)) {
-            if (entry.path().extension() == ".cs") {
-                scripts.push_back(entry.path().stem().string());
-            }
+        for (auto& entry : fs::directory_iterator("../../../Assets/Scripts")) {
+            if (entry.path().extension() == ".cs") scripts.push_back(entry.path().stem().string());
         }
         return scripts;
     }

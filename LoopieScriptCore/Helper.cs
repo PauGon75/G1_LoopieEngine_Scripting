@@ -38,6 +38,8 @@ namespace Loopie
         {
             return new Vector3(a.X * scalar, a.Y * scalar, a.Z * scalar);
         }
+
+        
     }
 
     public struct Quaternion

@@ -22,7 +22,8 @@ namespace Loopie {
         static void CheckForScriptChanges();
         static void ReloadAssembly();
         static void LoadCoreAssembly();
-        
+        void InitializeScriptInstance(MonoObject* instance, const std::string& uuid);
+
         static MonoAssembly* LoadAssembly(const std::string& filePath);
         static MonoDomain* GetAppDomain() { return m_AppDomain; }
         static MonoAssembly* GetAssembly() { return m_CoreAssembly; }

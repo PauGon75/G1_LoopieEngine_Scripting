@@ -16,6 +16,8 @@ namespace Loopie {
         if (!scene) return nullptr;
 
         char* cStr = mono_string_to_utf8(uuidStr);
+        if (!cStr) return nullptr;
+
         UUID uuid(cStr);
         mono_free(cStr);
 
@@ -44,9 +46,14 @@ namespace Loopie {
     }
 
     static MonoString* Entity_Create_Native(MonoString* name) {
-        char* cStr = mono_string_to_utf8(name);
-        std::string entityName(cStr);
-        mono_free(cStr);
+        std::string entityName = "New Entity";
+        if (name) {
+            char* cStr = mono_string_to_utf8(name);
+            if (cStr) {
+                entityName = cStr;
+                mono_free(cStr);
+            }
+        }
 
         Scene* scene = Application::GetInstance().m_scene;
         if (!scene) return nullptr;
@@ -95,6 +102,7 @@ namespace Loopie {
 
         if (type == "Transform") return entity->HasComponent<Transform>();
         if (type == "MeshRenderer") return entity->HasComponent<MeshRenderer>();
+        if (type == "Camera") return entity->HasComponent<Camera>();
         return false;
     }
 
@@ -109,6 +117,10 @@ namespace Loopie {
 
         if (type == "MeshRenderer" && !entity->HasComponent<MeshRenderer>()) {
             entity->AddComponent<MeshRenderer>();
+            return true;
+        }
+        if (type == "Camera" && !entity->HasComponent<Camera>()) {
+            entity->AddComponent<Camera>();
             return true;
         }
         return false;
@@ -127,27 +139,27 @@ namespace Loopie {
     static void Transform_GetPosition_Native(MonoString* uuidStr, float* x, float* y, float* z) {
         auto entity = GetEntityByUUID(uuidStr);
         if (entity) {
-            glm::vec3 pos = entity->GetTransform()->GetPosition();
+            glm::vec3 pos = entity->GetTransform()->GetLocalPosition();
             *x = pos.x; *y = pos.y; *z = pos.z;
         }
     }
 
     static void Transform_SetPosition_Native(MonoString* uuidStr, float x, float y, float z) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (entity) entity->GetTransform()->SetPosition({ x, y, z });
+        if (entity) entity->GetTransform()->SetLocalPosition({ x, y, z });
     }
 
     static void Transform_GetRotation_Native(MonoString* uuidStr, float* x, float* y, float* z, float* w) {
         auto entity = GetEntityByUUID(uuidStr);
         if (entity) {
-            glm::quat rot = entity->GetTransform()->GetRotation();
+            glm::quat rot = entity->GetTransform()->GetLocalRotation();
             *x = rot.x; *y = rot.y; *z = rot.z; *w = rot.w;
         }
     }
 
     static void Transform_SetRotation_Native(MonoString* uuidStr, float x, float y, float z, float w) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (entity) entity->GetTransform()->SetRotation(glm::quat(w, x, y, z));
+        if (entity) entity->GetTransform()->SetLocalRotation(glm::quat(w, x, y, z));
     }
 
     static void Transform_GetScale_Native(MonoString* uuidStr, float* x, float* y, float* z) {
@@ -181,8 +193,8 @@ namespace Loopie {
     }
 
     static void Input_GetMouseDelta_Native(float* x, float* y) {
-        *x = (float)Application::GetInstance().GetInputEvent().GetMouseDelta().x;
-        *y = (float)Application::GetInstance().GetInputEvent().GetMouseDelta().y;
+        auto delta = Application::GetInstance().GetInputEvent().GetMouseDelta();
+        *x = (float)delta.x; *y = (float)delta.y;
     }
 
     static bool Input_IsMouseButtonPressed_Native(int button) {
