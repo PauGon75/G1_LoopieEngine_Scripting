@@ -753,6 +753,7 @@ namespace Loopie {
 		if (filePath.extension().string() == ".scene") {
 			Application::GetInstance().GetScene().ReadAndLoadSceneFile(filePath.string());
 		}
+
 	}
 
 	std::string AssetsExplorerInterface::CreateFolder(const std::filesystem::path& directory, const std::string& name) {

@@ -193,6 +193,8 @@ namespace Loopie {
         std::filesystem::path assetPath = directory / (name + ".cs");
 
         // 2. Tu ruta del Proyecto C# (donde se compila la DLL)
+
+        //TODO CHANGE PATH
         std::filesystem::path coreProjectPath = "C:/Users/paugo/Documents/GitHub/Engine/G1_LoopieEngine_Scripting/LoopieScriptCore/";
         std::filesystem::path corePath = coreProjectPath / (name + ".cs");
 
