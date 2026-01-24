@@ -8,16 +8,15 @@
 #include <Loopie/Scene/Entity.h>
 
 namespace Loopie {
+    class Entity;
 
     class ScriptComponent : public Component {
     public:
-        // Usamos tu macro para que GetTypeID devuelva size_t correctamente
         DEFINE_TYPE(ScriptComponent)
 
-        ScriptComponent() = default;
+            ScriptComponent() = default;
         ~ScriptComponent() override;
 
-        // Implementaci�n obligatoria de Component.h
         void Init() override;
         void Update() override;
         JsonNode Serialize(JsonNode& parent) const override;
@@ -25,18 +24,16 @@ namespace Loopie {
 
         void SetScript(const std::string& name);
         const std::string& GetScriptName() const { return m_scriptName; }
-        bool IsBound() const { return m_isBound; } // Para que el Inspector lo sepa
-        void SetEntityReference(Entity* cppEntity);
+        bool IsBound() const { return m_isBound; }
 
-        //std::weak_ptr<Entity> m_owner;
     private:
         std::string m_scriptName;
-        MonoClass* m_scriptClass;
+        MonoClass* m_scriptClass = nullptr;
         MonoObject* m_instance = nullptr;
         MonoMethod* m_startMethod = nullptr;
         MonoMethod* m_updateMethod = nullptr;
-        
+
         bool m_startCalled = false;
-        bool m_isBound = false; // <--- Nuevo flag
+        bool m_isBound = false;
     };
-}   
+}

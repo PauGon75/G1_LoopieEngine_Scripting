@@ -14,6 +14,23 @@ namespace Loopie {
     void ScriptComponent::Init() {
         if (!m_scriptName.empty() && !m_instance) {
             SetScript(m_scriptName);
+
+            if (m_instance && m_owner.lock()) {
+                MonoClass* monoClass = mono_object_get_class(m_instance);
+                MonoClassField* entityIDField = mono_class_get_field_from_name(monoClass, "EntityID");
+
+                if (entityIDField) {
+                    const UUID& uuid = m_owner.lock()->GetUUID();
+                    uint64_t entityID;
+                    try {
+                        entityID = std::stoull(uuid.Get());
+                    }
+                    catch (...) {
+                        entityID = std::hash<std::string>{}(uuid.Get());
+                    }
+                    mono_field_set_value(m_instance, entityIDField, &entityID);
+                }
+            }
         }
     }
 

@@ -2,17 +2,33 @@ using System;
 
 namespace Loopie
 {
-    public abstract class LoopieScript
+    public class LoopieScript
     {
-        // Reference to the Entity that contains the script
-        //public Entity entity { get; internal set; }
+        public string EntityID { get; internal set; }
 
-        public virtual void Awake() { }
+        private Entity _entity;
+        public Entity Entity
+        {
+            get
+            {
+                if (_entity == null)
+                    _entity = new Entity(EntityID);
+                return _entity;
+            }
+        }
+
+        private Transform _transform;
+        public Transform Transform
+        {
+            get
+            {
+                if (_transform == null)
+                    _transform = new Transform(EntityID);
+                return _transform;
+            }
+        }
 
         public virtual void Start() { }
-
-        public virtual void Update() { }
-
-        public virtual void OnDestroy() { }
+        public virtual void Update(float dt) { }
     }
 }

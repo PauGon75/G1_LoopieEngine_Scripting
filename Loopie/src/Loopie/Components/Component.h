@@ -39,9 +39,9 @@ namespace Loopie {
 		virtual void Deserialize(const JsonNode& data) = 0;
 
 		virtual void Init() = 0;
+		std::weak_ptr<Entity> m_owner;
 
 	private:
-		std::weak_ptr<Entity> m_owner;
 		UUID m_uuid;
 		bool m_isActive = true;
 	};
