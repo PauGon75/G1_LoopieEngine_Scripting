@@ -16,7 +16,7 @@ LoopieEngine is a video game engine created by Adrià García, Ana Alcazar and P
 <img src="./images/CuteTeamGameEngines.jpg" style="width: 500px;">
 </div>
 
-**Individual work of each member:** [TaskList](https://docs.google.com/spreadsheets/d/1SdDNdTcWUb7oJugyaaYaRzsubqppoDt9VPHvI7UfRxA/edit?usp=drive_link) [TODO: Hay que poner el link del pdf cuando acabemos el TaskList]
+**Individual work of each member:** [TaskList](https://drive.google.com/file/d/1xCMPx9yvm6_fWuwH8RyBW2s5dW_1sDVB/view?usp=sharing)
 
 ## Main Core Systems
 
