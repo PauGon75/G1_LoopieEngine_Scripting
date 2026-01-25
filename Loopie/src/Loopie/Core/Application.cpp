@@ -19,7 +19,6 @@ namespace Loopie {
 
 		Log::Info("Application Started");
 		AddModule(new ScriptingModule());
-		// Window Creation
 		m_window = new Window();
 		Log::Info("Window created successfully.");
 
@@ -38,7 +37,6 @@ namespace Loopie {
 		}
 		m_modules.clear();
 
-		//// Cleaning
 		delete(m_window); 
 		m_window = nullptr;
 

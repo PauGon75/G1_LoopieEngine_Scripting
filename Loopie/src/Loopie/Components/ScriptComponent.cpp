@@ -13,7 +13,6 @@ extern MonoImage* g_GameAssemblyImage;
 
 namespace Loopie {
 
-    // HELPER: Inyecta el ID sin repetir código
     static void InjectEntityID(MonoObject* instance, const std::string& uuid) {
         if (!instance) return;
 
@@ -28,7 +27,6 @@ namespace Loopie {
         if (entityIDField) {
             MonoString* monoStr = mono_string_new(ScriptingModule::GetAppDomain(), uuid.c_str());
             mono_field_set_value(instance, entityIDField, monoStr);
-            // Log::Debug("Inyectado ID: {0}", uuid); // Descomenta si quieres spam
         }
         else {
             Log::Error("[ScriptComponent] CRITICO: No se encuentra 'public string EntityID' en el script C#.");
@@ -40,22 +38,15 @@ namespace Loopie {
     }
     void ScriptComponent::EnsureInitialized()
     {
-        // NO LEAS la memoria (no uses .c_str() ni comparaciones).
-        // Simplemente reconstruye los objetos.
-
-        // 1. Resetea el string
         new (&m_scriptName) std::string();
 
-        // 2. Resetea la instancia (asumiendo que es un puntero o similar)
         m_instance = nullptr;
     }
     void ScriptComponent::Init() {
-        // 1. Aseguramos que el script esté cargado
         if (!m_scriptName.empty() && !m_instance) {
             SetScript(m_scriptName);
         }
 
-        // 2. FORZAMOS la inyección siempre en el Init (por si Deserialize lo cargó sin dueño)
         if (m_instance) {
             auto owner = m_owner.lock();
             if (owner) {
@@ -90,7 +81,6 @@ namespace Loopie {
         if (m_instance) {
             mono_runtime_object_init(m_instance);
 
-            // 3. INYECCIÓN INMEDIATA (Para que funcione al Recargar Assembly o Hot-Reload)
             auto owner = m_owner.lock();
             if (owner) {
                 InjectEntityID(m_instance, owner->GetUUID().Get());
@@ -110,7 +100,7 @@ namespace Loopie {
             m_startCalled = true;
         }
 
-        float dt = 0.016f; // TODO: Usar Time.deltaTime real
+        float dt = 0.016f;
         void* args[1] = { &dt };
         mono_runtime_invoke(m_updateMethod, m_instance, args, nullptr);
     }

@@ -26,7 +26,6 @@ namespace Loopie {
         return scene->GetEntity(uuid);
     }
 
-    // --- LOGGING ---
     static void Log_Native(MonoString* message) {
         if (!message) return;
         char* cStr = mono_string_to_utf8(message);
@@ -48,7 +47,6 @@ namespace Loopie {
         mono_free(cStr);
     }
 
-    // --- ENTITY MANAGEMENT ---
     static MonoString* Entity_Create_Native(MonoString* name) {
         std::string entityName = "New Entity";
         if (name) {
@@ -63,7 +61,7 @@ namespace Loopie {
         if (!scene) return nullptr;
 
         std::shared_ptr<Entity> entity = scene->CreateEntity(entityName);
-        if (!entity) return nullptr; // Seguridad extra
+        if (!entity) return nullptr;
 
         return mono_string_new(mono_domain_get(), entity->GetUUID().Get().c_str());
     }
@@ -97,7 +95,6 @@ namespace Loopie {
         if (entity) entity->SetIsActive(active);
     }
 
-    // --- COMPONENTS ---
     static bool Entity_HasComponent_Native(MonoString* uuidStr, MonoString* componentType) {
         if (!componentType) return false;
         char* cStr = mono_string_to_utf8(componentType);
@@ -123,7 +120,6 @@ namespace Loopie {
         if (!entity) return false;
 
         if (type == "MeshRenderer" && !entity->HasComponent<MeshRenderer>()) {
-            // Fix memoria para AddComponent generico si fuera necesario
             auto* comp = entity->AddComponent<MeshRenderer>();
             comp->EnsureInitialized();            return true;
         }
@@ -144,7 +140,6 @@ namespace Loopie {
         if (entity && type == "MeshRenderer") entity->RemoveComponent<MeshRenderer>();
     }
 
-    // --- TRANSFORM (BLINDADO CON LOGS) ---
     static void Transform_GetPosition_Native(MonoString* uuidStr, float* x, float* y, float* z) {
         auto entity = GetEntityByUUID(uuidStr);
         if (entity) {
@@ -152,8 +147,7 @@ namespace Loopie {
             *x = pos.x; *y = pos.y; *z = pos.z;
         }
         else {
-            *x = 0; *y = 0; *z = 0; // Evitar basura
-            // Log::Error("[ScriptGlue] GetPosition: Entidad nula.");
+            *x = 0; *y = 0; *z = 0;
         }
     }
 
@@ -209,7 +203,6 @@ namespace Loopie {
         }
     }
 
-    // --- SCRIPTING ---
     static void Entity_AddScript_Native(MonoString* uuidStr, MonoString* scriptNameStr) {
         auto entity = GetEntityByUUID(uuidStr);
         if (!entity) {
@@ -222,7 +215,6 @@ namespace Loopie {
 
         ScriptComponent* scriptComp = nullptr;
 
-        // FIX MEMORIA: Usamos Placement New también aquí para evitar basura en la RAM
         if (entity->HasComponent<ScriptComponent>()) {
             scriptComp = entity->GetComponent<ScriptComponent>();
         }
@@ -241,7 +233,6 @@ namespace Loopie {
         mono_free(scriptName);
     }
 
-    // --- DUPLICATION (ROBUSTO) ---
     static MonoString* Entity_Duplicate_Native(MonoString* srcIdStr) {
         auto srcEntity = GetEntityByUUID(srcIdStr);
         if (!srcEntity) {
@@ -261,7 +252,6 @@ namespace Loopie {
             return nullptr;
         }
 
-        // Copia de Transform segura
         Transform* srcTrans = srcEntity->GetTransform();
         Transform* dstTrans = newEntity->GetTransform();
 
@@ -273,10 +263,9 @@ namespace Loopie {
             Log::Error("[ScriptGlue] Warning: Fallo al copiar Transform (uno es nulo).");
         }
 
-        // Copia de MeshRenderer con Placement New
         if (srcEntity->HasComponent<MeshRenderer>()) {
             auto* destMR = newEntity->AddComponent<MeshRenderer>();
-            destMR->EnsureInitialized(); // <-- ESTO ES SEGURO (BUENO)
+            destMR->EnsureInitialized();
             auto* srcMR = srcEntity->GetComponent<MeshRenderer>();
             if (srcMR && destMR) {
                 if (srcMR->GetMesh()) destMR->SetMesh(srcMR->GetMesh());
@@ -303,7 +292,6 @@ namespace Loopie {
         }
     }
 
-    // --- INPUT ---
     static bool Input_IsKeyPressed_Native(int keyCode) {
         const bool* state = SDL_GetKeyboardState(NULL);
         if (keyCode >= 0 && keyCode < SDL_SCANCODE_COUNT) {
@@ -331,8 +319,6 @@ namespace Loopie {
     }
 
     static bool Input_IsMouseButtonPressed_Native(int button) {
-        // Fix temporal: devolvemos false por defecto para evitar spam
-        // return Application::GetInstance().GetInputEvent().IsMouseButtonPressed(button);
         return false;
     }
 

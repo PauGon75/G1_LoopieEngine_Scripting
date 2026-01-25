@@ -2,7 +2,6 @@ using System;
 
 namespace Loopie
 {
-    // SDL3 Scancodes
     public enum KeyCode
     {
         A = 4,
@@ -71,19 +70,16 @@ namespace Loopie
 
     public static class Input
     {
-        // Returns true while key is held down
         public static bool GetKey(KeyCode key)
         {
             return InternalCalls.Input_IsKeyPressed((int)key);
         }
 
-        // Returns true only on the frame the key was pressed
         public static bool GetKeyDown(KeyCode key)
         {
             return InternalCalls.Input_IsKeyDown((int)key);
         }
 
-        // Returns true only on the frame the key was released
         public static bool GetKeyUp(KeyCode key)
         {
             return InternalCalls.Input_IsKeyReleased((int)key);

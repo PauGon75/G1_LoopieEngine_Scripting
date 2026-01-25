@@ -69,7 +69,6 @@ namespace Loopie
             ID = id;
         }
 
-        // --- FIX: Added Transform Property ---
         private Transform _transform;
         public Transform Transform
         {
@@ -80,14 +79,12 @@ namespace Loopie
                 return _transform;
             }
         }
-        // -------------------------------------
         public void AddScript(string scriptName)
         {
             InternalCalls.Entity_AddScript(ID, scriptName);
         }
         public void SetMesh(string meshName)
         {
-            // Esto llama a C++ para que cargue la "Sphere"
             InternalCalls.MeshRenderer_SetMesh(ID, meshName);
         }
         public string Name
@@ -103,7 +100,6 @@ namespace Loopie
         }
         public static Entity Find(string name)
         {
-            // Ensure InternalCalls.Entity_Find is defined in InternalCalls.cs
             string id = InternalCalls.Entity_Find(name);
             if (string.IsNullOrEmpty(id)) return null;
             return new Entity(id);

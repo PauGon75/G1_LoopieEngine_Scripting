@@ -6,25 +6,25 @@
                 {
                     "transform": {
                         "euler_angles": {
-                            "x": 0.0,
+                            "x": 20.672718048095703,
                             "y": -0.0,
                             "z": 0.0
                         },
                         "position": {
                             "x": 0.0,
-                            "y": 1.0,
+                            "y": 7.930337905883789,
                             "z": -10.0
                         },
                         "rotation": {
-                            "w": 1.0,
-                            "x": 0.0,
+                            "w": 0.9837713837623596,
+                            "x": 0.17942655086517334,
                             "y": 0.0,
                             "z": 0.0
                         },
                         "scale": {
                             "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
+                            "y": 0.9999995231628418,
+                            "z": 0.9999995231628418
                         }
                     }
                 },
@@ -38,7 +38,7 @@
                 }
             ],
             "name": "MainCamera",
-            "parent_uuid": "08571b82-81ed-c05f-fdfb-9d9a2cc9212b",
+            "parent_uuid": "ef218577-406b-cb98-db01-670182e848af",
             "uuid": "7be8bed2-1395-f0d2-b4ad-90234ff2a278"
         },
         {
@@ -70,14 +70,11 @@
                     }
                 },
                 {
-                    "meshrenderer": {
-                        "mesh_index": 0,
-                        "mesh_uuid": "87fb32c3-69e3-22cf-cae9-13ec7e5cbce3"
-                    }
+                    "meshrenderer": {}
                 }
             ],
             "name": "Ground",
-            "parent_uuid": "08571b82-81ed-c05f-fdfb-9d9a2cc9212b",
+            "parent_uuid": "ef218577-406b-cb98-db01-670182e848af",
             "uuid": "974a68b9-380a-7fe6-67c1-d1a1e5a8f4cd"
         },
         {
@@ -118,78 +115,6 @@
             "name": "City_building_004",
             "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
             "uuid": "3634b05e-6bb7-8065-a904-f6823624a8cf"
-        },
-        {
-            "active": true,
-            "components": [
-                {
-                    "transform": {
-                        "euler_angles": {
-                            "x": 0.0,
-                            "y": -0.0,
-                            "z": 0.0
-                        },
-                        "position": {
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": 0.0
-                        },
-                        "rotation": {
-                            "w": 1.0,
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    }
-                }
-            ],
-            "name": "Street",
-            "parent_uuid": "08571b82-81ed-c05f-fdfb-9d9a2cc9212b",
-            "uuid": "7457c233-d409-8fc8-f912-80ecb06894c9"
-        },
-        {
-            "active": true,
-            "components": [
-                {
-                    "transform": {
-                        "euler_angles": {
-                            "x": 0.0,
-                            "y": -0.0,
-                            "z": 0.0
-                        },
-                        "position": {
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": 0.0
-                        },
-                        "rotation": {
-                            "w": 1.0,
-                            "x": 0.0,
-                            "y": 0.0,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    }
-                },
-                {
-                    "meshrenderer": {
-                        "mesh_index": 4,
-                        "mesh_uuid": "628b54f3-3c59-7f32-295d-9b58ebdae096"
-                    }
-                }
-            ],
-            "name": "TankTracksLeft_1",
-            "parent_uuid": "bb5f0c72-6d1e-a472-a059-76491c7be957",
-            "uuid": "55255677-0a92-87f5-22a7-60a3f41e8618"
         },
         {
             "active": true,
@@ -252,6 +177,78 @@
                             "z": 0.0
                         },
                         "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    }
+                },
+                {
+                    "meshrenderer": {
+                        "mesh_index": 4,
+                        "mesh_uuid": "628b54f3-3c59-7f32-295d-9b58ebdae096"
+                    }
+                }
+            ],
+            "name": "TankTracksLeft_1",
+            "parent_uuid": "bb5f0c72-6d1e-a472-a059-76491c7be957",
+            "uuid": "55255677-0a92-87f5-22a7-60a3f41e8618"
+        },
+        {
+            "active": true,
+            "components": [
+                {
+                    "transform": {
+                        "euler_angles": {
+                            "x": 0.0,
+                            "y": -0.0,
+                            "z": 0.0
+                        },
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "rotation": {
+                            "w": 1.0,
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    }
+                }
+            ],
+            "name": "Street",
+            "parent_uuid": "ef218577-406b-cb98-db01-670182e848af",
+            "uuid": "7457c233-d409-8fc8-f912-80ecb06894c9"
+        },
+        {
+            "active": true,
+            "components": [
+                {
+                    "transform": {
+                        "euler_angles": {
+                            "x": 0.0,
+                            "y": -0.0,
+                            "z": 0.0
+                        },
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "rotation": {
+                            "w": 1.0,
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "scale": {
                             "x": 0.019999999552965164,
                             "y": 0.019999999552965164,
                             "z": 0.019999999552965164
@@ -265,7 +262,7 @@
                 }
             ],
             "name": "Tank",
-            "parent_uuid": "08571b82-81ed-c05f-fdfb-9d9a2cc9212b",
+            "parent_uuid": "ef218577-406b-cb98-db01-670182e848af",
             "uuid": "bb5f0c72-6d1e-a472-a059-76491c7be957"
         },
         {
@@ -431,45 +428,6 @@
                     "transform": {
                         "euler_angles": {
                             "x": 0.0,
-                            "y": 89.98021697998047,
-                            "z": 0.0
-                        },
-                        "position": {
-                            "x": 25.154010772705078,
-                            "y": 8.553863608540269e-07,
-                            "z": 39.15372085571289
-                        },
-                        "rotation": {
-                            "w": 0.7072288393974304,
-                            "x": 0.0,
-                            "y": 0.7069846987724304,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    }
-                },
-                {
-                    "meshrenderer": {
-                        "mesh_index": 4,
-                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
-                    }
-                }
-            ],
-            "name": "City_building_010",
-            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
-            "uuid": "2bf80e4a-e148-a562-fac6-e56656ab2bb0"
-        },
-        {
-            "active": true,
-            "components": [
-                {
-                    "transform": {
-                        "euler_angles": {
-                            "x": 0.0,
                             "y": -0.0,
                             "z": 0.0
                         },
@@ -501,6 +459,45 @@
             "name": "TankTracksLeft",
             "parent_uuid": "bb5f0c72-6d1e-a472-a059-76491c7be957",
             "uuid": "d3f9fa6b-670c-de3f-bee6-7f2a47032d52"
+        },
+        {
+            "active": true,
+            "components": [
+                {
+                    "transform": {
+                        "euler_angles": {
+                            "x": 0.0,
+                            "y": 89.98021697998047,
+                            "z": 0.0
+                        },
+                        "position": {
+                            "x": 25.154010772705078,
+                            "y": 8.553863608540269e-07,
+                            "z": 39.15372085571289
+                        },
+                        "rotation": {
+                            "w": 0.7072288393974304,
+                            "x": 0.0,
+                            "y": 0.7069846987724304,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    }
+                },
+                {
+                    "meshrenderer": {
+                        "mesh_index": 4,
+                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
+                    }
+                }
+            ],
+            "name": "City_building_010",
+            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
+            "uuid": "2bf80e4a-e148-a562-fac6-e56656ab2bb0"
         },
         {
             "active": true,
@@ -548,45 +545,6 @@
                     "transform": {
                         "euler_angles": {
                             "x": 0.0,
-                            "y": 89.98021697998047,
-                            "z": 0.0
-                        },
-                        "position": {
-                            "x": -42.288055419921875,
-                            "y": 5.014607040720875e-07,
-                            "z": -33.201576232910156
-                        },
-                        "rotation": {
-                            "w": 0.7072288393974304,
-                            "x": 0.0,
-                            "y": 0.7069846987724304,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    }
-                },
-                {
-                    "meshrenderer": {
-                        "mesh_index": 6,
-                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
-                    }
-                }
-            ],
-            "name": "City_building_013",
-            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
-            "uuid": "0c8c1512-01d1-a2f5-edcb-e63b95330ccd"
-        },
-        {
-            "active": true,
-            "components": [
-                {
-                    "transform": {
-                        "euler_angles": {
-                            "x": 0.0,
                             "y": -89.98021697998047,
                             "z": 0.0
                         },
@@ -618,6 +576,45 @@
             "name": "City_building_040",
             "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
             "uuid": "161aee25-ba54-213e-88bc-219c37a84258"
+        },
+        {
+            "active": true,
+            "components": [
+                {
+                    "transform": {
+                        "euler_angles": {
+                            "x": 0.0,
+                            "y": 89.98021697998047,
+                            "z": 0.0
+                        },
+                        "position": {
+                            "x": -42.288055419921875,
+                            "y": 5.014607040720875e-07,
+                            "z": -33.201576232910156
+                        },
+                        "rotation": {
+                            "w": 0.7072288393974304,
+                            "x": 0.0,
+                            "y": 0.7069846987724304,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    }
+                },
+                {
+                    "meshrenderer": {
+                        "mesh_index": 6,
+                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
+                    }
+                }
+            ],
+            "name": "City_building_013",
+            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
+            "uuid": "0c8c1512-01d1-a2f5-edcb-e63b95330ccd"
         },
         {
             "active": true,
@@ -657,6 +654,123 @@
             "name": "City_building_014",
             "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
             "uuid": "174fcdb7-c1c4-0425-8d8a-4309e2e09569"
+        },
+        {
+            "active": true,
+            "components": [
+                {
+                    "transform": {
+                        "euler_angles": {
+                            "x": 0.0,
+                            "y": -89.98021697998047,
+                            "z": 0.0
+                        },
+                        "position": {
+                            "x": -42.8072395324707,
+                            "y": -9.383451811117993e-07,
+                            "z": 30.643888473510742
+                        },
+                        "rotation": {
+                            "w": 0.7072288393974304,
+                            "x": 0.0,
+                            "y": -0.7069846987724304,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    }
+                },
+                {
+                    "meshrenderer": {
+                        "mesh_index": 24,
+                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
+                    }
+                }
+            ],
+            "name": "City_building_039",
+            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
+            "uuid": "806281c0-e45e-fe49-4e28-1ebbfe4dbe0d"
+        },
+        {
+            "active": true,
+            "components": [
+                {
+                    "transform": {
+                        "euler_angles": {
+                            "x": 0.0,
+                            "y": -89.98021697998047,
+                            "z": 0.0
+                        },
+                        "position": {
+                            "x": -41.64900207519531,
+                            "y": 0.0,
+                            "z": 16.495393753051758
+                        },
+                        "rotation": {
+                            "w": 0.7072288393974304,
+                            "x": 0.0,
+                            "y": -0.7069846987724304,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    }
+                },
+                {
+                    "meshrenderer": {
+                        "mesh_index": 23,
+                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
+                    }
+                }
+            ],
+            "name": "City_building_038",
+            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
+            "uuid": "7a2ffb85-af3d-734a-5e52-735100023c34"
+        },
+        {
+            "active": true,
+            "components": [
+                {
+                    "transform": {
+                        "euler_angles": {
+                            "x": -180.0,
+                            "y": 2.2311800421448424e-05,
+                            "z": -180.0
+                        },
+                        "position": {
+                            "x": -20.31769371032715,
+                            "y": 0.0,
+                            "z": 16.16360855102539
+                        },
+                        "rotation": {
+                            "w": 1.9470718370939721e-07,
+                            "x": -4.371138118131057e-08,
+                            "y": 1.0,
+                            "z": -4.371138118131057e-08
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    }
+                },
+                {
+                    "meshrenderer": {
+                        "mesh_index": 22,
+                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
+                    }
+                }
+            ],
+            "name": "City_building_037",
+            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
+            "uuid": "bda129d3-2c61-b22b-7a10-137d4b6e9edc"
         },
         {
             "active": true,
@@ -747,9 +861,9 @@
                             "z": -180.0
                         },
                         "position": {
-                            "x": -20.31769371032715,
+                            "x": -20.831323623657227,
                             "y": 0.0,
-                            "z": 16.16360855102539
+                            "z": 27.426488876342773
                         },
                         "rotation": {
                             "w": 1.9470718370939721e-07,
@@ -766,92 +880,14 @@
                 },
                 {
                     "meshrenderer": {
-                        "mesh_index": 22,
+                        "mesh_index": 10,
                         "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
                     }
                 }
             ],
-            "name": "City_building_037",
+            "name": "City_building_022",
             "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
-            "uuid": "bda129d3-2c61-b22b-7a10-137d4b6e9edc"
-        },
-        {
-            "active": true,
-            "components": [
-                {
-                    "transform": {
-                        "euler_angles": {
-                            "x": 0.0,
-                            "y": -89.98021697998047,
-                            "z": 0.0
-                        },
-                        "position": {
-                            "x": -41.64900207519531,
-                            "y": 0.0,
-                            "z": 16.495393753051758
-                        },
-                        "rotation": {
-                            "w": 0.7072288393974304,
-                            "x": 0.0,
-                            "y": -0.7069846987724304,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    }
-                },
-                {
-                    "meshrenderer": {
-                        "mesh_index": 23,
-                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
-                    }
-                }
-            ],
-            "name": "City_building_038",
-            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
-            "uuid": "7a2ffb85-af3d-734a-5e52-735100023c34"
-        },
-        {
-            "active": true,
-            "components": [
-                {
-                    "transform": {
-                        "euler_angles": {
-                            "x": 0.0,
-                            "y": -89.98021697998047,
-                            "z": 0.0
-                        },
-                        "position": {
-                            "x": -42.8072395324707,
-                            "y": -9.383451811117993e-07,
-                            "z": 30.643888473510742
-                        },
-                        "rotation": {
-                            "w": 0.7072288393974304,
-                            "x": 0.0,
-                            "y": -0.7069846987724304,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    }
-                },
-                {
-                    "meshrenderer": {
-                        "mesh_index": 24,
-                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
-                    }
-                }
-            ],
-            "name": "City_building_039",
-            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
-            "uuid": "806281c0-e45e-fe49-4e28-1ebbfe4dbe0d"
+            "uuid": "0b310563-dcca-6be5-6b94-4d72fac03f56"
         },
         {
             "active": true,
@@ -898,20 +934,20 @@
                 {
                     "transform": {
                         "euler_angles": {
-                            "x": -180.0,
-                            "y": 2.2311800421448424e-05,
-                            "z": -180.0
+                            "x": 0.0,
+                            "y": -89.98021697998047,
+                            "z": 0.0
                         },
                         "position": {
-                            "x": -20.831323623657227,
-                            "y": 0.0,
-                            "z": 27.426488876342773
+                            "x": -42.8072395324707,
+                            "y": -9.383451811117993e-07,
+                            "z": 41.83556365966797
                         },
                         "rotation": {
-                            "w": 1.9470718370939721e-07,
-                            "x": -4.371138118131057e-08,
-                            "y": 1.0,
-                            "z": -4.371138118131057e-08
+                            "w": 0.7072288393974304,
+                            "x": 0.0,
+                            "y": -0.7069846987724304,
+                            "z": 0.0
                         },
                         "scale": {
                             "x": 1.0,
@@ -922,14 +958,14 @@
                 },
                 {
                     "meshrenderer": {
-                        "mesh_index": 10,
+                        "mesh_index": 15,
                         "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
                     }
                 }
             ],
-            "name": "City_building_022",
+            "name": "City_building_030",
             "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
-            "uuid": "0b310563-dcca-6be5-6b94-4d72fac03f56"
+            "uuid": "56e0c9a1-3702-6362-4642-9f51759cff14"
         },
         {
             "active": true,
@@ -969,45 +1005,6 @@
             "name": "City_building_023",
             "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
             "uuid": "b815ac6a-4fb2-cb8f-fb64-41b6f052a5f1"
-        },
-        {
-            "active": true,
-            "components": [
-                {
-                    "transform": {
-                        "euler_angles": {
-                            "x": 0.0,
-                            "y": -89.98021697998047,
-                            "z": 0.0
-                        },
-                        "position": {
-                            "x": -42.8072395324707,
-                            "y": -9.383451811117993e-07,
-                            "z": 41.83556365966797
-                        },
-                        "rotation": {
-                            "w": 0.7072288393974304,
-                            "x": 0.0,
-                            "y": -0.7069846987724304,
-                            "z": 0.0
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    }
-                },
-                {
-                    "meshrenderer": {
-                        "mesh_index": 15,
-                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
-                    }
-                }
-            ],
-            "name": "City_building_030",
-            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
-            "uuid": "56e0c9a1-3702-6362-4642-9f51759cff14"
         },
         {
             "active": true,
@@ -1137,9 +1134,9 @@
                             "z": 0.0
                         },
                         "position": {
-                            "x": -29.478403091430664,
+                            "x": -9.51959373196587e-06,
                             "y": 0.0,
-                            "z": -21.01409912109375
+                            "z": -7.388232707977295
                         },
                         "rotation": {
                             "w": 1.0,
@@ -1156,14 +1153,14 @@
                 },
                 {
                     "meshrenderer": {
-                        "mesh_index": 17,
-                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
+                        "mesh_index": 2,
+                        "mesh_uuid": "628b54f3-3c59-7f32-295d-9b58ebdae096"
                     }
                 }
             ],
-            "name": "City_building_032",
-            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
-            "uuid": "4db38aba-9e30-a90a-2440-fcc16866b01e"
+            "name": "TankChassis_2",
+            "parent_uuid": "bb5f0c72-6d1e-a472-a059-76491c7be957",
+            "uuid": "f92aadd0-82da-52a9-9442-abab787c80ab"
         },
         {
             "active": true,
@@ -1215,9 +1212,9 @@
                             "z": 0.0
                         },
                         "position": {
-                            "x": -9.51959373196587e-06,
+                            "x": -29.478403091430664,
                             "y": 0.0,
-                            "z": -7.388232707977295
+                            "z": -21.01409912109375
                         },
                         "rotation": {
                             "w": 1.0,
@@ -1234,14 +1231,14 @@
                 },
                 {
                     "meshrenderer": {
-                        "mesh_index": 2,
-                        "mesh_uuid": "628b54f3-3c59-7f32-295d-9b58ebdae096"
+                        "mesh_index": 17,
+                        "mesh_uuid": "6278ac2b-81d9-c940-7940-edf2e7613c8a"
                     }
                 }
             ],
-            "name": "TankChassis_2",
-            "parent_uuid": "bb5f0c72-6d1e-a472-a059-76491c7be957",
-            "uuid": "f92aadd0-82da-52a9-9442-abab787c80ab"
+            "name": "City_building_032",
+            "parent_uuid": "7457c233-d409-8fc8-f912-80ecb06894c9",
+            "uuid": "4db38aba-9e30-a90a-2440-fcc16866b01e"
         },
         {
             "active": true,
@@ -1644,6 +1641,45 @@
                             "z": 0.0
                         },
                         "position": {
+                            "x": 3.371387720108032e-07,
+                            "y": 125.89893341064453,
+                            "z": -0.9181888103485107
+                        },
+                        "rotation": {
+                            "w": 1.0,
+                            "x": 0.0,
+                            "y": 0.0,
+                            "z": 0.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    }
+                },
+                {
+                    "meshrenderer": {
+                        "mesh_index": 0,
+                        "mesh_uuid": "8b66f2b5-2a2f-f129-23ff-0d286fc4b8b7"
+                    }
+                }
+            ],
+            "name": "Bullet",
+            "parent_uuid": "bb5f0c72-6d1e-a472-a059-76491c7be957",
+            "uuid": "7cea3c6a-2f77-7b5a-9669-f104a1919ab6"
+        },
+        {
+            "active": true,
+            "components": [
+                {
+                    "transform": {
+                        "euler_angles": {
+                            "x": 0.0,
+                            "y": -0.0,
+                            "z": 0.0
+                        },
+                        "position": {
                             "x": -0.001055495929904282,
                             "y": 107.96411895751953,
                             "z": -2.5321364402770996
@@ -1684,7 +1720,7 @@
                         },
                         "position": {
                             "x": 0.0,
-                            "y": 98.29378509521484,
+                            "y": 0.0,
                             "z": 0.0
                         },
                         "rotation": {
@@ -1694,22 +1730,16 @@
                             "z": 0.0
                         },
                         "scale": {
-                            "x": 50.0,
-                            "y": 50.0,
-                            "z": 50.0
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         }
-                    }
-                },
-                {
-                    "meshrenderer": {
-                        "mesh_index": 0,
-                        "mesh_uuid": "8c5a4ecd-43ae-544d-2058-c1509ecb8c81"
                     }
                 }
             ],
-            "name": "Bullet",
-            "parent_uuid": "bb5f0c72-6d1e-a472-a059-76491c7be957",
-            "uuid": "c3ddd4e0-4725-b4cd-29f2-7f4fddafcec4"
+            "name": "ModelEntity",
+            "parent_uuid": "59c8ece4-d9a9-82a9-50b3-68b97672c926",
+            "uuid": "ba026f70-f938-eaad-1844-71691694ff24"
         }
     ]
 }

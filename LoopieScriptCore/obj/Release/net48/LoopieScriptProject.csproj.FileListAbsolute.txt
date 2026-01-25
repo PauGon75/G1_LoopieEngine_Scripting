@@ -1,0 +1,10 @@
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\assets\scripts\Loopie.Core.dll
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\assets\scripts\Loopie.Core.pdb
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Release\net48\LoopieScriptProject.csproj.AssemblyReference.cache
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Release\net48\LoopieScriptProject.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Release\net48\LoopieScriptProject.AssemblyInfoInputs.cache
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Release\net48\LoopieScriptProject.AssemblyInfo.cs
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Release\net48\LoopieScriptProject.csproj.CoreCompileInputs.cache
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Release\net48\LoopieScriptProject.sourcelink.json
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Release\net48\Loopie.Core.dll
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Release\net48\Loopie.Core.pdb

@@ -7,7 +7,6 @@ namespace Loopie {
 
     class ScriptResource : public Resource {
     public:
-        // Constructor: Pasa el UUID y el Tipo al padre
         ScriptResource(UUID uuid, const std::string& path)
             : Resource(uuid, ResourceType::SCRIPT), m_path(path) {
             if (std::filesystem::exists(path)) {
@@ -15,16 +14,12 @@ namespace Loopie {
             }
         }
 
-        // Destructor virtual: Muy importante para evitar fugas y errores de vtable
         virtual ~ScriptResource() override = default;
 
-        // ESTA LINEA ES LA QUE ARREGLA std::make_shared
-        // Debe ser EXACTAMENTE "bool Load() override"
         bool Load() override {
             return true;
         }
 
-        // Getters y Setters
         const std::string& GetSourcePath() const { return m_path; }
         const std::string& GetClassName() const { return m_className; }
         void SetClassName(const std::string& name) { m_className = name; }

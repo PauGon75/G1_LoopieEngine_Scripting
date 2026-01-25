@@ -1,10 +1,10 @@
 #include "TextEditorWindow.h"
 #include "Loopie/Core/Log.h"
-#include "Loopie/Scripting/ScriptingModule.h" // NECESARIO para recargar
+#include "Loopie/Scripting/ScriptingModule.h" 
 #include <imgui.h>
 #include <fstream>
 #include <sstream>
-#include <filesystem> // NECESARIO para manejar rutas
+#include <filesystem> 
 
 namespace Loopie
 {
@@ -129,18 +129,14 @@ namespace Loopie
         SDL_StartTextInput(Application::GetInstance().GetWindow().GetSDLWindow());
     }
 
-    // --- AQUI ESTA LA MAGIA DE GUARDADO ---
     void TextEditorWindow::SaveFile()
     {
         if (m_currentFile.empty())
         {
-            // Debería abrir save as dialog (no implementado aquí)
             return;
         }
 
         std::string content = m_editor.GetText();
-
-        // 1. Guardar en la ubicación original (Assets/Scripts/...)
         {
             std::ofstream file(m_currentFile);
             if (!file.is_open())
@@ -152,14 +148,11 @@ namespace Loopie
             file.close();
         }
 
-        // 2. Guardar copia en LoopieScriptCore para compilar
-        // Solo hacemos esto si es un script de C#
         if (m_currentFile.find(".cs") != std::string::npos)
         {
             std::filesystem::path originalPath(m_currentFile);
             std::string filename = originalPath.filename().string();
 
-            // Ruta relativa a la carpeta Core (ajusta si tu estructura es distinta)
             std::filesystem::path corePath = "../../../LoopieScriptCore/" + filename;
 
             std::ofstream coreFile(corePath);
@@ -169,7 +162,6 @@ namespace Loopie
                 coreFile.close();
                 Log::Info("Editor: Sincronizado {0} con LoopieScriptCore.", filename);
 
-                // 3. Forzar recarga inmediata en el motor
                 ScriptingModule::CheckForScriptChanges();
             }
             else
@@ -197,7 +189,6 @@ namespace Loopie
     {
         if (m_hasUnsavedChanges)
         {
-            // Aquí deberías mostrar un diálogo de confirmación
         }
 
         m_editor.SetText("");
@@ -211,7 +202,6 @@ namespace Loopie
     {
         if (m_hasUnsavedChanges)
         {
-            // Diálogo de confirmación
         }
 
         m_isVisible = false;
@@ -236,7 +226,6 @@ namespace Loopie
             SaveFile();
         else if (ctrl && shift && ImGui::IsKeyPressed(ImGuiKey_S))
         {
-            // Save As - Pendiente
         }
         else if (ctrl && ImGui::IsKeyPressed(ImGuiKey_N))
             NewFile();

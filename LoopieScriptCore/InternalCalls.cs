@@ -5,7 +5,6 @@ namespace Loopie
 {
     public static class InternalCalls
     {
-        // === LOGGING ===
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Log(string message);
 
@@ -15,7 +14,6 @@ namespace Loopie
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void LogError(string message);
 
-        // === ENTITY MANAGEMENT === (CAMBIO: string en lugar de ulong)
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern string Entity_Create(string name);
 
@@ -34,7 +32,6 @@ namespace Loopie
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Entity_SetActive(string entityID, bool active);
 
-        // === COMPONENT MANAGEMENT ===
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool Entity_HasComponent(string entityID, string componentType);
 
@@ -44,7 +41,6 @@ namespace Loopie
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Entity_RemoveComponent(string entityID, string componentType);
 
-        // === TRANSFORM COMPONENT ===
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_GetPosition(string entityID, out float x, out float y, out float z);
 
@@ -63,7 +59,6 @@ namespace Loopie
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Transform_SetScale(string entityID, float x, float y, float z);
 
-        // === INPUT ===
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool Input_IsKeyPressed(int keyCode);
 

@@ -70,16 +70,13 @@ namespace Loopie {
         }
     }
 
-    // FIX IMPORTANTE: Inyecta el ID correctamente en C#
     void ScriptingModule::InitializeScriptInstance(MonoObject* instance, const std::string& uuid) {
         if (!instance) return;
 
         MonoClass* monoClass = mono_object_get_class(instance);
 
-        // 1. Buscamos el campo EntityID en la clase del script
         MonoClassField* idField = mono_class_get_field_from_name(monoClass, "EntityID");
 
-        // 2. Si no esta, buscamos en la clase padre (LoopieScript)
         if (!idField) {
             MonoClass* parentClass = mono_class_get_parent(monoClass);
             if (parentClass) {
@@ -88,7 +85,6 @@ namespace Loopie {
         }
 
         if (idField) {
-            // 3. Creamos el String de Mono y lo asignamos
             MonoString* monoStr = mono_string_new(m_AppDomain, uuid.c_str());
             mono_field_set_value(instance, idField, monoStr);
         }
@@ -103,22 +99,18 @@ namespace Loopie {
         if (activeScene) {
             for (auto& [uuid, entity] : activeScene->GetAllEntities()) {
                 if (auto* script = entity->GetComponent<ScriptComponent>()) {
-                    // Al recargar, volvemos a vincular el script y su ID
                     script->SetScript(script->GetScriptName());
                 }
             }
         }
     }
 
-    // --- NUEVA FUNCIÓN: Sincronizar Assets -> Core ---
     void ScriptingModule::SyncScriptsFromAssetsToCore() {
-        // Rutas (Ajustalas si tu estructura cambia)
         std::string assetsPathStr = "../../../Assets";
         std::string corePathStr = "../../../LoopieScriptCore";
 
         if (!fs::exists(assetsPathStr) || !fs::exists(corePathStr)) return;
 
-        // Recorremos Assets buscando .cs
         for (auto& entry : fs::recursive_directory_iterator(assetsPathStr)) {
             if (entry.path().extension() == ".cs") {
 
@@ -127,7 +119,6 @@ namespace Loopie {
 
                 bool shouldCopy = false;
 
-                // Si no existe en Core o el de Assets es mas nuevo -> Copiar
                 if (!fs::exists(destPath)) {
                     shouldCopy = true;
                 }
@@ -142,7 +133,6 @@ namespace Loopie {
                 if (shouldCopy) {
                     try {
                         fs::copy_file(entry.path(), destPath, fs::copy_options::overwrite_existing);
-                        // Log::Info("Sync: Script '{0}' actualizado en Core.", filename);
                     }
                     catch (std::exception& e) {
                         Log::Error("Error sincronizando script: {0}", e.what());
@@ -153,10 +143,8 @@ namespace Loopie {
     }
 
     void ScriptingModule::CheckForScriptChanges() {
-        // 1. Primero sincronizamos los archivos
         SyncScriptsFromAssetsToCore();
 
-        // 2. Luego verificamos si hay cambios en la carpeta Core para recompilar
         std::string scriptsPath = R"(../../../LoopieScriptCore)";
         if (!fs::exists(scriptsPath)) return;
 
@@ -176,14 +164,13 @@ namespace Loopie {
         }
 
         if (needsReload) {
-            // AQUI deberias llamar a tu sistema de build (MSBuild/dotnet) si lo tienes integrado
             ReloadAssembly();
         }
     }
 
     void ScriptingModule::OnUpdate() {
         static float timer = 0;
-        timer += 0.016f; // Asumiendo 60 FPS
+        timer += 0.016f; 
         if (timer >= m_WatcherInterval) {
             CheckForScriptChanges();
             timer = 0;
@@ -219,12 +206,10 @@ namespace Loopie {
             "    }\n"
             "}\n";
 
-        // Crear en Assets
         std::ofstream f1(directory / (name + ".cs"));
         f1 << content;
         f1.close();
 
-        // Crear copia en Core
         std::ofstream f2(fs::path("../../../LoopieScriptCore/") / (name + ".cs"));
         f2 << content;
         f2.close();
@@ -232,7 +217,7 @@ namespace Loopie {
 
     std::vector<std::string> ScriptingModule::GetAvailableScripts() {
         std::vector<std::string> scripts;
-        std::string path = "../../../Assets/Scripts"; // Ajusta tu ruta si difiere
+        std::string path = "../../../Assets/Scripts";
         if (!fs::exists(path)) return scripts;
 
         for (auto& entry : fs::directory_iterator(path)) {

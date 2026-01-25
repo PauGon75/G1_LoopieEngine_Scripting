@@ -4,7 +4,6 @@ namespace Loopie
 {
     public class LoopieScript
     {
-        // Campo simple para que C++ lo rellene facil
         public string EntityID;
 
         private Entity _entity;

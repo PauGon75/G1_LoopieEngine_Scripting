@@ -37,7 +37,6 @@ namespace Loopie {
                 ImGui::EndMenuBar();
             }
 
-            // Atajo de teclado para guardar
             if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_S)) Save();
 
             ImGui::TextDisabled("Archivo: %s", m_currentAssetPath.string().c_str());
@@ -51,15 +50,12 @@ namespace Loopie {
     void ScriptEditorInterface::Save() {
         if (m_currentAssetPath.empty()) return;
 
-        // 1. Guardar en la carpeta de Assets del motor
         std::ofstream assetOut(m_currentAssetPath);
         assetOut << m_textBuffer;
         assetOut.close();
 
-        // 2. Guardar copia exacta en la carpeta Core de C# para compilar
         std::string fileName = m_currentAssetPath.filename().string();
 
-        //TODO CHANGE PATH
         std::filesystem::path corePath ="../../../LoopieScriptCore/" + fileName;
 
         std::ofstream coreOut(corePath);
@@ -68,7 +64,6 @@ namespace Loopie {
 
         Log::Info("ScriptEditor: Cambios guardados y sincronizados.");
 
-        // 3. Disparar compilación y recarga
         ScriptingModule::ReloadAssembly();
     }
 }

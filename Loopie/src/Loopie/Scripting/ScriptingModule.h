@@ -21,9 +21,7 @@ namespace Loopie {
 
         static void CheckForScriptChanges();
 
-        // --- NUEVO: Función para sincronizar Assets -> Core ---
         static void SyncScriptsFromAssetsToCore();
-        // ------------------------------------------------------
 
         static void ReloadAssembly();
         static void LoadCoreAssembly();
@@ -41,12 +39,11 @@ namespace Loopie {
 
         static std::unordered_map<std::string, std::filesystem::file_time_type> m_FileWatchMap;
         float m_WatcherTimer = 0.0f;
-        const float m_WatcherInterval = 1.0f; // He bajado esto a 1s para que sea más rápido
+        const float m_WatcherInterval = 1.0f;
 
         static std::vector<std::string> GetAvailableScripts();
 
         static std::string GetScriptsPath() {
-            // Ajusta esto si tu ruta real es distinta
             return "../../../Assets/Scripts";
         }
 
