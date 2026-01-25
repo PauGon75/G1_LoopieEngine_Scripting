@@ -85,7 +85,7 @@ public class TankController : LoopieScript
 
         Vector3 tankPos = Transform.Position;
         Vector3 finalPos = tankPos + (aimDir * BulletForward);
-        finalPos.Y = BulletHeight; ¡
+        finalPos.Y = BulletHeight;
 
         newBullet.Transform.Position = finalPos;
         newBullet.Transform.Rotation = bulletRot;
