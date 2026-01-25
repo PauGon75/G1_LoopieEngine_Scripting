@@ -87,5 +87,15 @@ namespace Loopie
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern string Entity_Find(string name);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Entity_AddScript(string uuid, string scriptName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void MeshRenderer_SetMesh(string uuid, string path);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern string Entity_Duplicate(string uuid);
+
     }
 }

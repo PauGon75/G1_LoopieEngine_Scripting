@@ -8,6 +8,7 @@
 #include "Loopie/Components/Camera.h"
 #include <mono/metadata/object.h>
 #include <SDL3/SDL.h>
+#include <Loopie/Components/ScriptComponent.h>
 
 namespace Loopie {
 
@@ -25,6 +26,7 @@ namespace Loopie {
         return scene->GetEntity(uuid);
     }
 
+    // --- LOGGING ---
     static void Log_Native(MonoString* message) {
         if (!message) return;
         char* cStr = mono_string_to_utf8(message);
@@ -46,6 +48,7 @@ namespace Loopie {
         mono_free(cStr);
     }
 
+    // --- ENTITY MANAGEMENT ---
     static MonoString* Entity_Create_Native(MonoString* name) {
         std::string entityName = "New Entity";
         if (name) {
@@ -60,6 +63,8 @@ namespace Loopie {
         if (!scene) return nullptr;
 
         std::shared_ptr<Entity> entity = scene->CreateEntity(entityName);
+        if (!entity) return nullptr; // Seguridad extra
+
         return mono_string_new(mono_domain_get(), entity->GetUUID().Get().c_str());
     }
 
@@ -92,6 +97,7 @@ namespace Loopie {
         if (entity) entity->SetIsActive(active);
     }
 
+    // --- COMPONENTS ---
     static bool Entity_HasComponent_Native(MonoString* uuidStr, MonoString* componentType) {
         if (!componentType) return false;
         char* cStr = mono_string_to_utf8(componentType);
@@ -117,8 +123,9 @@ namespace Loopie {
         if (!entity) return false;
 
         if (type == "MeshRenderer" && !entity->HasComponent<MeshRenderer>()) {
-            entity->AddComponent<MeshRenderer>();
-            return true;
+            // Fix memoria para AddComponent generico si fuera necesario
+            auto* comp = entity->AddComponent<MeshRenderer>();
+            comp->EnsureInitialized();            return true;
         }
         if (type == "Camera" && !entity->HasComponent<Camera>()) {
             entity->AddComponent<Camera>();
@@ -137,17 +144,27 @@ namespace Loopie {
         if (entity && type == "MeshRenderer") entity->RemoveComponent<MeshRenderer>();
     }
 
+    // --- TRANSFORM (BLINDADO CON LOGS) ---
     static void Transform_GetPosition_Native(MonoString* uuidStr, float* x, float* y, float* z) {
         auto entity = GetEntityByUUID(uuidStr);
         if (entity) {
             glm::vec3 pos = entity->GetTransform()->GetLocalPosition();
             *x = pos.x; *y = pos.y; *z = pos.z;
         }
+        else {
+            *x = 0; *y = 0; *z = 0; // Evitar basura
+            // Log::Error("[ScriptGlue] GetPosition: Entidad nula.");
+        }
     }
 
     static void Transform_SetPosition_Native(MonoString* uuidStr, float x, float y, float z) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (entity) entity->GetTransform()->SetLocalPosition({ x, y, z });
+        if (entity) {
+            entity->GetTransform()->SetLocalPosition({ x, y, z });
+        }
+        else {
+            Log::Error("[ScriptGlue] SetPosition: Intento de mover entidad nula/invalida.");
+        }
     }
 
     static void Transform_GetRotation_Native(MonoString* uuidStr, float* x, float* y, float* z, float* w) {
@@ -156,11 +173,19 @@ namespace Loopie {
             glm::quat rot = entity->GetTransform()->GetLocalRotation();
             *x = rot.x; *y = rot.y; *z = rot.z; *w = rot.w;
         }
+        else {
+            *x = 0; *y = 0; *z = 0; *w = 1;
+        }
     }
 
     static void Transform_SetRotation_Native(MonoString* uuidStr, float x, float y, float z, float w) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (entity) entity->GetTransform()->SetLocalRotation(glm::quat(w, x, y, z));
+        if (entity) {
+            entity->GetTransform()->SetLocalRotation(glm::quat(w, x, y, z));
+        }
+        else {
+            Log::Error("[ScriptGlue] SetRotation: Intento de rotar entidad nula/invalida.");
+        }
     }
 
     static void Transform_GetScale_Native(MonoString* uuidStr, float* x, float* y, float* z) {
@@ -169,16 +194,118 @@ namespace Loopie {
             glm::vec3 scale = entity->GetTransform()->GetLocalScale();
             *x = scale.x; *y = scale.y; *z = scale.z;
         }
+        else {
+            *x = 1; *y = 1; *z = 1;
+        }
     }
 
     static void Transform_SetScale_Native(MonoString* uuidStr, float x, float y, float z) {
         auto entity = GetEntityByUUID(uuidStr);
-        if (entity) entity->GetTransform()->SetLocalScale({ x, y, z });
+        if (entity) {
+            entity->GetTransform()->SetLocalScale({ x, y, z });
+        }
+        else {
+            Log::Error("[ScriptGlue] SetScale: Intento de escalar entidad nula/invalida.");
+        }
     }
 
+    // --- SCRIPTING ---
+    static void Entity_AddScript_Native(MonoString* uuidStr, MonoString* scriptNameStr) {
+        auto entity = GetEntityByUUID(uuidStr);
+        if (!entity) {
+            Log::Error("[ScriptGlue] Entity_AddScript: Entity no encontrada.");
+            return;
+        }
+
+        char* scriptName = mono_string_to_utf8(scriptNameStr);
+        if (!scriptName) return;
+
+        ScriptComponent* scriptComp = nullptr;
+
+        // FIX MEMORIA: Usamos Placement New también aquí para evitar basura en la RAM
+        if (entity->HasComponent<ScriptComponent>()) {
+            scriptComp = entity->GetComponent<ScriptComponent>();
+        }
+        else {
+            scriptComp = entity->AddComponent<ScriptComponent>();
+            new (scriptComp) ScriptComponent(); // <--- RESETEA LA MEMORIA 0xFF
+        }
+
+        if (scriptComp) {
+            scriptComp->SetScript(scriptName);
+        }
+        else {
+            Log::Error("[ScriptGlue] Fallo critico al crear ScriptComponent en entidad.");
+        }
+
+        mono_free(scriptName);
+    }
+
+    // --- DUPLICATION (ROBUSTO) ---
+    static MonoString* Entity_Duplicate_Native(MonoString* srcIdStr) {
+        auto srcEntity = GetEntityByUUID(srcIdStr);
+        if (!srcEntity) {
+            Log::Error("[ScriptGlue] CRITICAL: No se encontro la entidad origen (ID invalido).");
+            return nullptr;
+        }
+
+        Scene* scene = Application::GetInstance().m_scene;
+        if (!scene) {
+            Log::Error("[ScriptGlue] CRITICAL: La escena es NULL.");
+            return nullptr;
+        }
+
+        std::shared_ptr<Entity> newEntity = scene->CreateEntity(srcEntity->GetName() + "_Clone");
+        if (!newEntity) {
+            Log::Error("[ScriptGlue] CRITICAL: CreateEntity fallo (devolvio null).");
+            return nullptr;
+        }
+
+        // Copia de Transform segura
+        Transform* srcTrans = srcEntity->GetTransform();
+        Transform* dstTrans = newEntity->GetTransform();
+
+        if (srcTrans && dstTrans) {
+            dstTrans->SetLocalScale(srcTrans->GetLocalScale());
+            dstTrans->SetLocalRotation(srcTrans->GetLocalRotation());
+        }
+        else {
+            Log::Error("[ScriptGlue] Warning: Fallo al copiar Transform (uno es nulo).");
+        }
+
+        // Copia de MeshRenderer con Placement New
+        if (srcEntity->HasComponent<MeshRenderer>()) {
+            auto* destMR = newEntity->AddComponent<MeshRenderer>();
+            destMR->EnsureInitialized(); // <-- ESTO ES SEGURO (BUENO)
+            auto* srcMR = srcEntity->GetComponent<MeshRenderer>();
+            if (srcMR && destMR) {
+                if (srcMR->GetMesh()) destMR->SetMesh(srcMR->GetMesh());
+                if (srcMR->GetMaterial()) destMR->SetMaterial(srcMR->GetMaterial());
+            }
+        }
+
+        return mono_string_new(ScriptingModule::GetAppDomain(), newEntity->GetUUID().Get().c_str());
+    }
+
+    static void MeshRenderer_SetMesh_Native(MonoString* uuidStr, MonoString* meshNameStr) {
+        auto entity = GetEntityByUUID(uuidStr);
+        if (!entity) return;
+
+        char* meshName = mono_string_to_utf8(meshNameStr);
+        std::string meshPath(meshName);
+        mono_free(meshName);
+
+        if (entity->HasComponent<MeshRenderer>()) {
+            entity->GetComponent<MeshRenderer>()->SetMesh(meshPath);
+        }
+        else {
+            Log::Error("No se puede poner mesh a entidad {0} porque no tiene MeshRenderer", entity->GetName());
+        }
+    }
+
+    // --- INPUT ---
     static bool Input_IsKeyPressed_Native(int keyCode) {
         const bool* state = SDL_GetKeyboardState(NULL);
-
         if (keyCode >= 0 && keyCode < SDL_SCANCODE_COUNT) {
             return state[keyCode];
         }
@@ -204,12 +331,13 @@ namespace Loopie {
     }
 
     static bool Input_IsMouseButtonPressed_Native(int button) {
-        //return Application::GetInstance().GetInputEvent().IsMouseButtonPressed(button);
-        return true;
+        // Fix temporal: devolvemos false por defecto para evitar spam
+        // return Application::GetInstance().GetInputEvent().IsMouseButtonPressed(button);
+        return false;
     }
+
     static MonoString* Entity_Find_Native(MonoString* name) {
         if (!name) return nullptr;
-
         char* nameCStr = mono_string_to_utf8(name);
         std::string targetName(nameCStr);
         mono_free(nameCStr);
@@ -217,7 +345,6 @@ namespace Loopie {
         Scene* scene = Application::GetInstance().m_scene;
         if (!scene) return nullptr;
 
-        // Recorremos todas las entidades buscando el nombre
         for (auto& [uuid, entity] : scene->GetAllEntities()) {
             if (entity->GetName() == targetName) {
                 return mono_string_new(ScriptingModule::GetAppDomain(), uuid.Get().c_str());
@@ -225,6 +352,7 @@ namespace Loopie {
         }
         return nullptr;
     }
+
     void ScriptGlue::RegisterGlue() {
         mono_add_internal_call("Loopie.InternalCalls::Log", (void*)Log_Native);
         mono_add_internal_call("Loopie.InternalCalls::LogWarning", (void*)LogWarning_Native);
@@ -251,5 +379,8 @@ namespace Loopie {
         mono_add_internal_call("Loopie.InternalCalls::Input_GetMouseDelta", (void*)Input_GetMouseDelta_Native);
         mono_add_internal_call("Loopie.InternalCalls::Input_IsMouseButtonPressed", (void*)Input_IsMouseButtonPressed_Native);
         mono_add_internal_call("Loopie.InternalCalls::Entity_Find", (void*)Entity_Find_Native);
+        mono_add_internal_call("Loopie.InternalCalls::Entity_AddScript", (void*)Entity_AddScript_Native);
+        mono_add_internal_call("Loopie.InternalCalls::MeshRenderer_SetMesh", (void*)MeshRenderer_SetMesh_Native);
+        mono_add_internal_call("Loopie.InternalCalls::Entity_Duplicate", (void*)Entity_Duplicate_Native);
     }
 }

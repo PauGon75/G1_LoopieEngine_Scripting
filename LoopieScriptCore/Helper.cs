@@ -81,13 +81,26 @@ namespace Loopie
             }
         }
         // -------------------------------------
-
+        public void AddScript(string scriptName)
+        {
+            InternalCalls.Entity_AddScript(ID, scriptName);
+        }
+        public void SetMesh(string meshName)
+        {
+            // Esto llama a C++ para que cargue la "Sphere"
+            InternalCalls.MeshRenderer_SetMesh(ID, meshName);
+        }
         public string Name
         {
             get => InternalCalls.Entity_GetName(ID);
             set => InternalCalls.Entity_SetName(ID, value);
         }
-
+        public static Entity Instantiate(Entity original)
+        {
+            if (original == null) return null;
+            string newID = InternalCalls.Entity_Duplicate(original.ID);
+            return new Entity(newID);
+        }
         public static Entity Find(string name)
         {
             // Ensure InternalCalls.Entity_Find is defined in InternalCalls.cs

@@ -3,25 +3,51 @@ using Loopie;
 
 public class TankController : LoopieScript
 {
+    // --- Configuración de Movimiento ---
     public float MoveSpeed = 10.0f;       // Velocidad de avance
-    public float RotationSpeed = 2.5f;    // Velocidad de giro del chasis
-    public float TurretRotationSpeed = 1.0f;
+    public float RotationSpeed = 2.0f;    // Velocidad de giro del chasis
+    public float TurretRotationSpeed = 1.0f; // Sensibilidad del ratón
 
+    // --- Configuración de Disparo ---
+    public float ShootCooldown = 0.5f;    // Tiempo entre disparos
+    private float _timer = 0.0f;
+
+    // --- Referencias ---
     private Entity _turret;
-    private float _turretYaw = 0.0f;      // Ángulo de la torreta (Local)
-    private float _tankYaw = 0.0f;        // Ángulo del tanque (World/Local)
+    private Entity _bulletTemplate;       // La bala original que usaremos de molde
+
+    // --- Estado Interno ---
+    private float _tankYaw = 0.0f;        // Angulo del chasis
+    private float _turretYaw = 0.0f;      // Angulo de la torreta
 
     public override void Start()
     {
-        InternalCalls.Log("Tank Controls Activados: W/S (Motor) - A/D (Giro)");
+        InternalCalls.Log("Iniciando TankController...");
 
-        // 1. Buscamos la torreta
-        _turret = Entity.Find("Turret");
-        if (_turret != null) InternalCalls.Log("Torreta vinculada.");
+        // 1. Vincular Torreta
+        _turret = Entity.Find("TankTurret");
+        if (_turret == null)
+            InternalCalls.LogError("ERROR: No encuentro la entidad 'Turret'.");
 
-        // 2. IMPORTANTE: Leer la rotación inicial para no pegar un "salto" al empezar
-        // Asumimos que el tanque solo rota en Y. La fórmula es yaw = 2 * atan2(y, w)
+        // 2. Vincular Plantilla de Bala
+        // Busca un objeto llamado 'Bullet' (que deberías tener oculto o dentro del tanque)
+        _bulletTemplate = Entity.Find("Bullet");
+
+        if (_bulletTemplate != null)
+        {
+            // Apagamos la plantilla para que no moleste en la escena
+            _bulletTemplate.IsActive = false;
+            InternalCalls.Log("Plantilla 'Bullet' encontrada y desactivada.");
+        }
+        else
+        {
+            InternalCalls.LogError("ERROR: No encuentro la entidad 'Bullet' para usar de plantilla.");
+        }
+
+        // 3. Sincronizar rotación inicial
+        // Evita que el tanque salte a 0 grados al empezar si ya estaba rotado en el editor
         Quaternion startRot = Transform.Rotation;
+        // Formula inversa aproximada para sacar el ángulo Y del Quaternion
         _tankYaw = 2.0f * (float)Math.Atan2(startRot.Y, startRot.W);
     }
 
@@ -29,8 +55,11 @@ public class TankController : LoopieScript
     {
         if (string.IsNullOrEmpty(EntityID)) return;
 
-        // --- 1. GIRO DEL TANQUE (A/D) ---
-        // A -> Izquierda (-), D -> Derecha (+)
+        // =========================================================
+        // 1. MOVIMIENTO DEL TANQUE (Estilo Tanque Real)
+        // =========================================================
+
+        // GIRO (A/D)
         if (Input.GetKey(KeyCode.A)) _tankYaw -= RotationSpeed * dt;
         if (Input.GetKey(KeyCode.D)) _tankYaw += RotationSpeed * dt;
 
@@ -40,12 +69,9 @@ public class TankController : LoopieScript
         float tankCos = (float)Math.Cos(tankHalf);
         Transform.Rotation = new Quaternion(0, tankSin, 0, tankCos);
 
-        // --- 2. AVANCE DEL TANQUE (W/S) ---
-        // Calculamos el vector "Forward" (Hacia adelante) basado en el ángulo actual
-        // En matemáticas estándar (y Unity/OpenGL), si 0º es Z+, entonces:
-        // X = sin(angle), Z = cos(angle)
+        // AVANCE (W/S)
+        // Calculamos el vector "Hacia Adelante" basado en el ángulo actual
         Vector3 forward = new Vector3((float)Math.Sin(_tankYaw), 0, (float)Math.Cos(_tankYaw));
-
         Vector3 currentPos = Transform.Position;
         bool moved = false;
 
@@ -62,8 +88,9 @@ public class TankController : LoopieScript
 
         if (moved) Transform.Position = currentPos;
 
-        // --- 3. GIRO DE LA TORRETA (Ratón) ---
-        // La torreta gira independientemente sobre el chasis
+        // =========================================================
+        // 2. MOVIMIENTO DE LA TORRETA (Independiente)
+        // =========================================================
         if (_turret != null)
         {
             Vector2 mouseDelta = Input.MouseDelta;
@@ -73,7 +100,57 @@ public class TankController : LoopieScript
             float turretSin = (float)Math.Sin(turretHalf);
             float turretCos = (float)Math.Cos(turretHalf);
 
+            // Solo aplicamos rotación local. La posición la hereda del tanque.
             _turret.Transform.Rotation = new Quaternion(0, turretSin, 0, turretCos);
         }
+
+        // =========================================================
+        // 3. DISPARO
+        // =========================================================
+        _timer -= dt;
+        if (Input.GetKey(KeyCode.Space) && _timer <= 0)
+        {
+            Shoot();
+            _timer = ShootCooldown;
+        }
+    }
+
+    void Shoot()
+    {
+        // Validaciones de seguridad
+        if (_turret == null) return;
+        if (_bulletTemplate == null) return;
+
+        // 1. INSTANCIAR (CLONAR)
+        // Crea una copia exacta de la plantilla (mesh, material, escala...)
+        Entity newBullet = Entity.Instantiate(_bulletTemplate);
+        if (newBullet == null) return;
+
+        // 2. ACTIVAR
+        // Como la plantilla estaba apagada, la copia nace apagada. La encendemos.
+        newBullet.IsActive = true;
+
+        // 3. AÑADIR LOGICA
+        // Le pegamos el script que hace que se mueva hacia adelante
+        newBullet.AddScript("Bullet");
+
+        // 4. POSICIONAR EN LA PUNTA DEL CAÑÓN
+        // Calculamos el vector Forward de la torreta para saber dónde es "adelante"
+        Quaternion rot = _turret.Transform.Rotation;
+
+        // Formula matemática para vector Forward desde Quaternion
+        float fx = 2 * (rot.X * rot.Z + rot.W * rot.Y);
+        float fy = 2 * (rot.Y * rot.Z - rot.W * rot.X);
+        float fz = 1 - 2 * (rot.X * rot.X + rot.Y * rot.Y);
+        Vector3 turretForward = new Vector3(fx, fy, fz);
+
+        // Posicion: Centro de torreta + 3 metros hacia adelante
+        Vector3 spawnPos = _turret.Transform.Position + (turretForward * 3.0f);
+
+        // Ajuste de altura (opcional, por si el cañón está alto)
+        spawnPos.Y += 0.5f;
+
+        newBullet.Transform.Position = spawnPos;
+        newBullet.Transform.Rotation = rot; // Sale con la misma rotación que la torreta
     }
 }

@@ -19,10 +19,6 @@ namespace Loopie {
 		if (GetOwner() && GetTransform())
 			GetTransform()->m_transformNotifier.RemoveObserver(this);
 
-		if (m_mesh)
-			m_mesh->DecrementReferenceCount();
-		if (m_material)
-			m_material->DecrementReferenceCount();
 	}
 
 	void MeshRenderer::Init()
@@ -55,17 +51,43 @@ namespace Loopie {
 			///
 		}
 	}
+	void MeshRenderer::EnsureInitialized()
+	{
+		// TRUCO MAESTRO:
+		// Solo "limpiamos" los smart pointers si contienen basura (0xFF)
+		// Usamos placement new SOLO en los miembros, no en 'this'.
 
+		// Si m_mesh es basura, lo reiniciamos a nullptr limpiamente
+		if ((void*)m_mesh.get() == (void*)0xFFFFFFFFFFFFFFFF) {
+			new (&m_mesh) std::shared_ptr<Mesh>();
+		}
+
+		// Lo mismo para el material
+		if ((void*)m_material.get() == (void*)0xFFFFFFFFFFFFFFFF) {
+			new (&m_material) std::shared_ptr<Material>();
+		}
+
+		// Inicializamos bools por si acaso
+		m_boundingBoxesDirty = true;
+	}
 	void MeshRenderer::SetMesh(std::shared_ptr<Mesh> mesh)
 	{
-		if (m_mesh)
-			m_mesh->DecrementReferenceCount();
+		// Solo asignalo. shared_ptr gestiona el conteo de referencias viejo y nuevo.
 		m_mesh = mesh;
-		if (m_mesh)
-			m_mesh->IncrementReferenceCount();
 		SetBoundingBoxesDirty();
 	}
+	void MeshRenderer::SetMesh(const std::string& meshPath)
+	{
+		// Intenta buscar el metadata del asset
+		Metadata* meta = AssetRegistry::GetMetadata(meshPath);
 
+		if (meta) {
+			SetMesh(ResourceManager::GetMesh(*meta, 0));
+		}
+		else {
+			Log::Debug("MeshRenderer: No se encontro el mesh '{0}'", meshPath);
+		}
+	}
 	void MeshRenderer::SetMaterial(std::shared_ptr<Material> material)
 	{
 		if(m_material)

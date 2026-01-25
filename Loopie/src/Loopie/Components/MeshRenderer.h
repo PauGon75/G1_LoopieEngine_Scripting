@@ -21,12 +21,12 @@ namespace Loopie {
 		~MeshRenderer();
 		void Init() override; //// From Component
 		void OnNotify(const TransformNotification& id) override;
-
+		std::shared_ptr<Mesh> GetMesh() const { return m_mesh; }
+		std::shared_ptr<Material> GetMaterial() const { return m_material; }
 		void RenderGizmo() override;
-		
-		std::shared_ptr<Mesh> GetMesh() { return m_mesh; }
+		void EnsureInitialized();
 		void SetMesh(std::shared_ptr<Mesh> mesh);
-
+		void SetMesh(const std::string& meshPath);
 		std::shared_ptr<Material> GetMaterial();
 		void SetMaterial(std::shared_ptr <Material> material);
 		
