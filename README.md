@@ -16,6 +16,8 @@ LoopieEngine is a video game engine created by Adrià García, Ana Alcazar and P
 <img src="./images/CuteTeamGameEngines.jpg" style="width: 500px;">
 </div>
 
+**Individual work of each member:** [TaskList](https://docs.google.com/spreadsheets/d/1SdDNdTcWUb7oJugyaaYaRzsubqppoDt9VPHvI7UfRxA/edit?usp=drive_link) [TODO: Hay que poner el link del pdf cuando acabemos el TaskList]
+
 ## Main Core Systems
 
 **1. Scripting:** Provides gameplay logic through C# scripts executed via the Mono runtime. It allows entities to define behavior, access engine functionality, and respond to lifecycle events such as creation and updates.
@@ -56,12 +58,40 @@ As our group was in charge of implementing the Scripting System, we decided to i
 
 Our system uses all of this subsystems, including Hot Reload and the Text Editor. With our Scripting System, users are able to create and manage scripts as resources, add them to the different entities and edit them within the editor. You can see an example of the functionalities in the tank script. With this script you can move a tank with the keyboard and rotate the turret with the mouse around the scene. The tank shoots bullets (which are new entities).
 
-[gif de editor]
+[TODO: gif de editor]
 
-[gif de in-game]
+[TODO: gif de in-game]
 
-### GitHub Repository
+[TODO: video final]
 
-### Final Release
+## GitHub Repository
 
-### License
+[G1_LoopieEngine_Scripting](https://github.com/PauGon75/G1_LoopieEngine_Scripting)
+
+## Final Release
+
+[GitHub Release](https://github.com/PauGon75/G1_LoopieEngine_Scripting/releases) [TODO: Cambiar link cuando tengamos release]
+
+## License
+
+MIT License
+
+Copyright (c) 2025 CITM - UPC
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
