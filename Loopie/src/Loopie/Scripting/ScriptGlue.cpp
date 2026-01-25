@@ -7,6 +7,7 @@
 #include "Loopie/Components/MeshRenderer.h"
 #include "Loopie/Components/Camera.h"
 #include <mono/metadata/object.h>
+#include <SDL3/SDL.h>
 
 namespace Loopie {
 
@@ -176,7 +177,12 @@ namespace Loopie {
     }
 
     static bool Input_IsKeyPressed_Native(int keyCode) {
-        return Application::GetInstance().GetInputEvent().GetKeyStatus((SDL_Scancode)keyCode) == KeyState::DOWN;
+        const bool* state = SDL_GetKeyboardState(NULL);
+
+        if (keyCode >= 0 && keyCode < SDL_SCANCODE_COUNT) {
+            return state[keyCode];
+        }
+        return false;
     }
 
     static bool Input_IsKeyDown_Native(int keyCode) {

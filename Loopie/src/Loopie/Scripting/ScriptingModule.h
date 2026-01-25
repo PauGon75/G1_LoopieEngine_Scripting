@@ -20,6 +20,11 @@ namespace Loopie {
         void OnUnload() override;
 
         static void CheckForScriptChanges();
+
+        // --- NUEVO: Función para sincronizar Assets -> Core ---
+        static void SyncScriptsFromAssetsToCore();
+        // ------------------------------------------------------
+
         static void ReloadAssembly();
         static void LoadCoreAssembly();
         void InitializeScriptInstance(MonoObject* instance, const std::string& uuid);
@@ -36,18 +41,17 @@ namespace Loopie {
 
         static std::unordered_map<std::string, std::filesystem::file_time_type> m_FileWatchMap;
         float m_WatcherTimer = 0.0f;
-        const float m_WatcherInterval = 2.0f;
+        const float m_WatcherInterval = 1.0f; // He bajado esto a 1s para que sea más rápido
 
         static std::vector<std::string> GetAvailableScripts();
 
-        //TODO CHANGE PATH
-
         static std::string GetScriptsPath() {
-            return "../../../Projects/Scripting Project/Assets/Scenes/a/Assets/Scripts";
+            // Ajusta esto si tu ruta real es distinta
+            return "../../../Assets/Scripts";
         }
+
         static void CreateScriptAsset(const std::filesystem::path& directory, const std::string& name);
     private:
         static ScriptingModule* s_Instance;
     };
-
 }

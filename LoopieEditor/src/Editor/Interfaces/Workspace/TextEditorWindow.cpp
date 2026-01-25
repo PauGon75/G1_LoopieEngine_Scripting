@@ -1,8 +1,10 @@
 #include "TextEditorWindow.h"
 #include "Loopie/Core/Log.h"
+#include "Loopie/Scripting/ScriptingModule.h" // NECESARIO para recargar
 #include <imgui.h>
 #include <fstream>
 #include <sstream>
+#include <filesystem> // NECESARIO para manejar rutas
 
 namespace Loopie
 {
@@ -78,7 +80,6 @@ namespace Loopie
             ImGui::EndMenuBar();
         }
 
-        // El editor necesita TODO el espacio disponible
         m_editor.Render("##TextEditorContent");
 
         if (m_editor.IsTextChanged())
@@ -128,22 +129,55 @@ namespace Loopie
         SDL_StartTextInput(Application::GetInstance().GetWindow().GetSDLWindow());
     }
 
+    // --- AQUI ESTA LA MAGIA DE GUARDADO ---
     void TextEditorWindow::SaveFile()
     {
         if (m_currentFile.empty())
         {
-            // Debería abrir save as dialog
+            // Debería abrir save as dialog (no implementado aquí)
             return;
         }
 
-        std::ofstream file(m_currentFile);
-        if (!file.is_open())
+        std::string content = m_editor.GetText();
+
+        // 1. Guardar en la ubicación original (Assets/Scripts/...)
         {
-            Log::Error("Failed to save file: {0}", m_currentFile);
-            return;
+            std::ofstream file(m_currentFile);
+            if (!file.is_open())
+            {
+                Log::Error("Failed to save file: {0}", m_currentFile);
+                return;
+            }
+            file << content;
+            file.close();
         }
 
-        file << m_editor.GetText();
+        // 2. Guardar copia en LoopieScriptCore para compilar
+        // Solo hacemos esto si es un script de C#
+        if (m_currentFile.find(".cs") != std::string::npos)
+        {
+            std::filesystem::path originalPath(m_currentFile);
+            std::string filename = originalPath.filename().string();
+
+            // Ruta relativa a la carpeta Core (ajusta si tu estructura es distinta)
+            std::filesystem::path corePath = "../../../LoopieScriptCore/" + filename;
+
+            std::ofstream coreFile(corePath);
+            if (coreFile.is_open())
+            {
+                coreFile << content;
+                coreFile.close();
+                Log::Info("Editor: Sincronizado {0} con LoopieScriptCore.", filename);
+
+                // 3. Forzar recarga inmediata en el motor
+                ScriptingModule::CheckForScriptChanges();
+            }
+            else
+            {
+                Log::Error("Editor: Fallo al copiar script a Core: {0}", corePath.string());
+            }
+        }
+
         m_hasUnsavedChanges = false;
     }
 
@@ -194,7 +228,6 @@ namespace Loopie
 
     void TextEditorWindow::HandleShortcuts()
     {
-
         ImGuiIO& io = ImGui::GetIO();
         bool ctrl = io.KeyCtrl;
         bool shift = io.KeyShift;
@@ -203,7 +236,7 @@ namespace Loopie
             SaveFile();
         else if (ctrl && shift && ImGui::IsKeyPressed(ImGuiKey_S))
         {
-            // Save As
+            // Save As - Pendiente
         }
         else if (ctrl && ImGui::IsKeyPressed(ImGuiKey_N))
             NewFile();

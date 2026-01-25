@@ -7,7 +7,7 @@ public class TestScript
     void Start()
     {
         // Enviamos un mensaje a la consola de C++ a través de nuestro Glue
-        InternalCalls.Log("¡TestScript iniciado desde C#!");
+        InternalCalls.Log("¡TestScript C#!");
 
         // Creamos una entidad en la escena de C++
         Entity.Create("Entidad_Desde_CSharp");
@@ -20,5 +20,8 @@ public class TestScript
         //TEST EDITOR WORKS!!!!!
     }
 }
+
+
+
 
 
