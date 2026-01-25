@@ -228,7 +228,7 @@ namespace Loopie {
         }
         else {
             scriptComp = entity->AddComponent<ScriptComponent>();
-            new (scriptComp) ScriptComponent(); // <--- RESETEA LA MEMORIA 0xFF
+            scriptComp->EnsureInitialized();
         }
 
         if (scriptComp) {

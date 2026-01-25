@@ -32,7 +32,17 @@ namespace Loopie {
     ScriptComponent::~ScriptComponent() {
         m_instance = nullptr;
     }
+    void ScriptComponent::EnsureInitialized()
+    {
+        // NO LEAS la memoria (no uses .c_str() ni comparaciones).
+        // Simplemente reconstruye los objetos.
 
+        // 1. Resetea el string
+        new (&m_scriptName) std::string();
+
+        // 2. Resetea la instancia (asumiendo que es un puntero o similar)
+        m_instance = nullptr;
+    }
     void ScriptComponent::Init() {
         // 1. Aseguramos que el script esté cargado
         if (!m_scriptName.empty() && !m_instance) {
