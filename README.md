@@ -58,11 +58,12 @@ As our group was in charge of implementing the Scripting System, we decided to i
 
 Our system uses all of this subsystems, including Hot Reload and the Text Editor. With our Scripting System, users are able to create and manage scripts as resources, add them to the different entities and edit them within the editor. You can see an example of the functionalities in the tank script. With this script you can move a tank with the keyboard and rotate the turret with the mouse around the scene. The tank shoots bullets (which are new entities).
 
-[TODO: gif de editor]
+![ezgif-88e91b2a242759c9](https://github.com/user-attachments/assets/f4ef01d9-f8b4-4271-b112-69ef70558196)
 
-[TODO: gif de in-game]
+![ezgif-86896126e2ea963f](https://github.com/user-attachments/assets/058eaf0b-646e-464d-90e7-dbbecd2a3874)
 
-[TODO: video final]
+https://github.com/user-attachments/assets/8f0363ed-962b-4e40-b658-5105081a3a50
+
 
 ## GitHub Repository
 
