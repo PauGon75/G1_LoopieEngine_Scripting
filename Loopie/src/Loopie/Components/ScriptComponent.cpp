@@ -2,7 +2,13 @@
 #include "Loopie/Core/Log.h"
 #include <mono/metadata/reflection.h>
 #include "Loopie/Scripting/ScriptingModule.h"
+#include <mono/jit/jit.h>
+#include <mono/metadata/debug-helpers.h>
+#include <mono/metadata/attrdefs.h>
 
+#include <imgui.h>       
+#include <glm/glm.hpp>   
+#include <glm/gtc/type_ptr.hpp>
 extern MonoImage* g_GameAssemblyImage;
 
 namespace Loopie {
@@ -119,6 +125,60 @@ namespace Loopie {
         if (data.Contains("ScriptName")) {
             auto result = data.GetValue<std::string>("ScriptName");
             if (result.Found) SetScript(result.Result);
+        }
+    }
+
+
+    void ScriptComponent::OnImGuiRender()
+    {
+        if (!m_instance) return;
+
+        MonoClass* klass = mono_object_get_class(m_instance);
+        void* iter = nullptr;
+        MonoClassField* field;
+
+        while ((field = mono_class_get_fields(klass, &iter)))
+        {
+            uint32_t flags = mono_field_get_flags(field);
+            if ((flags & MONO_FIELD_ATTR_PUBLIC) == 0) continue;
+
+            const char* fieldName = mono_field_get_name(field);
+            MonoType* type = mono_field_get_type(field);
+            int typeEnum = mono_type_get_type(type);
+
+            if (typeEnum == MONO_TYPE_R4)
+            {
+                float value = 0.0f;
+                mono_field_get_value(m_instance, field, &value);
+                if (ImGui::DragFloat(fieldName, &value, 0.1f))
+                    mono_field_set_value(m_instance, field, &value);
+            }
+            else if (typeEnum == MONO_TYPE_I4)
+            {
+                int value = 0;
+                mono_field_get_value(m_instance, field, &value);
+                if (ImGui::DragInt(fieldName, &value))
+                    mono_field_set_value(m_instance, field, &value);
+            }
+            else if (typeEnum == MONO_TYPE_BOOLEAN)
+            {
+                bool value = false;
+                mono_field_get_value(m_instance, field, &value);
+                if (ImGui::Checkbox(fieldName, &value))
+                    mono_field_set_value(m_instance, field, &value);
+            }
+            else if (typeEnum == MONO_TYPE_VALUETYPE)
+            {
+                char* typeName = mono_type_get_name(type);
+                if (std::string(typeName).find("Vector3") != std::string::npos)
+                {
+                    glm::vec3 value;
+                    mono_field_get_value(m_instance, field, &value);
+                    if (ImGui::DragFloat3(fieldName, glm::value_ptr(value), 0.1f))
+                        mono_field_set_value(m_instance, field, &value);
+                }
+                mono_free(typeName);
+            }
         }
     }
 }

@@ -25,14 +25,15 @@ namespace Loopie {
         void SetScript(const std::string& name);
         const std::string& GetScriptName() const { return m_scriptName; }
         bool IsBound() const { return m_isBound; }
-
+        void OnImGuiRender();
+        void EnsureInitialized();
     private:
         std::string m_scriptName;
         MonoClass* m_scriptClass = nullptr;
         MonoObject* m_instance = nullptr;
+
         MonoMethod* m_startMethod = nullptr;
         MonoMethod* m_updateMethod = nullptr;
-
         bool m_startCalled = false;
         bool m_isBound = false;
     };

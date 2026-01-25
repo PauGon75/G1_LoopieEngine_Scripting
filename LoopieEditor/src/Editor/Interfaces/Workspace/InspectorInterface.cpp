@@ -474,26 +474,44 @@ namespace Loopie {
 	}
 	void InspectorInterface::DrawScriptComponent(ScriptComponent* script) {
 		ImGui::PushID(script);
-		if (ImGui::CollapsingHeader("Scripting Component", ImGuiTreeNodeFlags_DefaultOpen)) {
 
+		// 1. PRIMERO: Dibujamos la cabecera (El "Item" visual)
+		bool open = ImGui::CollapsingHeader("Scripting Component", ImGuiTreeNodeFlags_DefaultOpen);
+
+		// 2. SEGUNDO: Comprobamos el click derecho SOBRE la cabecera que acabamos de dibujar
+		if (RemoveComponent(script)) {
+			ImGui::PopID();
+			return; // Si se borra, nos vamos para no dibujar sobre memoria muerta
+		}
+
+		// 3. TERCERO: Si la cabecera está abierta, dibujamos el contenido
+		if (open) {
 			char buffer[256];
 			strncpy_s(buffer, script->GetScriptName().c_str(), sizeof(buffer) - 1);
 
 			if (ImGui::InputText("Class Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue)) {
-				script->SetScript(std::string(buffer)); // Solo se activa al pulsar ENTER
+				script->SetScript(std::string(buffer));
 			}
 
-			// --- COMPROBACIÓN VISUAL ---
+			// Estado visual
 			if (script->GetScriptName().empty()) {
 				ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Status: Empty");
 			}
 			else if (script->IsBound()) {
-				ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: SCRIPT BOUND"); // Verde
+				ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: SCRIPT BOUND");
 			}
 			else {
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Status: INVALID CLASS (Check DLL)"); // Rojo
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Status: INVALID CLASS (Check DLL)");
+			}
+
+			ImGui::Separator();
+
+			// Reflexión de variables
+			if (script->IsBound()) {
+				script->OnImGuiRender();
 			}
 		}
+
 		ImGui::PopID();
 	}
 }
