@@ -18,3 +18,5 @@ C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScr
 C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\net48\LoopieScriptProject.sourcelink.json
 C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\net48\Loopie.Core.dll
 C:\Users\Judit\Documents\Github_Repositories\G1_LoopieEngine_Scripting\LoopieScriptCore\obj\Debug\net48\Loopie.Core.pdb
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Assets\Scripts\net48\Loopie.Core.dll
+C:\Users\paugo\Documents\GitHub\Engine\G1_LoopieEngine_Scripting\Assets\Scripts\net48\Loopie.Core.pdb

@@ -20,6 +20,7 @@ namespace Loopie {
         void OnUnload() override;
 
         static void CheckForScriptChanges();
+        bool CompileCsProject();
 
         static void SyncScriptsFromAssetsToCore();
 

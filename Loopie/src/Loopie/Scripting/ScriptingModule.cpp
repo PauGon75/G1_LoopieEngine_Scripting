@@ -4,10 +4,15 @@
 #include "Loopie/Scene/Scene.h"
 #include "Loopie/Components/ScriptComponent.h"
 #include "ScriptGlue.h"
+
 #include <mono/metadata/mono-config.h>
 #include <mono/metadata/debug-helpers.h>
+#include <mono/metadata/assembly.h>
+
 #include <filesystem>
 #include <fstream>
+#include <vector>
+#include <cstdlib>
 
 MonoImage* g_GameAssemblyImage = nullptr;
 namespace fs = std::filesystem;
@@ -21,6 +26,22 @@ namespace Loopie {
     MonoAssembly* ScriptingModule::m_CoreAssembly = nullptr;
 
     std::unordered_map<std::string, std::filesystem::file_time_type> ScriptingModule::m_FileWatchMap{};
+
+    static std::vector<char> ReadFileBinary(const std::filesystem::path& filepath)
+    {
+        std::ifstream file(filepath, std::ios::binary | std::ios::ate);
+        if (!file)
+            return {};
+
+        std::streamsize size = file.tellg();
+        file.seekg(0, std::ios::beg);
+
+        std::vector<char> buffer(size);
+        if (file.read(buffer.data(), size))
+            return buffer;
+
+        return {};
+    }
 
     void ScriptingModule::OnLoad() {
         if (!m_RootDomain) {
@@ -57,12 +78,31 @@ namespace Loopie {
         mono_domain_set(m_AppDomain, true);
 
         std::string scriptDllPath = "../../../Assets/Scripts/Loopie.Core.dll";
+        
         if (fs::exists(scriptDllPath)) {
-            m_CoreAssembly = mono_domain_assembly_open(m_AppDomain, scriptDllPath.c_str());
-            if (m_CoreAssembly) {
-                m_AssemblyImage = mono_assembly_get_image(m_CoreAssembly);
-                g_GameAssemblyImage = m_AssemblyImage;
-                ScriptGlue::RegisterGlue();
+            
+            std::vector<char> fileData = ReadFileBinary(scriptDllPath);
+            
+            if (!fileData.empty()) {
+                MonoImageOpenStatus status;
+                m_AssemblyImage = mono_image_open_from_data_full(fileData.data(), fileData.size(), true, &status, false);
+
+                if (status != MONO_IMAGE_OK) {
+                    Log::Error("Fallo al abrir la imagen de Mono desde memoria: {0}", scriptDllPath);
+                    return;
+                }
+
+                m_CoreAssembly = mono_assembly_load_from_full(m_AssemblyImage, scriptDllPath.c_str(), &status, false);
+                
+                if (m_CoreAssembly) {
+                    g_GameAssemblyImage = m_AssemblyImage;
+                    ScriptGlue::RegisterGlue();
+                    Log::Info("Script Assembly cargado correctamente desde memoria.");
+                }
+                else {
+                    Log::Error("Fallo al cargar el Assembly desde la imagen.");
+                    mono_image_close(m_AssemblyImage); 
+                }
             }
         }
         else {
@@ -70,11 +110,36 @@ namespace Loopie {
         }
     }
 
+    bool ScriptingModule::CompileCsProject() {
+        std::string projectPath = "../../../LoopieScriptCore/LoopieScriptProject.csproj"; 
+
+        if (!fs::exists(projectPath)) {
+            projectPath = "../../Assets/Scripts/Loopie.Core.csproj"; 
+            if (!fs::exists(projectPath)) {
+                 Log::Error("No encuentro el .csproj para compilar en: {0}", projectPath);
+                 return false;
+            }
+        }
+
+        Log::Warn("Compilando scripts C#...");
+        
+        std::string command = "dotnet build \"" + projectPath + "\" -c Debug > nul";
+        
+        int result = std::system(command.c_str());
+
+        if (result == 0) {
+            Log::Info("Compilacion Exitosa.");
+            return true;
+        } else {
+            Log::Error("Error de compilacion en los scripts C#.");
+            return false;
+        }
+    }
+
     void ScriptingModule::InitializeScriptInstance(MonoObject* instance, const std::string& uuid) {
         if (!instance) return;
 
         MonoClass* monoClass = mono_object_get_class(instance);
-
         MonoClassField* idField = mono_class_get_field_from_name(monoClass, "EntityID");
 
         if (!idField) {
@@ -94,7 +159,9 @@ namespace Loopie {
     }
 
     void ScriptingModule::ReloadAssembly() {
+        Log::Warn("Recargando Assembly...");
         LoadCoreAssembly();
+        
         Scene* activeScene = Application::GetInstance().m_scene;
         if (activeScene) {
             for (auto& [uuid, entity] : activeScene->GetAllEntities()) {
@@ -148,7 +215,8 @@ namespace Loopie {
         std::string scriptsPath = R"(../../../LoopieScriptCore)";
         if (!fs::exists(scriptsPath)) return;
 
-        bool needsReload = false;
+        bool detectedChange = false;
+        
         for (auto& entry : fs::recursive_directory_iterator(scriptsPath)) {
             if (entry.path().extension() == ".cs") {
                 std::string pathStr = entry.path().string();
@@ -158,13 +226,15 @@ namespace Loopie {
                     currentWriteTime > m_FileWatchMap[pathStr])
                 {
                     m_FileWatchMap[pathStr] = currentWriteTime;
-                    needsReload = true;
+                    detectedChange = true;
                 }
             }
         }
 
-        if (needsReload) {
-            ReloadAssembly();
+        if (detectedChange) {
+            if (s_Instance && s_Instance->CompileCsProject()) {
+                ReloadAssembly();
+            }
         }
     }
 

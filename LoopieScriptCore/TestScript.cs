@@ -7,10 +7,10 @@ public class TestScript
     void Start()
     {
 
-        InternalCalls.Log("¡TestScript C#!");
+        InternalCalls.Log("¡ C#!");
 
 
-        Entity.Create("Entidad_Desde_CSharp");
+        Entity.Create("ayuda");
     }
 
 
