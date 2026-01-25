@@ -8,4 +8,16 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<NuGetAudit>false</NuGetAudit>
 	</PropertyGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Message Text="Copiando DLL al motor..." Importance="high" />
+
+		<Copy SourceFiles="$(TargetDir)$(TargetName).dll"
+			  DestinationFolder="../Assets/Scripts"
+			  OverwriteReadOnlyFiles="true" />
+
+		<Copy SourceFiles="$(TargetDir)$(TargetName).pdb"
+			  DestinationFolder="../Assets/Scripts"
+			  OverwriteReadOnlyFiles="true" />
+	</Target>
+
 </Project>
